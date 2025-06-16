@@ -138,7 +138,7 @@ function App() {
 | Static Items | ✅ | ✅ | Full support |
 | Bounded Movement | ✅ | ✅ | Keep items in bounds |
 | **Layout Options** |
-| Responsive Breakpoints | ✅ | 🚧 | Coming soon |
+| Responsive Breakpoints | ✅ | ✅ | Full support with ResponsiveGridContainer |
 | Persist Layout | ✅ | ✅ | Via onLayoutChange |
 | Min/Max Dimensions | ✅ | ✅ | Full support |
 | Prevent Collision | ✅ | ✅ | Full support |
@@ -147,7 +147,7 @@ function App() {
 | Layout Change | ✅ | ✅ | Full support |
 | Drag Events | ✅ | ✅ | Start, move, stop |
 | Resize Events | ✅ | ✅ | Start, resize, stop |
-| Drop from Outside | ✅ | 🚧 | Coming soon |
+| Drop from Outside | ✅ | ✅ | Full support with DroppableGridContainer |
 | **Styling** |
 | CSS-in-JS | ✅ | ❌ | Uses Tailwind |
 | Custom Classes | ✅ | ✅ | Full support |
@@ -183,6 +183,40 @@ const items = [
   { id: '1', x: 0, y: 0, w: 4, h: 2, static: true }, // This item cannot be moved
   { id: '2', x: 4, y: 0, w: 4, h: 2 },
 ]
+```
+
+### Responsive Breakpoints
+
+```tsx
+import { ResponsiveGridContainer } from 'tailwind-grid-layout'
+
+const layouts = {
+  lg: [{ id: '1', x: 0, y: 0, w: 3, h: 2 }],
+  md: [{ id: '1', x: 0, y: 0, w: 6, h: 2 }],
+  sm: [{ id: '1', x: 0, y: 0, w: 12, h: 2 }],
+}
+
+<ResponsiveGridContainer
+  layouts={layouts}
+  breakpoints={{ lg: 1200, md: 768, sm: 480 }}
+  cols={{ lg: 12, md: 8, sm: 4 }}
+>
+  {(item) => <div>Responsive Item {item.id}</div>}
+</ResponsiveGridContainer>
+```
+
+### Drag and Drop from Outside
+
+```tsx
+import { DroppableGridContainer } from 'tailwind-grid-layout'
+
+<DroppableGridContainer
+  items={items}
+  onDrop={(newItem) => setItems([...items, newItem])}
+  droppingItem={{ w: 2, h: 2 }} // Default size for dropped items
+>
+  {(item) => <div>Dropped Item {item.id}</div>}
+</DroppableGridContainer>
 ```
 
 ### Custom Resize Handles
@@ -269,7 +303,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## License
 
-MIT © [Your Name]
+MIT © [Seungwoo, Lee](./LICENSE)
 
 ## Acknowledgments
 

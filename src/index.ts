@@ -1,7 +1,11 @@
 export { GridContainer } from './components/GridContainer'
+export { ResponsiveGridContainer } from './components/ResponsiveGridContainer'
+export { DroppableGridContainer } from './components/DroppableGridContainer'
 export { GridItemComponent } from './components/GridItem'
 export { ResizeHandle } from './components/ResizeHandle'
 
 export * from './types'
 export * from './utils/grid'
 export { cn } from './utils/cn'
+export type { ResponsiveGridContainerProps, BreakpointLayouts } from './components/ResponsiveGridContainer'
+export type { DroppableGridContainerProps } from './components/DroppableGridContainer'
