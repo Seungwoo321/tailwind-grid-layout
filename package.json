@@ -1,0 +1,81 @@
+{
+  "name": "tailwind-grid-layout",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "A modern, Tailwind CSS-based grid layout system for React. A lightweight alternative to react-grid-layout with full feature parity.",
+  "keywords": [
+    "react",
+    "grid",
+    "layout",
+    "tailwind",
+    "tailwindcss",
+    "drag",
+    "drop",
+    "resize",
+    "responsive",
+    "react-grid-layout"
+  ],
+  "homepage": "https://github.com/yourusername/tailwind-grid-layout",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/tailwind-grid-layout.git"
+  },
+  "license": "MIT",
+  "author": "Your Name",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc --noEmit && tsc -p tsconfig.build.json && vite build",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest --coverage",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/coverage-v8": "^3.2.2",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^9.28.0",
+    "postcss": "^8.4.33",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.8.3",
+    "vite": "^5.0.12",
+    "vite-plugin-css-injected-by-js": "^3.5.2",
+    "vite-plugin-dts": "^3.7.2",
+    "vitest": "^3.2.2"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "tailwindcss": ">=3.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
