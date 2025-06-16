@@ -3,7 +3,7 @@
 A modern, lightweight grid layout system for React built with Tailwind CSS. A powerful alternative to react-grid-layout with full feature parity and a smaller bundle size.
 
 [![npm version](https://img.shields.io/npm/v/tailwind-grid-layout.svg)](https://www.npmjs.com/package/tailwind-grid-layout)
-[![license](https://img.shields.io/npm/l/tailwind-grid-layout.svg)](https://github.com/yourusername/tailwind-grid-layout/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/tailwind-grid-layout.svg)](https://github.com/Seungwoo321/tailwind-grid-layout/blob/main/LICENSE)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/tailwind-grid-layout)](https://bundlephobia.com/package/tailwind-grid-layout)
 
 ## Features
@@ -28,8 +28,25 @@ pnpm add tailwind-grid-layout
 
 ### Prerequisites
 
-- React 16.8+ or 18+
-- Tailwind CSS 3.0+
+- React 19.1.0
+- Tailwind CSS 4.1.8+ (v4 only - CSS-first configuration)
+- Node.js 20.0.0+
+- pnpm 10.11.0+
+
+## Tailwind CSS v4 Setup
+
+This library requires Tailwind CSS v4 with its new CSS-first configuration approach. No JavaScript configuration file is needed.
+
+```css
+/* In your main CSS file */
+@import "tailwindcss";
+
+/* Optional: Add custom theme configuration */
+@theme {
+  --color-grid-placeholder: oklch(0.7 0.15 210);
+  --color-grid-handle: oklch(0.3 0.05 210);
+}
+```
 
 ## Quick Start
 
