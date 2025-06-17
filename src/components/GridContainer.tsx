@@ -2,15 +2,9 @@
 
 import React, { useRef, useState, useCallback, useEffect } from 'react'
 import { cn } from '../utils/cn'
-import { GridConfig, GridItem, DragState, ResizeState } from '../types'
-import { getPixelPosition, calculateGridPosition, findFreeSpace, compactLayout, moveItems, getAllCollisions } from '../utils/grid'
+import { GridItem, DragState, ResizeState, GridContainerProps } from '../types'
+import { getPixelPosition, calculateGridPosition, compactLayout, moveItems, getAllCollisions } from '../utils/grid'
 import { GridItemComponent } from './GridItem'
-
-interface GridContainerProps extends GridConfig {
-  items: GridItem[]
-  children: (item: GridItem) => React.ReactNode
-  className?: string
-}
 
 export const GridContainer: React.FC<GridContainerProps> = ({
   cols = 12,
@@ -24,7 +18,6 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   preventCollision = false,
   allowOverlap = false,
   isBounded = true,
-  verticalCompact = true,
   compactType = 'vertical',
   resizeHandles = ['se'],
   draggableCancel,
@@ -35,7 +28,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   onResizeStart,
   onResize,
   onResizeStop,
-  onDrop,
+  onDrop: _onDrop,
   items,
   children,
   className

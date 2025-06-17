@@ -6,6 +6,8 @@ A modern, lightweight grid layout system for React built with Tailwind CSS. A po
 [![license](https://img.shields.io/npm/l/tailwind-grid-layout.svg)](https://github.com/Seungwoo321/tailwind-grid-layout/blob/main/LICENSE)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/tailwind-grid-layout)](https://bundlephobia.com/package/tailwind-grid-layout)
 
+> English | [한국어](./README.ko.md)
+
 ## Features
 
 - 🎯 **Full Feature Parity** with react-grid-layout

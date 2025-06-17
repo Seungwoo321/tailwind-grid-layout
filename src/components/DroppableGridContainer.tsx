@@ -56,15 +56,18 @@ export function DroppableGridContainer({
       const relativeY = e.clientY - rect.top
 
       // Calculate grid units
-      const cellWidth = rect.width / props.cols
-      const cellHeight = props.rowHeight + (props.gap || 16)
+      const cols = props.cols || 12
+      const rowHeight = props.rowHeight || 60
+      const gap = props.gap || 16
+      const cellWidth = rect.width / cols
+      const cellHeight = rowHeight + gap
       
       const gridX = Math.floor(relativeX / cellWidth)
       const gridY = Math.floor(relativeY / cellHeight)
 
       const newItem: GridItem = {
         id: droppedData.id || `dropped-${Date.now()}`,
-        x: Math.max(0, Math.min(gridX, props.cols - (droppingItem.w || 2))),
+        x: Math.max(0, Math.min(gridX, cols - (droppingItem.w || 2))),
         y: Math.max(0, gridY),
         w: droppingItem.w || 2,
         h: droppingItem.h || 2,

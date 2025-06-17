@@ -60,3 +60,36 @@ export interface ResizeState {
   startPos: { x: number; y: number }
   originalPos?: { x: number; y: number }
 }
+
+export type ResizeHandle = 's' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'
+export type CompactType = 'vertical' | 'horizontal' | null
+
+export interface GridContainerProps {
+  items: GridItem[]
+  children: (item: GridItem) => React.ReactNode
+  cols?: number
+  rowHeight?: number
+  gap?: number
+  margin?: [number, number]
+  containerPadding?: [number, number]
+  maxRows?: number
+  isDraggable?: boolean
+  isResizable?: boolean
+  preventCollision?: boolean
+  allowOverlap?: boolean
+  isBounded?: boolean
+  compactType?: CompactType
+  resizeHandles?: ResizeHandle[]
+  draggableCancel?: string
+  draggableHandle?: string
+  className?: string
+  style?: React.CSSProperties
+  onLayoutChange?: (layout: GridItem[]) => void
+  onDragStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent, element: HTMLElement) => void
+  onDrag?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent, element: HTMLElement) => void
+  onDragStop?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent, element: HTMLElement) => void
+  onResizeStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent, element: HTMLElement) => void
+  onResize?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent, element: HTMLElement) => void
+  onResizeStop?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent, element: HTMLElement) => void
+  onDrop?: (e: DragEvent) => void
+}
