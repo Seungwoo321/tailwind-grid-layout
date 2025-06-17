@@ -1,14 +1,24 @@
 @import "tailwindcss";
 
-@theme {
-  /* Grid specific colors */
-  --color-grid-placeholder: oklch(0.7 0.15 210);
-  --color-grid-handle: oklch(0.3 0.05 210);
-  --color-grid-border: oklch(0.8 0.05 210);
-  
-  /* shadcn/ui colors */
-  --color-card: oklch(1 0 0);
-  --color-card-foreground: oklch(0.1 0 0);
-  --color-muted-foreground: oklch(0.46 0.01 0);
-  --color-border: oklch(0.89 0.01 0);
+/* Grid specific styles */
+.grid-placeholder {
+  background: rgba(59, 130, 246, 0.15);
+  border: 2px dashed rgb(59, 130, 246);
+}
+
+.grid-resize-handle {
+  background: rgba(59, 130, 246, 0.5);
+}
+
+/* Card component styles for shadcn/ui compatibility */
+.bg-card {
+  background-color: white;
+}
+
+.text-card-foreground {
+  color: rgb(10, 10, 10);
+}
+
+.text-muted-foreground {
+  color: rgb(115, 115, 115);
 }
