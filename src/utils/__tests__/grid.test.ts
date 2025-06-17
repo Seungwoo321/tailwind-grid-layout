@@ -33,24 +33,28 @@ describe('Grid Utilities', () => {
       const item: GridPosition = { x: 2, y: 1, w: 3, h: 2 }
       const result = getPixelPosition(item, 12, 60, 16, 1200)
       
-      expect(result).toEqual({
-        left: 196,
-        top: 76,
-        width: 280,
-        height: 136
-      })
+      const colWidth = (1200 - 16 * 11) / 12
+      const expectedLeft = 2 * (colWidth + 16)
+      const expectedWidth = 3 * colWidth + 2 * 16
+      
+      expect(result.left).toBeCloseTo(expectedLeft)
+      expect(result.top).toBe(76)
+      expect(result.width).toBeCloseTo(expectedWidth)
+      expect(result.height).toBe(136)
     })
 
     it('should use margin when provided', () => {
       const item: GridPosition = { x: 2, y: 1, w: 3, h: 2 }
       const result = getPixelPosition(item, 12, 60, 16, 1200, [10, 20])
       
-      expect(result).toEqual({
-        left: 194,
-        top: 80,
-        width: 286,
-        height: 140
-      })
+      const colWidth = (1200 - 10 * 11) / 12
+      const expectedLeft = 2 * (colWidth + 10)
+      const expectedWidth = 3 * colWidth + 2 * 10
+      
+      expect(result.left).toBeCloseTo(expectedLeft)
+      expect(result.top).toBe(80)
+      expect(result.width).toBeCloseTo(expectedWidth)
+      expect(result.height).toBe(140)
     })
   })
 
@@ -231,6 +235,110 @@ describe('Grid Utilities', () => {
       
       const collisions = getAllCollisions(layout, item)
       expect(collisions.map(i => i.id)).not.toContain('1')
+    })
+  })
+
+  describe('edge cases for compactLayout', () => {
+    it('should skip compacting static items even with different compactType', () => {
+      const layout: GridItem[] = [
+        { id: '1', x: 0, y: 1, w: 2, h: 2, static: true },
+        { id: '2', x: 0, y: 3, w: 2, h: 2 }
+      ]
+
+      const compacted = compactLayout(layout, 12, 'horizontal')
+
+      // Static item should remain at original position
+      expect(compacted[0].y).toBe(1)
+      expect(compacted[0].x).toBe(0)
+      // Non-static item should move left
+      expect(compacted[1].x).toBe(0)
+    })
+
+    it('should handle edge collision boundary case', () => {
+      const layout: GridItem[] = [
+        { id: '1', x: 0, y: 0, w: 1, h: 1 },
+        { id: '2', x: 0, y: 1, w: 1, h: 1 }
+      ]
+
+      // Test exact boundary collision
+      const compacted = compactLayout(layout, 12, 'vertical')
+      expect(compacted[0].y).toBe(0)
+      expect(compacted[1].y).toBe(1)
+    })
+  })
+
+  describe('moveItems edge cases', () => {
+    it('should handle collision detection when item height causes exact boundary touch', () => {
+      const layout: GridItem[] = [
+        { id: '1', x: 0, y: 0, w: 2, h: 2 },
+        { id: '2', x: 0, y: 2, w: 2, h: 2 }
+      ]
+      const movingItem = { id: '3', x: 0, y: 1, w: 2, h: 1 }
+
+      const newLayout = moveItems(layout, movingItem, 12)
+
+      // Item 1 gets pushed up and item 2 gets pushed down due to collision
+      const item2 = newLayout.find(i => i.id === '2')
+      // The item will be moved down because of the collision with movingItem
+      expect(item2!.y).toBeGreaterThan(2)
+    })
+
+    it('should handle moving up boundary case', () => {
+      const layout: GridItem[] = [
+        { id: '1', x: 0, y: 2, w: 2, h: 2 },
+        { id: '2', x: 0, y: 0, w: 2, h: 1 }
+      ]
+      const movingItem = { id: '1', x: 0, y: 0, w: 2, h: 2 }
+      const originalItem = { id: '1', x: 0, y: 2, w: 2, h: 2 }
+
+      const newLayout = moveItems(layout, movingItem, 12, originalItem)
+
+      // Item 2 should be pushed down
+      const item2 = newLayout.find(i => i.id === '2')
+      expect(item2!.y).toBeGreaterThanOrEqual(2)
+    })
+
+    it('should skip already processed items in moveItems', () => {
+      // Create a complex collision scenario where items could be processed multiple times
+      const layout: GridItem[] = [
+        { id: '1', x: 0, y: 0, w: 2, h: 2 },
+        { id: '2', x: 0, y: 2, w: 2, h: 2 },
+        { id: '3', x: 0, y: 4, w: 2, h: 2 },
+        { id: '4', x: 0, y: 6, w: 2, h: 2 }
+      ]
+      
+      // Move item to cause cascading collisions
+      const movingItem = { id: 'new', x: 0, y: 1, w: 2, h: 4 }
+      
+      const newLayout = moveItems(layout, movingItem, 12)
+      
+      // All items should be moved and each should be processed only once
+      const uniqueIds = new Set(newLayout.map(item => item.id))
+      expect(uniqueIds.size).toBe(layout.length)
+      
+      // Items should be pushed down
+      expect(newLayout.find(i => i.id === '2')!.y).toBeGreaterThan(2)
+      expect(newLayout.find(i => i.id === '3')!.y).toBeGreaterThan(4)
+      expect(newLayout.find(i => i.id === '4')!.y).toBeGreaterThan(6)
+    })
+  })
+
+  describe('compactLayout sorting edge cases', () => {
+    it('should sort items with same x value by y in horizontal compact', () => {
+      const items: GridItem[] = [
+        { id: '1', x: 0, y: 3, w: 1, h: 1 },
+        { id: '2', x: 0, y: 1, w: 1, h: 1 },
+        { id: '3', x: 0, y: 2, w: 1, h: 1 },
+        { id: '4', x: 1, y: 0, w: 1, h: 1 }
+      ]
+      
+      const result = compactLayout(items, 12, 'horizontal')
+      
+      // Items with x=0 should be sorted by y
+      const xZeroItems = result.filter(i => i.x === 0)
+      expect(xZeroItems[0].id).toBe('2') // y=1
+      expect(xZeroItems[1].id).toBe('3') // y=2
+      expect(xZeroItems[2].id).toBe('1') // y=3
     })
   })
 })

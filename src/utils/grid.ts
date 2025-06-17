@@ -164,100 +164,53 @@ export function compactLayout(
 export function moveItems(
   layout: GridItem[],
   item: GridItem,
-  cols: number,
-  originalItem?: GridItem
+  _cols: number,
+  _originalItem?: GridItem
 ): GridItem[] {
   const compareWith = { ...item }
-  const movedLayout = [...layout]
+  let movedLayout = [...layout]
   
-  // React Grid Layout style: check for collisions with partial overlap
-  const collisions = movedLayout.filter(l => {
-    if (l.id === item.id || l.static) return false
-    
-    // Check if there's any overlap
-    const hasOverlap = checkCollision(compareWith, l)
-    if (!hasOverlap) return false
-    
-    // Calculate overlap amount for better movement detection
-    const overlapY = Math.min(compareWith.y + compareWith.h, l.y + l.h) - Math.max(compareWith.y, l.y)
-    const overlapX = Math.min(compareWith.x + compareWith.w, l.x + l.w) - Math.max(compareWith.x, l.x)
-    
-    // React Grid Layout behavior: move when overlap is more than 50% in either dimension
-    const significantOverlapY = overlapY > compareWith.h * 0.5 || overlapY > l.h * 0.5
-    const significantOverlapX = overlapX > compareWith.w * 0.5 || overlapX > l.w * 0.5
-    
-    return significantOverlapY && significantOverlapX
-  })
-  
-  if (collisions.length === 0) {
-    return layout
+  // Update the position of the moving item in the layout
+  const itemIndex = movedLayout.findIndex(l => l.id === item.id)
+  if (itemIndex !== -1) {
+    movedLayout[itemIndex] = compareWith
   }
   
-  // Determine direction of movement
-  const isMovingDown = originalItem && originalItem.y < compareWith.y
-  const isMovingUp = originalItem && originalItem.y > compareWith.y
+  // React Grid Layout style: check for collisions
+  const getCollisions = (checkItem: GridItem): GridItem[] => {
+    return movedLayout.filter(l => {
+      if (l.id === checkItem.id || l.static) return false
+      return checkCollision(checkItem, l)
+    })
+  }
   
-  // Sort collisions for processing
-  collisions.sort((a, b) => {
-    if (isMovingDown) {
-      // Process from top to bottom
-      return a.y - b.y
-    } else {
-      // Process from bottom to top
-      return b.y - a.y
-    }
-  })
+  // Process collisions iteratively until no more collisions
+  const processedIds = new Set<string>()
+  const itemsToMove: GridItem[] = [compareWith]
   
-  // Move colliding items
-  collisions.forEach(collision => {
-    const collisionIndex = movedLayout.findIndex(l => l.id === collision.id)
-    if (collisionIndex === -1) return
+  while (itemsToMove.length > 0) {
+    const currentItem = itemsToMove.shift()!
+    if (processedIds.has(currentItem.id)) continue
+    processedIds.add(currentItem.id)
     
-    // React Grid Layout style movement
-    if (isMovingDown) {
-      // When moving down, colliding items should move down
-      const newY = compareWith.y + compareWith.h
-      movedLayout[collisionIndex] = {
-        ...collision,
-        y: newY
-      }
+    const collisions = getCollisions(currentItem)
+    
+    for (const collision of collisions) {
+      if (processedIds.has(collision.id)) continue
       
-      // Recursively move items that this collision pushes down
-      const pushedItem = { ...collision, y: newY }
-      const secondaryCollisions = movedLayout.filter(l => 
-        l.id !== collision.id && 
-        l.id !== compareWith.id && 
-        !l.static &&
-        checkCollision(pushedItem, l)
-      )
+      // Calculate new position for the colliding item
+      const newY = currentItem.y + currentItem.h
+      const movedCollision = { ...collision, y: newY }
       
-      secondaryCollisions.forEach(secondary => {
-        const secIndex = movedLayout.findIndex(l => l.id === secondary.id)
-        if (secIndex !== -1) {
-          movedLayout[secIndex] = {
-            ...secondary,
-            y: pushedItem.y + pushedItem.h
-          }
-        }
-      })
-    } else if (isMovingUp) {
-      // When moving up, only move items that are below the dragged item
-      if (collision.y >= compareWith.y) {
-        const newY = compareWith.y + compareWith.h
-        movedLayout[collisionIndex] = {
-          ...collision,
-          y: newY
-        }
-      }
-    } else {
-      // First placement or horizontal movement
-      const newY = compareWith.y + compareWith.h
-      movedLayout[collisionIndex] = {
-        ...collision,
-        y: newY
+      // Update in layout
+      const collisionIndex = movedLayout.findIndex(l => l.id === collision.id)
+      if (collisionIndex !== -1) {
+        movedLayout[collisionIndex] = movedCollision
+        // Add to queue to check for further collisions
+        itemsToMove.push(movedCollision)
       }
     }
-  })
+  }
   
   return movedLayout
 }

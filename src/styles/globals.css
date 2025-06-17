@@ -1,6 +1,7 @@
 @import "tailwindcss";
+@config "../../tailwind.config.ts";
 
-/* shadcn/ui CSS variables for Tailwind v4 */
+/* shadcn/ui CSS variables */
 @layer base {
   :root {
     --background: 0 0% 100%;

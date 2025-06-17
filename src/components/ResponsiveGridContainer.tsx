@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { GridContainer } from './GridContainer'
 import type { GridItem, GridContainerProps } from '../types'
 
@@ -6,12 +6,13 @@ export interface BreakpointLayouts {
   [breakpoint: string]: GridItem[]
 }
 
-export interface ResponsiveGridContainerProps extends Omit<GridContainerProps, 'items' | 'cols'> {
+export interface ResponsiveGridContainerProps extends Omit<GridContainerProps, 'items' | 'cols' | 'onLayoutChange'> {
   layouts: BreakpointLayouts
   breakpoints?: { [breakpoint: string]: number }
   cols?: { [breakpoint: string]: number }
   onLayoutChange?: (layout: GridItem[], layouts: BreakpointLayouts) => void
   onBreakpointChange?: (newBreakpoint: string, cols: number) => void
+  width?: number // For WidthProvider support
 }
 
 const defaultBreakpoints = {
@@ -36,10 +37,13 @@ export function ResponsiveGridContainer({
   cols = defaultCols,
   onLayoutChange,
   onBreakpointChange,
+  width,
   ...props
 }: ResponsiveGridContainerProps) {
   const [currentBreakpoint, setCurrentBreakpoint] = useState<string>('lg')
-  const [currentCols, setCurrentCols] = useState(cols.lg || 12)
+  const [currentCols, setCurrentCols] = useState(
+    typeof cols === 'object' && cols.lg ? cols.lg : 12
+  )
 
   // Get sorted breakpoints
   const sortedBreakpoints = useMemo(() => {
@@ -48,7 +52,13 @@ export function ResponsiveGridContainer({
 
   // Calculate current breakpoint based on window width
   const getBreakpoint = (width: number) => {
-    let breakpoint = sortedBreakpoints[sortedBreakpoints.length - 1][0]
+    // Default to 'lg' if no breakpoints are sorted
+    if (sortedBreakpoints.length === 0) return 'lg'
+    
+    const lastEntry = sortedBreakpoints[sortedBreakpoints.length - 1]
+    if (!lastEntry) return 'lg'
+    
+    let breakpoint = lastEntry[0]
     
     for (const [bp, minWidth] of sortedBreakpoints) {
       if (width >= minWidth) {
@@ -63,19 +73,27 @@ export function ResponsiveGridContainer({
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
-      const newBreakpoint = getBreakpoint(window.innerWidth)
+      const containerWidth = width ?? window.innerWidth
+      const newBreakpoint = getBreakpoint(containerWidth)
       if (newBreakpoint !== currentBreakpoint) {
         setCurrentBreakpoint(newBreakpoint)
-        const newCols = cols[newBreakpoint] || defaultCols[newBreakpoint] || 12
+        const newCols = (typeof cols === 'object' && cols[newBreakpoint]) || 
+                        (defaultCols as Record<string, number>)[newBreakpoint] || 
+                        12
         setCurrentCols(newCols)
         onBreakpointChange?.(newBreakpoint, newCols)
       }
     }
 
     handleResize() // Set initial breakpoint
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [currentBreakpoint, cols, sortedBreakpoints, onBreakpointChange])
+    
+    // Only listen to window resize if width is not provided
+    if (width === undefined) {
+      window.addEventListener('resize', handleResize)
+      return () => window.removeEventListener('resize', handleResize)
+    }
+    return undefined
+  }, [currentBreakpoint, cols, sortedBreakpoints, onBreakpointChange, width])
 
   // Get current layout
   const currentLayout = layouts[currentBreakpoint] || []

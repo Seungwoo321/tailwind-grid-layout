@@ -84,6 +84,10 @@ export interface GridContainerProps {
   draggableHandle?: string
   className?: string
   style?: React.CSSProperties
+  autoSize?: boolean // 자동으로 컨테이너 높이 조정
+  verticalCompact?: boolean // 레거시 - compactType을 사용하는 것을 권장
+  transformScale?: number // 스케일 변환 지원
+  droppingItem?: Partial<GridItem> // 드롭 중인 아이템 미리보기
   onLayoutChange?: (layout: GridItem[]) => void
   onDragStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent, element: HTMLElement) => void
   onDrag?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent, element: HTMLElement) => void

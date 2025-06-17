@@ -1,0 +1,26 @@
+
+> tailwind-grid-layout@0.0.1 dev:storybook /Users/mzc01-swlee/dev/repository/tailwind-grid-layout
+> storybook dev -p 6006
+
+@storybook/core v8.5.8
+
+info => Starting manager..
+info => Starting preview..
+info Using tsconfig paths for react-docgen
+╭─────────────────────────────────────────────────────────────────────╮
+│                                                                     │
+│   [38;2;162;224;94mStorybook 8.5.8 for react-vite started[39m                            │
+│   167 ms for manager and 1.32 s for preview                         │
+│                                                                     │
+│   Local:            http://localhost:6006/                          │
+│   On your network:  http://10.100.33.133:6006/                      │
+│                                                                     │
+│   [38;2;243;173;56mA new version (9.0.10) is available![39m                              │
+│                                                                     │
+│   Upgrade now: [38;2;162;224;94mnpx storybook@latest upgrade[39m                         │
+│                                                                     │
+│   Read full changelog:                                              │
+│   https://github.com/storybookjs/storybook/blob/main/CHANGELOG.md   │
+│                                                                     │
+╰─────────────────────────────────────────────────────────────────────╯
+ ELIFECYCLE  Command failed.

@@ -1,0 +1,29 @@
+
+> tailwind-grid-layout@0.0.1 dev:storybook /Users/mzc01-swlee/dev/repository/tailwind-grid-layout
+> storybook dev -p 6006
+
+@storybook/cli v7.6.20
+
+(node:75435) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+info => Starting manager..
+info => Starting preview..
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+╭─────────────────────────────────────────────────────────────────────╮
+│                                                                     │
+│   Storybook 7.6.20 for react-vite started                           │
+│   167 ms for manager and 2.01 s for preview                         │
+│                                                                     │
+│   Local:            http://localhost:6006/                          │
+│   On your network:  http://10.100.33.133:6006/                      │
+│                                                                     │
+│   A new version (9.0.10) is available!                              │
+│                                                                     │
+│   Upgrade now: npx storybook@latest upgrade                         │
+│                                                                     │
+│   Read full changelog:                                              │
+│   https://github.com/storybookjs/storybook/blob/next/CHANGELOG.md   │
+│                                                                     │
+╰─────────────────────────────────────────────────────────────────────╯
+오전 9:56:57 [vite] page reload .claude/settings.local.json
+ ELIFECYCLE  Command failed.

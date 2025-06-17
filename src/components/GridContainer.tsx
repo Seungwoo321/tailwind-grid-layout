@@ -21,6 +21,10 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   compactType = 'vertical',
   resizeHandles = ['se'],
   draggableCancel,
+  autoSize = true,
+  verticalCompact: _verticalCompact = true,
+  transformScale: _transformScale = 1,
+  droppingItem,
   onLayoutChange,
   onDragStart,
   onDrag,
@@ -31,7 +35,8 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   onDrop: _onDrop,
   items,
   children,
-  className
+  className,
+  style
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState(0)
@@ -110,7 +115,6 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     if (!item || item.isDraggable === false) return
     
     const rect = e.currentTarget.getBoundingClientRect()
-    const containerRect = containerRef.current!.getBoundingClientRect()
     
     const newDragState = {
       isDragging: true,
@@ -405,6 +409,8 @@ export const GridContainer: React.FC<GridContainerProps> = ({
         document.body.style.userSelect = ''
       }
     }
+    // Return undefined when not dragging
+    return undefined
   }, [dragState.isDragging, handleDragMove, handleDragEnd])
 
   useEffect(() => {
@@ -419,13 +425,18 @@ export const GridContainer: React.FC<GridContainerProps> = ({
         document.body.style.userSelect = ''
       }
     }
+    // Return undefined when not resizing
+    return undefined
   }, [resizeState.isResizing, handleResizeMove, handleResizeEnd])
 
   // Calculate grid height
   const verticalMargin = margin ? margin[1] : gap
-  const gridHeight = Math.max(
+  const calculatedHeight = Math.max(
     ...layout.map(item => (item.y + item.h) * (rowHeight + verticalMargin))
-  ) || 400
+  ) || 0
+  
+  // Apply autoSize
+  const gridHeight = autoSize ? calculatedHeight : undefined
 
   return (
     <div
@@ -436,8 +447,9 @@ export const GridContainer: React.FC<GridContainerProps> = ({
         className
       )}
       style={{
-        minHeight: gridHeight + containerPadding[1] * 2,
-        padding: `${containerPadding[1]}px ${containerPadding[0]}px`
+        ...(gridHeight !== undefined && { minHeight: gridHeight + containerPadding[1] * 2 }),
+        padding: `${containerPadding[1]}px ${containerPadding[0]}px`,
+        ...style
       }}
     >
       {/* Grid items */}
@@ -506,6 +518,21 @@ export const GridContainer: React.FC<GridContainerProps> = ({
           />
         )
       })()}
+      
+      {/* Dropping Item Preview */}
+      {droppingItem && !dragState.isDragging && (
+        <div
+          className="absolute bg-gray-200 border-2 border-dashed border-gray-400 rounded opacity-75 pointer-events-none flex items-center justify-center"
+          style={{
+            width: ((droppingItem.w || 1) * containerWidth / cols) - gap,
+            height: ((droppingItem.h || 1) * rowHeight) - gap,
+            left: containerPadding[0],
+            top: containerPadding[1]
+          }}
+        >
+          <span className="text-gray-600 font-medium">Drop here</span>
+        </div>
+      )}
     </div>
   )
 }

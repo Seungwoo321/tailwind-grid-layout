@@ -101,7 +101,13 @@ function App() {
 | **compactType** | `'vertical' \| 'horizontal' \| null` | `'vertical'` | Compaction type |
 | **resizeHandles** | `Array<'s' \| 'w' \| 'e' \| 'n' \| 'sw' \| 'nw' \| 'se' \| 'ne'>` | `['se']` | Resize handle positions |
 | **draggableCancel** | `string` | - | CSS selector for elements that should not trigger drag |
+| **draggableHandle** | `string` | - | CSS selector for drag handle |
+| **autoSize** | `boolean` | `true` | Container height adjusts to fit all items |
+| **verticalCompact** | `boolean` | `true` | DEPRECATED: Use compactType |
+| **transformScale** | `number` | `1` | Scale factor for drag/resize when zoomed |
+| **droppingItem** | `Partial<GridItem>` | - | Preview item while dragging from outside |
 | **className** | `string` | - | Additional CSS classes for the container |
+| **style** | `React.CSSProperties` | - | Inline styles for the container |
 | **onLayoutChange** | `(layout: GridItem[]) => void` | - | Callback when layout changes |
 | **onDragStart** | `(layout, oldItem, newItem, placeholder, e, element) => void` | - | Drag start callback |
 | **onDrag** | `(layout, oldItem, newItem, placeholder, e, element) => void` | - | Drag callback |
@@ -250,11 +256,104 @@ import { DroppableGridContainer } from 'tailwind-grid-layout'
 <GridContainer
   items={items}
   isBounded={true}
-  maxRows={10} // Limit grid to 10 rows
+  maxRows={10}
 >
   {(item) => <div>Item {item.id}</div>}
 </GridContainer>
 ```
+
+### AutoSize Container
+
+```tsx
+<GridContainer
+  items={items}
+  autoSize={true} // Container height adjusts automatically
+>
+  {(item) => <div>Item {item.id}</div>}
+</GridContainer>
+
+// With fixed height
+<div style={{ height: 400, overflow: 'auto' }}>
+  <GridContainer
+    items={items}
+    autoSize={false}
+    style={{ height: '100%' }}
+  >
+    {(item) => <div>Item {item.id}</div>}
+  </GridContainer>
+</div>
+```
+
+### Dropping Item Preview
+
+```tsx
+<DroppableGridContainer
+  items={items}
+  droppingItem={{ w: 4, h: 2 }} // Shows preview while dragging
+  onDrop={(newItem) => setItems([...items, newItem])}
+>
+  {(item) => <div>Item {item.id}</div>}
+</DroppableGridContainer>
+```
+
+## Layout Utilities
+
+### generateLayouts
+
+Generate identical layouts for all breakpoints from a single layout definition.
+
+```tsx
+import { generateLayouts } from 'tailwind-grid-layout'
+
+const items = [
+  { id: '1', x: 0, y: 0, w: 4, h: 2 },
+  { id: '2', x: 4, y: 0, w: 4, h: 2 }
+]
+
+// Creates layouts for lg, md, sm, xs, xxs with identical positioning
+const layouts = generateLayouts(items)
+```
+
+### generateResponsiveLayouts
+
+Automatically adjust layouts to fit different column counts per breakpoint.
+
+```tsx
+import { generateResponsiveLayouts } from 'tailwind-grid-layout'
+
+const items = [
+  { id: '1', x: 0, y: 0, w: 12, h: 2 },
+  { id: '2', x: 0, y: 2, w: 6, h: 2 }
+]
+
+// Adjusts item widths and positions to fit column constraints
+const layouts = generateResponsiveLayouts(items, {
+  lg: 12,
+  md: 10, 
+  sm: 6,
+  xs: 4,
+  xxs: 2
+})
+```
+
+### WidthProvider HOC
+
+Automatically provides container width to ResponsiveGridContainer.
+
+```tsx
+import { ResponsiveGridContainer, WidthProvider } from 'tailwind-grid-layout'
+
+const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
+
+// No need to manually track container width
+<ResponsiveGridWithWidth
+  layouts={layouts}
+  measureBeforeMount={true} // Optional: prevent layout shift
+>
+  {(item) => <div>Item {item.id}</div>}
+</ResponsiveGridWithWidth>
+```
+
 
 ## Styling Guide
 

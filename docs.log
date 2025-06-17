@@ -1,0 +1,9 @@
+
+> tailwind-grid-layout@0.0.1 dev:docs /Users/mzc01-swlee/dev/repository/tailwind-grid-layout
+> vite --config vite.docs.config.ts
+
+
+  VITE v5.4.19  ready in 233 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose

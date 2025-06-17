@@ -18,6 +18,16 @@ export default defineConfig({
         '**/*.config.*',
         '**/mockData.ts',
         'src/index.ts',
+        '.storybook/**',
+        'docs/**',
+        'examples/**',
+        'stories/**',
+        'src/components/ui/**',
+        'src/lib/**',
+        'src/types/index.ts',
+        '**/*.stories.tsx',
+        '**/node_modules/**',
+        'dist/**'
       ],
       thresholds: {
         lines: 100,

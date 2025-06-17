@@ -3,7 +3,7 @@ import { GridContainer } from './GridContainer'
 import type { GridItem, GridContainerProps } from '../types'
 import { cn } from '../utils/cn'
 
-export interface DroppableGridContainerProps extends GridContainerProps {
+export interface DroppableGridContainerProps extends Omit<GridContainerProps, 'onDrop'> {
   onDrop?: (item: GridItem) => void
   droppingItem?: Partial<GridItem>
 }
@@ -19,7 +19,9 @@ export function DroppableGridContainer({
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
-    e.dataTransfer.dropEffect = 'copy'
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'copy'
+    }
     setIsDraggingOver(true)
   }
 
@@ -92,7 +94,7 @@ export function DroppableGridContainer({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <GridContainer {...props} />
+      <GridContainer {...props} droppingItem={isDraggingOver ? droppingItem : undefined} />
       {isDraggingOver && (
         <div className="absolute inset-0 bg-blue-500/10 rounded-lg pointer-events-none" />
       )}

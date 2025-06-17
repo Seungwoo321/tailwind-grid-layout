@@ -101,7 +101,13 @@ function App() {
 | **compactType** | `'vertical' \| 'horizontal' \| null` | `'vertical'` | 압축 타입 |
 | **resizeHandles** | `Array<'s' \| 'w' \| 'e' \| 'n' \| 'sw' \| 'nw' \| 'se' \| 'ne'>` | `['se']` | 크기 조정 핸들 위치 |
 | **draggableCancel** | `string` | - | 드래그를 트리거하지 않을 요소의 CSS 선택자 |
+| **draggableHandle** | `string` | - | 드래그 핸들용 CSS 선택자 |
+| **autoSize** | `boolean` | `true` | 모든 아이템에 맞게 컨테이너 높이 자동 조정 |
+| **verticalCompact** | `boolean` | `true` | 더 이상 사용되지 않음: compactType 사용 |
+| **transformScale** | `number` | `1` | 확대/축소 시 드래그/크기 조정을 위한 스케일 팩터 |
+| **droppingItem** | `Partial<GridItem>` | - | 외부에서 드래그 중 미리보기 아이템 |
 | **className** | `string` | - | 컨테이너에 추가할 CSS 클래스 |
+| **style** | `React.CSSProperties` | - | 컨테이너용 인라인 스타일 |
 | **onLayoutChange** | `(layout: GridItem[]) => void` | - | 레이아웃 변경 시 콜백 |
 | **onDragStart** | `(layout, oldItem, newItem, placeholder, e, element) => void` | - | 드래그 시작 콜백 |
 | **onDrag** | `(layout, oldItem, newItem, placeholder, e, element) => void` | - | 드래그 중 콜백 |
@@ -255,6 +261,99 @@ import { DroppableGridContainer } from 'tailwind-grid-layout'
   {(item) => <div>아이템 {item.id}</div>}
 </GridContainer>
 ```
+
+### AutoSize 컨테이너
+
+```tsx
+<GridContainer
+  items={items}
+  autoSize={true} // 컨테이너 높이가 자동으로 조정됨
+>
+  {(item) => <div>아이템 {item.id}</div>}
+</GridContainer>
+
+// 고정 높이
+<div style={{ height: 400, overflow: 'auto' }}>
+  <GridContainer
+    items={items}
+    autoSize={false}
+    style={{ height: '100%' }}
+  >
+    {(item) => <div>아이템 {item.id}</div>}
+  </GridContainer>
+</div>
+```
+
+### DroppingItem 미리보기
+
+```tsx
+<DroppableGridContainer
+  items={items}
+  droppingItem={{ w: 4, h: 2 }} // 드래그 중 미리보기 표시
+  onDrop={(newItem) => setItems([...items, newItem])}
+>
+  {(item) => <div>아이템 {item.id}</div>}
+</DroppableGridContainer>
+```
+
+## 레이아웃 유틸리티
+
+### generateLayouts
+
+단일 레이아웃 정의에서 모든 브레이크포인트에 대한 동일한 레이아웃을 생성합니다.
+
+```tsx
+import { generateLayouts } from 'tailwind-grid-layout'
+
+const items = [
+  { id: '1', x: 0, y: 0, w: 4, h: 2 },
+  { id: '2', x: 4, y: 0, w: 4, h: 2 }
+]
+
+// lg, md, sm, xs, xxs에 대해 동일한 위치로 레이아웃 생성
+const layouts = generateLayouts(items)
+```
+
+### generateResponsiveLayouts
+
+브레이크포인트별 다른 컬럼 수에 맞게 레이아웃을 자동으로 조정합니다.
+
+```tsx
+import { generateResponsiveLayouts } from 'tailwind-grid-layout'
+
+const items = [
+  { id: '1', x: 0, y: 0, w: 12, h: 2 },
+  { id: '2', x: 0, y: 2, w: 6, h: 2 }
+]
+
+// 컬럼 제약에 맞게 아이템 너비와 위치를 조정
+const layouts = generateResponsiveLayouts(items, {
+  lg: 12,
+  md: 10, 
+  sm: 6,
+  xs: 4,
+  xxs: 2
+})
+```
+
+### WidthProvider HOC
+
+ResponsiveGridContainer에 컨테이너 너비를 자동으로 제공합니다.
+
+```tsx
+import { ResponsiveGridContainer, WidthProvider } from 'tailwind-grid-layout'
+
+const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
+
+// 컨테이너 너비를 수동으로 추적할 필요 없음
+<ResponsiveGridWithWidth
+  layouts={layouts}
+  measureBeforeMount={true} // 선택사항: 레이아웃 변경 방지
+>
+  {(item) => <div>아이템 {item.id}</div>}
+</ResponsiveGridWithWidth>
+```
+
 
 ## 스타일링 가이드
 
