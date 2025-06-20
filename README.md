@@ -134,6 +134,18 @@ function App() {
 | **static** | `boolean` | - | Make item static (unmovable/unresizable) |
 | **className** | `string` | - | Additional CSS classes for the item |
 
+### ResponsiveGridContainer Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| **layouts** | `BreakpointLayouts` | required | Object with layouts for each breakpoint |
+| **breakpoints** | `{ [breakpoint: string]: number }` | `{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }` | Minimum widths for each breakpoint |
+| **cols** | `{ [breakpoint: string]: number }` | `{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }` | Number of columns for each breakpoint |
+| **onLayoutChange** | `(layout: GridItem[], layouts: BreakpointLayouts) => void` | - | Called when layout changes with current layout and all layouts |
+| **onBreakpointChange** | `(newBreakpoint: string, cols: number) => void` | - | Called when breakpoint changes |
+| **width** | `number` | - | Container width (provided by WidthProvider) |
+| ...GridContainerProps | - | - | All other GridContainer props except items, cols, onLayoutChange |
+
 ## Comparison with react-grid-layout
 
 | Feature | react-grid-layout | tailwind-grid-layout | Notes |
@@ -146,7 +158,7 @@ function App() {
 | Static Items | ✅ | ✅ | Full support |
 | Bounded Movement | ✅ | ✅ | Keep items in bounds |
 | **Layout Options** |
-| Responsive Breakpoints | ✅ | ✅ | Full support with ResponsiveGridContainer |
+| Responsive Breakpoints | ✅ | ✅ | Real-time responsive layouts with ResizeObserver |
 | Persist Layout | ✅ | ✅ | Via onLayoutChange |
 | Min/Max Dimensions | ✅ | ✅ | Full support |
 | Prevent Collision | ✅ | ✅ | Full support |
@@ -196,21 +208,83 @@ const items = [
 ### Responsive Breakpoints
 
 ```tsx
-import { ResponsiveGridContainer } from 'tailwind-grid-layout'
+import { ResponsiveGridContainer, WidthProvider } from 'tailwind-grid-layout'
 
+// Define layouts for each breakpoint
 const layouts = {
-  lg: [{ id: '1', x: 0, y: 0, w: 3, h: 2 }],
-  md: [{ id: '1', x: 0, y: 0, w: 6, h: 2 }],
-  sm: [{ id: '1', x: 0, y: 0, w: 12, h: 2 }],
+  lg: [
+    { id: '1', x: 0, y: 0, w: 6, h: 2 },
+    { id: '2', x: 6, y: 0, w: 6, h: 2 },
+    { id: '3', x: 0, y: 2, w: 4, h: 2 },
+    { id: '4', x: 4, y: 2, w: 8, h: 2 }
+  ],
+  md: [
+    { id: '1', x: 0, y: 0, w: 10, h: 2 },
+    { id: '2', x: 0, y: 2, w: 10, h: 2 },
+    { id: '3', x: 0, y: 4, w: 5, h: 2 },
+    { id: '4', x: 5, y: 4, w: 5, h: 2 }
+  ],
+  sm: [
+    { id: '1', x: 0, y: 0, w: 6, h: 2 },
+    { id: '2', x: 0, y: 2, w: 6, h: 2 },
+    { id: '3', x: 0, y: 4, w: 6, h: 2 },
+    { id: '4', x: 0, y: 6, w: 6, h: 2 }
+  ],
+  xs: [
+    { id: '1', x: 0, y: 0, w: 4, h: 2 },
+    { id: '2', x: 0, y: 2, w: 4, h: 2 },
+    { id: '3', x: 0, y: 4, w: 4, h: 2 },
+    { id: '4', x: 0, y: 6, w: 4, h: 2 }
+  ],
+  xxs: [
+    { id: '1', x: 0, y: 0, w: 2, h: 2 },
+    { id: '2', x: 0, y: 2, w: 2, h: 2 },
+    { id: '3', x: 0, y: 4, w: 2, h: 2 },
+    { id: '4', x: 0, y: 6, w: 2, h: 2 }
+  ]
 }
 
-<ResponsiveGridContainer
-  layouts={layouts}
-  breakpoints={{ lg: 1200, md: 768, sm: 480 }}
-  cols={{ lg: 12, md: 8, sm: 4 }}
->
-  {(item) => <div>Responsive Item {item.id}</div>}
-</ResponsiveGridContainer>
+// Option 1: Manual width tracking
+function ResponsiveExample() {
+  const [currentBreakpoint, setCurrentBreakpoint] = useState('lg')
+  
+  return (
+    <ResponsiveGridContainer
+      layouts={layouts}
+      onBreakpointChange={(breakpoint) => {
+        setCurrentBreakpoint(breakpoint)
+        console.log(`Switched to ${breakpoint} breakpoint`)
+      }}
+      onLayoutChange={(layout, allLayouts) => {
+        // Save layouts to state or backend
+        console.log('Layout changed:', allLayouts)
+      }}
+    >
+      {(item) => (
+        <div className="bg-blue-500 text-white p-4 rounded">
+          Item {item.id}
+        </div>
+      )}
+    </ResponsiveGridContainer>
+  )
+}
+
+// Option 2: Using WidthProvider for automatic width detection
+const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
+
+function App() {
+  return (
+    <ResponsiveGridWithWidth
+      layouts={layouts}
+      // Custom breakpoints (optional)
+      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+      // Custom column configuration (optional)
+      cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+    >
+      {(item) => <div>Item {item.id}</div>}
+    </ResponsiveGridWithWidth>
+  )
+}
 ```
 
 ### Drag and Drop from Outside
@@ -284,6 +358,60 @@ import { DroppableGridContainer } from 'tailwind-grid-layout'
 </div>
 ```
 
+### Real-time Responsive Updates
+
+The responsive grid automatically updates layouts when the window is resized, with debounced handling for optimal performance:
+
+```tsx
+import { ResponsiveGridContainer } from 'tailwind-grid-layout'
+
+function DashboardExample() {
+  const [layouts, setLayouts] = useState({
+    lg: dashboardLayoutLg,
+    md: dashboardLayoutMd,
+    sm: dashboardLayoutSm,
+    xs: dashboardLayoutXs,
+    xxs: dashboardLayoutXxs
+  })
+  const [currentBreakpoint, setCurrentBreakpoint] = useState('')
+  const [currentCols, setCurrentCols] = useState(12)
+
+  return (
+    <>
+      {/* Visual breakpoint indicator */}
+      <div className="mb-4 p-2 bg-green-100 rounded">
+        Current: {currentBreakpoint} ({currentCols} columns)
+      </div>
+      
+      <ResponsiveGridContainer
+        layouts={layouts}
+        onLayoutChange={(layout, allLayouts) => {
+          setLayouts(allLayouts)
+        }}
+        onBreakpointChange={(breakpoint, cols) => {
+          setCurrentBreakpoint(breakpoint)
+          setCurrentCols(cols)
+        }}
+        rowHeight={100}
+        gap={16}
+        containerPadding={[16, 16]}
+      >
+        {(item) => (
+          <Card key={item.id}>
+            <CardHeader>
+              <CardTitle>{item.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {item.content}
+            </CardContent>
+          </Card>
+        )}
+      </ResponsiveGridContainer>
+    </>
+  )
+}
+```
+
 ### Dropping Item Preview
 
 ```tsx
@@ -338,20 +466,35 @@ const layouts = generateResponsiveLayouts(items, {
 
 ### WidthProvider HOC
 
-Automatically provides container width to ResponsiveGridContainer.
+Automatically provides container width to ResponsiveGridContainer using ResizeObserver for optimal performance.
 
 ```tsx
 import { ResponsiveGridContainer, WidthProvider } from 'tailwind-grid-layout'
 
 const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
 
-// No need to manually track container width
+// Basic usage
 <ResponsiveGridWithWidth
   layouts={layouts}
-  measureBeforeMount={true} // Optional: prevent layout shift
+  rowHeight={100}
 >
   {(item) => <div>Item {item.id}</div>}
 </ResponsiveGridWithWidth>
+
+// With measureBeforeMount to prevent layout shift on initial render
+<ResponsiveGridWithWidth
+  layouts={layouts}
+  measureBeforeMount={true}
+  rowHeight={100}
+>
+  {(item) => <div>Item {item.id}</div>}
+</ResponsiveGridWithWidth>
+
+// WidthProvider features:
+// - Uses ResizeObserver for efficient width detection
+// - Falls back to window resize events if ResizeObserver is unavailable
+// - Handles SSR correctly with measureBeforeMount option
+// - Debounced resize handling (150ms) for better performance
 ```
 
 
