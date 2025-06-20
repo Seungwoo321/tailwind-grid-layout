@@ -158,6 +158,10 @@ export function ShowcaseExample() {
         <h1 className="text-4xl font-bold mb-4">Tailwind Grid Layout</h1>
         <p className="text-xl text-gray-600 mb-2">A modern grid system built with Tailwind CSS</p>
         <p className="text-gray-500">Drag, resize, and organize your content with ease</p>
+        {/* Mobile Touch Support Notice */}
+        <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200 text-blue-700 text-sm max-w-md mx-auto md:hidden">
+          <span className="font-semibold">📱 Mobile Ready!</span> Touch to drag and resize grid items on your mobile device.
+        </div>
         {/* GitHub Icon */}
         <a
           href="https://github.com/Seungwoo321/tailwind-grid-layout"
@@ -254,6 +258,34 @@ export function ShowcaseExample() {
         </div>
       </section>
 
+      {/* Mobile Touch Instructions */}
+      <section className="lg:hidden">
+        <h2 className="text-2xl font-semibold mb-4">📱 Mobile Touch Guide</h2>
+        <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">1</div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Drag to Move</h3>
+              <p className="text-gray-600 text-sm">Touch and hold any grid item, then drag to move it to a new position.</p>
+            </div>
+          </div>
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-semibold text-sm">2</div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Resize Handle</h3>
+              <p className="text-gray-600 text-sm">Look for the resize handle (⌽) at the bottom-right corner of each item to resize.</p>
+            </div>
+          </div>
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-semibold text-sm">3</div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Responsive Layout</h3>
+              <p className="text-gray-600 text-sm">Items automatically rearrange when you rotate your device or change screen size.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features List */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
@@ -278,6 +310,30 @@ export function ShowcaseExample() {
           </CardHeader>
           <CardContent>
             <p>50% smaller bundle size compared to react-grid-layout while maintaining all functionality.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>📱 Mobile Touch Support</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Full touch event support for mobile devices. Drag and resize grid items with touch gestures seamlessly.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>⚡ High Performance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Optimized for performance with efficient event handling and smooth animations on all devices.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>🔧 TypeScript Ready</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Built with TypeScript for excellent type safety and developer experience out of the box.</p>
           </CardContent>
         </Card>
       </section>
