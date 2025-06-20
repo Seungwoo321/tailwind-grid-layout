@@ -134,6 +134,18 @@ function App() {
 | **static** | `boolean` | - | 아이템을 정적으로 만들기 (이동/크기조정 불가) |
 | **className** | `string` | - | 아이템에 추가할 CSS 클래스 |
 
+### ResponsiveGridContainer Props
+
+| Prop | 타입 | 기본값 | 설명 |
+|------|------|---------|-------------|
+| **layouts** | `BreakpointLayouts` | 필수 | 각 브레이크포인트별 레이아웃 객체 |
+| **breakpoints** | `{ [breakpoint: string]: number }` | `{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }` | 각 브레이크포인트의 최소 너비 |
+| **cols** | `{ [breakpoint: string]: number }` | `{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }` | 각 브레이크포인트의 열 개수 |
+| **onLayoutChange** | `(layout: GridItem[], layouts: BreakpointLayouts) => void` | - | 레이아웃 변경 시 현재 레이아웃과 모든 레이아웃을 전달하는 콜백 |
+| **onBreakpointChange** | `(newBreakpoint: string, cols: number) => void` | - | 브레이크포인트 변경 시 호출되는 콜백 |
+| **width** | `number` | - | 컨테이너 너비 (WidthProvider가 제공) |
+| ...GridContainerProps | - | - | items, cols, onLayoutChange를 제외한 모든 GridContainer props |
+
 ## react-grid-layout과의 비교
 
 | 기능 | react-grid-layout | tailwind-grid-layout | 비고 |
@@ -146,7 +158,7 @@ function App() {
 | 정적 아이템 | ✅ | ✅ | 완전 지원 |
 | 경계 내 이동 | ✅ | ✅ | 아이템을 경계 내에 유지 |
 | **레이아웃 옵션** |
-| 반응형 브레이크포인트 | ✅ | ✅ | ResponsiveGridContainer로 완전 지원 |
+| 반응형 브레이크포인트 | ✅ | ✅ | ResizeObserver를 통한 실시간 반응형 레이아웃 |
 | 레이아웃 유지 | ✅ | ✅ | onLayoutChange를 통해 |
 | 최소/최대 크기 | ✅ | ✅ | 완전 지원 |
 | 충돌 방지 | ✅ | ✅ | 완전 지원 |
@@ -196,21 +208,83 @@ const items = [
 ### 반응형 브레이크포인트
 
 ```tsx
-import { ResponsiveGridContainer } from 'tailwind-grid-layout'
+import { ResponsiveGridContainer, WidthProvider } from 'tailwind-grid-layout'
 
+// 각 브레이크포인트별 레이아웃 정의
 const layouts = {
-  lg: [{ id: '1', x: 0, y: 0, w: 3, h: 2 }],
-  md: [{ id: '1', x: 0, y: 0, w: 6, h: 2 }],
-  sm: [{ id: '1', x: 0, y: 0, w: 12, h: 2 }],
+  lg: [
+    { id: '1', x: 0, y: 0, w: 6, h: 2 },
+    { id: '2', x: 6, y: 0, w: 6, h: 2 },
+    { id: '3', x: 0, y: 2, w: 4, h: 2 },
+    { id: '4', x: 4, y: 2, w: 8, h: 2 }
+  ],
+  md: [
+    { id: '1', x: 0, y: 0, w: 10, h: 2 },
+    { id: '2', x: 0, y: 2, w: 10, h: 2 },
+    { id: '3', x: 0, y: 4, w: 5, h: 2 },
+    { id: '4', x: 5, y: 4, w: 5, h: 2 }
+  ],
+  sm: [
+    { id: '1', x: 0, y: 0, w: 6, h: 2 },
+    { id: '2', x: 0, y: 2, w: 6, h: 2 },
+    { id: '3', x: 0, y: 4, w: 6, h: 2 },
+    { id: '4', x: 0, y: 6, w: 6, h: 2 }
+  ],
+  xs: [
+    { id: '1', x: 0, y: 0, w: 4, h: 2 },
+    { id: '2', x: 0, y: 2, w: 4, h: 2 },
+    { id: '3', x: 0, y: 4, w: 4, h: 2 },
+    { id: '4', x: 0, y: 6, w: 4, h: 2 }
+  ],
+  xxs: [
+    { id: '1', x: 0, y: 0, w: 2, h: 2 },
+    { id: '2', x: 0, y: 2, w: 2, h: 2 },
+    { id: '3', x: 0, y: 4, w: 2, h: 2 },
+    { id: '4', x: 0, y: 6, w: 2, h: 2 }
+  ]
 }
 
-<ResponsiveGridContainer
-  layouts={layouts}
-  breakpoints={{ lg: 1200, md: 768, sm: 480 }}
-  cols={{ lg: 12, md: 8, sm: 4 }}
->
-  {(item) => <div>반응형 아이템 {item.id}</div>}
-</ResponsiveGridContainer>
+// 옵션 1: 수동 너비 추적
+function ResponsiveExample() {
+  const [currentBreakpoint, setCurrentBreakpoint] = useState('lg')
+  
+  return (
+    <ResponsiveGridContainer
+      layouts={layouts}
+      onBreakpointChange={(breakpoint) => {
+        setCurrentBreakpoint(breakpoint)
+        console.log(`${breakpoint} 브레이크포인트로 전환됨`)
+      }}
+      onLayoutChange={(layout, allLayouts) => {
+        // 레이아웃을 상태나 백엔드에 저장
+        console.log('레이아웃 변경됨:', allLayouts)
+      }}
+    >
+      {(item) => (
+        <div className="bg-blue-500 text-white p-4 rounded">
+          아이템 {item.id}
+        </div>
+      )}
+    </ResponsiveGridContainer>
+  )
+}
+
+// 옵션 2: WidthProvider를 사용한 자동 너비 감지
+const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
+
+function App() {
+  return (
+    <ResponsiveGridWithWidth
+      layouts={layouts}
+      // 커스텀 브레이크포인트 (선택사항)
+      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+      // 커스텀 열 구성 (선택사항)
+      cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+    >
+      {(item) => <div>아이템 {item.id}</div>}
+    </ResponsiveGridWithWidth>
+  )
+}
 ```
 
 ### 외부에서 드래그 앤 드롭
@@ -284,6 +358,60 @@ import { DroppableGridContainer } from 'tailwind-grid-layout'
 </div>
 ```
 
+### 실시간 반응형 업데이트
+
+반응형 그리드는 윈도우 크기가 조정될 때 자동으로 레이아웃을 업데이트하며, 최적의 성능을 위해 디바운스 처리됩니다:
+
+```tsx
+import { ResponsiveGridContainer } from 'tailwind-grid-layout'
+
+function DashboardExample() {
+  const [layouts, setLayouts] = useState({
+    lg: dashboardLayoutLg,
+    md: dashboardLayoutMd,
+    sm: dashboardLayoutSm,
+    xs: dashboardLayoutXs,
+    xxs: dashboardLayoutXxs
+  })
+  const [currentBreakpoint, setCurrentBreakpoint] = useState('')
+  const [currentCols, setCurrentCols] = useState(12)
+
+  return (
+    <>
+      {/* 시각적 브레이크포인트 표시기 */}
+      <div className="mb-4 p-2 bg-green-100 rounded">
+        현재: {currentBreakpoint} ({currentCols}열)
+      </div>
+      
+      <ResponsiveGridContainer
+        layouts={layouts}
+        onLayoutChange={(layout, allLayouts) => {
+          setLayouts(allLayouts)
+        }}
+        onBreakpointChange={(breakpoint, cols) => {
+          setCurrentBreakpoint(breakpoint)
+          setCurrentCols(cols)
+        }}
+        rowHeight={100}
+        gap={16}
+        containerPadding={[16, 16]}
+      >
+        {(item) => (
+          <Card key={item.id}>
+            <CardHeader>
+              <CardTitle>{item.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {item.content}
+            </CardContent>
+          </Card>
+        )}
+      </ResponsiveGridContainer>
+    </>
+  )
+}
+```
+
 ### DroppingItem 미리보기
 
 ```tsx
@@ -338,20 +466,35 @@ const layouts = generateResponsiveLayouts(items, {
 
 ### WidthProvider HOC
 
-ResponsiveGridContainer에 컨테이너 너비를 자동으로 제공합니다.
+최적의 성능을 위해 ResizeObserver를 사용하여 ResponsiveGridContainer에 컨테이너 너비를 자동으로 제공합니다.
 
 ```tsx
 import { ResponsiveGridContainer, WidthProvider } from 'tailwind-grid-layout'
 
 const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
 
-// 컨테이너 너비를 수동으로 추적할 필요 없음
+// 기본 사용법
 <ResponsiveGridWithWidth
   layouts={layouts}
-  measureBeforeMount={true} // 선택사항: 레이아웃 변경 방지
+  rowHeight={100}
 >
   {(item) => <div>아이템 {item.id}</div>}
 </ResponsiveGridWithWidth>
+
+// 초기 렌더링 시 레이아웃 변경을 방지하는 measureBeforeMount 사용
+<ResponsiveGridWithWidth
+  layouts={layouts}
+  measureBeforeMount={true}
+  rowHeight={100}
+>
+  {(item) => <div>아이템 {item.id}</div>}
+</ResponsiveGridWithWidth>
+
+// WidthProvider 기능:
+// - 효율적인 너비 감지를 위해 ResizeObserver 사용
+// - ResizeObserver를 사용할 수 없는 경우 window resize 이벤트로 대체
+// - measureBeforeMount 옵션으로 SSR을 올바르게 처리
+// - 더 나은 성능을 위한 디바운스된 리사이즈 처리 (150ms)
 ```
 
 
