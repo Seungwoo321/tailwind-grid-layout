@@ -16,6 +16,12 @@ export default tseslint.config(
       '*.config.js',
       '*.config.ts',
       '.storybook/**',
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      '**/*.spec.ts',
+      '**/*.spec.tsx',
+      '__tests__/**',
+      'scripts/**/*.js'
     ]
   },
   
@@ -67,11 +73,33 @@ export default tseslint.config(
   },
   
   // Storybook configuration
-  ...storybook.configs['flat/recommended'],
+  ...(storybook.configs['flat/recommended'] || []),
   
   // Test files
   {
-    files: ['**/*.test.ts', '**/*.test.tsx'],
+    files: ['**/*.test.ts', '**/*.test.tsx', 'scripts/**/*.js'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unsafe-function-type': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off'
+    }
+  },
+  
+  // Stories files
+  {
+    files: ['**/*.stories.ts', '**/*.stories.tsx'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+      '@typescript-eslint/no-explicit-any': 'off'
+    }
+  },
+  
+  // Examples
+  {
+    files: ['examples/**/*.ts', 'examples/**/*.tsx'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off'
     }

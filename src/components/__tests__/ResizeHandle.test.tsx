@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import { render, fireEvent, act } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { ResizeHandle } from '../ResizeHandle'
 
@@ -36,7 +36,9 @@ describe('ResizeHandle', () => {
       )
 
       const handle = container.querySelector('.react-grid-layout__resize-handle') as HTMLElement
-      fireEvent.mouseDown(handle)
+      act(() => {
+        fireEvent.mouseDown(handle)
+      })
       
       expect(mockOnMouseDown).toHaveBeenCalled()
     })
@@ -52,7 +54,9 @@ describe('ResizeHandle', () => {
       )
 
       const handle = container.querySelector('.react-grid-layout__resize-handle') as HTMLElement
-      fireEvent.mouseDown(handle)
+      act(() => {
+        fireEvent.mouseDown(handle)
+      })
       
       expect(mockOnMouseDown).not.toHaveBeenCalled()
     })
@@ -164,7 +168,9 @@ describe('ResizeHandle', () => {
       )
 
       const handle = container.querySelector('div') as HTMLElement
-      fireEvent.mouseDown(handle)
+      act(() => {
+        fireEvent.mouseDown(handle)
+      })
       
       // onMouseDown should not be called because it's set to undefined
       expect(mockOnMouseDown).not.toHaveBeenCalled()
@@ -181,7 +187,9 @@ describe('ResizeHandle', () => {
       )
 
       const handle = container.querySelector('div') as HTMLElement
-      fireEvent.mouseDown(handle)
+      act(() => {
+        fireEvent.mouseDown(handle)
+      })
       
       expect(mockOnMouseDown).toHaveBeenCalled()
     })

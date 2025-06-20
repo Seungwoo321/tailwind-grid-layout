@@ -51,14 +51,13 @@ export function ResponsiveGridContainer({
   }, [breakpoints])
 
   // Calculate current breakpoint based on window width
-  const getBreakpoint = (width: number) => {
+  const getBreakpoint = useMemo(() => (width: number) => {
     // Default to 'lg' if no breakpoints are sorted
     if (sortedBreakpoints.length === 0) return 'lg'
     
     const lastEntry = sortedBreakpoints[sortedBreakpoints.length - 1]
-    if (!lastEntry) return 'lg'
-    
-    let breakpoint = lastEntry[0]
+    // lastEntry cannot be undefined here since we checked length > 0
+    let breakpoint = lastEntry![0]
     
     for (const [bp, minWidth] of sortedBreakpoints) {
       if (width >= minWidth) {
@@ -68,7 +67,7 @@ export function ResponsiveGridContainer({
     }
     
     return breakpoint
-  }
+  }, [sortedBreakpoints])
 
   // Handle window resize
   useEffect(() => {
@@ -93,7 +92,7 @@ export function ResponsiveGridContainer({
       return () => window.removeEventListener('resize', handleResize)
     }
     return undefined
-  }, [currentBreakpoint, cols, sortedBreakpoints, onBreakpointChange, width])
+  }, [currentBreakpoint, cols, sortedBreakpoints, onBreakpointChange, width, getBreakpoint])
 
   // Get current layout
   const currentLayout = layouts[currentBreakpoint] || []

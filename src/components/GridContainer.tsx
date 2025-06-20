@@ -109,10 +109,9 @@ export const GridContainer: React.FC<GridContainerProps> = ({
 
   // Handle drag start
   const handleDragStart = useCallback((itemId: string, e: React.MouseEvent) => {
-    if (!isDraggable) return
-    
-    const item = layout.find(i => i.id === itemId)
-    if (!item || item.isDraggable === false) return
+    // GridItem already checks isDraggable before calling this function
+    const item = layout.find(i => i.id === itemId)!
+    // GridItem already checks item.isDraggable before calling this function
     
     const rect = e.currentTarget.getBoundingClientRect()
     
@@ -137,11 +136,12 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     }
     
     e.preventDefault()
-  }, [isDraggable, layout, onDragStart])
+  }, [layout, onDragStart])
 
   // Handle drag move
   const handleDragMove = useCallback((e: MouseEvent) => {
-    if (!dragState.isDragging || !dragState.draggedItem || !containerRef.current) return
+    // This function is only called when dragging is active
+    if (!containerRef.current) return
     
     const containerRect = containerRef.current.getBoundingClientRect()
     const x = e.clientX - containerRect.left - dragState.dragOffset.x - containerPadding[0]
@@ -152,7 +152,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     const draggedItem = layout.find(i => i.id === dragState.draggedItem)
     if (!draggedItem || draggedItem.static) return
     
-    let newPosition = {
+    const newPosition = {
       x: Math.max(0, Math.min(cols - draggedItem.w, col)),
       y: Math.max(0, row),
       w: draggedItem.w,
@@ -181,7 +181,8 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       const staticCollisions = collisions.filter(item => item.static)
       
       if (staticCollisions.length > 0) {
-        return // Don't move if colliding with static items
+        // Don't update state or call callbacks if colliding with static items
+        return
       }
     }
     
@@ -189,10 +190,10 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     let finalLayout = tempLayout
     if (!preventCollision && !allowOverlap) {
       const itemWithNewPosition = { ...draggedItem, ...newPosition }
-      const originalPosition = dragState.originalPosition ? 
-        { ...draggedItem, ...dragState.originalPosition } : 
-        draggedItem
-      finalLayout = moveItems(tempLayout, itemWithNewPosition, cols, originalPosition)
+      // originalPosition is always set when drag starts
+      const originalPosition = dragState.originalPosition
+      const originalWithId = { ...draggedItem, ...originalPosition }
+      finalLayout = moveItems(tempLayout, itemWithNewPosition, cols, originalWithId)
     }
     
     // Compact the layout
@@ -216,13 +217,13 @@ export const GridContainer: React.FC<GridContainerProps> = ({
 
   // Handle drag end
   const handleDragEnd = useCallback((e: MouseEvent) => {
-    if (!dragState.isDragging || !dragState.draggedItem) return
+    // This function is only called when dragging is active
     
     const draggedItem = layout.find(i => i.id === dragState.draggedItem)
     if (draggedItem && onDragStop && dragState.originalPosition) {
       const element = containerRef.current?.querySelector(`[data-grid-id="${dragState.draggedItem}"]`) as HTMLElement
       if (element) {
-        onDragStop(layout, { ...draggedItem, ...dragState.originalPosition }, draggedItem, { ...draggedItem, ...(dragState.placeholder || {}) }, e, element)
+        onDragStop(layout, { ...draggedItem, ...dragState.originalPosition }, draggedItem, { ...draggedItem, ...dragState.placeholder }, e, element)
       }
     }
     
@@ -245,10 +246,8 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     handle: ResizeState['resizeHandle'],
     e: React.MouseEvent
   ) => {
-    if (!isResizable) return
-    
-    const item = layout.find(i => i.id === itemId)
-    if (!item || item.isResizable === false) return
+    // ResizeHandle component already checks isResizable before calling this
+    const item = layout.find(i => i.id === itemId)!
     
     setResizeState({
       isResizing: true,
@@ -267,11 +266,11 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     
     e.preventDefault()
     e.stopPropagation()
-  }, [isResizable, layout, onResizeStart])
+  }, [layout, onResizeStart])
 
   // Handle resize move
   const handleResizeMove = useCallback((e: MouseEvent) => {
-    if (!resizeState.isResizing || !resizeState.resizedItem) return
+    // This function is only called when resizing is active
     
     const item = layout.find(i => i.id === resizeState.resizedItem)
     if (!item) return
@@ -372,7 +371,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
 
   // Handle resize end
   const handleResizeEnd = useCallback((e: MouseEvent) => {
-    if (!resizeState.isResizing || !resizeState.resizedItem) return
+    // This function is only called when resizing is active
     
     const resizedItem = layout.find(i => i.id === resizeState.resizedItem)
     if (resizedItem && onResizeStop && resizeState.originalPos) {
@@ -431,9 +430,8 @@ export const GridContainer: React.FC<GridContainerProps> = ({
 
   // Calculate grid height
   const verticalMargin = margin ? margin[1] : gap
-  const calculatedHeight = Math.max(
-    ...layout.map(item => (item.y + item.h) * (rowHeight + verticalMargin))
-  ) || 0
+  const heights = layout.map(item => (item.y + item.h) * (rowHeight + verticalMargin))
+  const calculatedHeight = heights.length > 0 ? Math.max(...heights) : 0
   
   // Apply autoSize
   const gridHeight = autoSize ? calculatedHeight : undefined

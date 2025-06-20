@@ -21,8 +21,9 @@ export function WidthProvider<P extends { width?: number }>(
       mounted.current = true
       
       const handleResize = () => {
-        if (!elementRef.current) return
-        const newWidth = elementRef.current.offsetWidth
+        const element = elementRef.current
+        if (!element) return
+        const newWidth = element.offsetWidth
         setWidth(newWidth)
       }
 

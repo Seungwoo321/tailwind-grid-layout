@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { WidthProvider } from '../WidthProvider'
 import React from 'react'
@@ -9,6 +9,31 @@ const MockComponent = ({ width }: { width?: number }) => (
 )
 
 describe('WidthProvider', () => {
+  it('should handle resize when element ref is null', async () => {
+    // Create a component that can be wrapped by WidthProvider
+    const ContentComponent = ({ width }: { width?: number }) => {
+      const [showContent, setShowContent] = React.useState(false)
+      return (
+        <>
+          <button onClick={() => setShowContent(!showContent)}>Toggle</button>
+          {showContent ? <div data-testid="content">Width: {width ?? 'null'}</div> : null}
+        </>
+      )
+    }
+    
+    // Wrap the component with WidthProvider HOC
+    const WrappedComponent = WidthProvider(ContentComponent)
+
+    const { container } = render(<WrappedComponent />)
+    
+    // Trigger resize event when content is not rendered
+    await act(async () => {
+      window.dispatchEvent(new Event('resize'))
+    })
+    
+    // Should not crash and handle gracefully
+    expect(container).toBeInTheDocument()
+  })
   let mockResizeObserver: any
   
   beforeEach(() => {
@@ -40,23 +65,29 @@ describe('WidthProvider', () => {
     })
   })
 
-  it('should measure width before mount when measureBeforeMount is true', () => {
+  it('should measure width before mount when measureBeforeMount is true', async () => {
     const WrappedComponent = WidthProvider(MockComponent)
     
-    const { container } = render(<WrappedComponent measureBeforeMount />)
+    let container: HTMLElement
+    await act(async () => {
+      const result = render(<WrappedComponent measureBeforeMount />)
+      container = result.container
+    })
     
     // Should render a placeholder div initially with width style
-    const placeholder = container.querySelector('div')
+    const placeholder = container!.querySelector('div')
     expect(placeholder).toBeInTheDocument()
     expect(placeholder?.style.width).toBe('100%')
     // The placeholder div should not have the component rendered yet
-    expect(container.textContent).toBe('')
+    expect(container!.textContent).toBe('')
   })
 
-  it('should use ResizeObserver when available', () => {
+  it('should use ResizeObserver when available', async () => {
     const WrappedComponent = WidthProvider(MockComponent)
     
-    render(<WrappedComponent />)
+    await act(async () => {
+      render(<WrappedComponent />)
+    })
     
     // ResizeObserver should be created
     expect(mockResizeObserver).toHaveBeenCalled()
@@ -66,7 +97,7 @@ describe('WidthProvider', () => {
     expect(instance.observe).toHaveBeenCalled()
   })
 
-  it('should fall back to window resize when ResizeObserver is not available', () => {
+  it('should fall back to window resize when ResizeObserver is not available', async () => {
     // Remove ResizeObserver
     const originalResizeObserver = global.ResizeObserver
     // @ts-ignore
@@ -75,7 +106,9 @@ describe('WidthProvider', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener')
     
     const WrappedComponent = WidthProvider(MockComponent)
-    render(<WrappedComponent />)
+    await act(async () => {
+      render(<WrappedComponent />)
+    })
     
     // Should add resize listener
     expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function))
@@ -137,7 +170,7 @@ describe('WidthProvider', () => {
     useRefSpy.mockRestore()
   })
 
-  it('should handle resize observer entry without contentRect', () => {
+  it('should handle resize observer entry without contentRect', async () => {
     const WrappedComponent = WidthProvider(MockComponent)
     
     render(<WrappedComponent />)
@@ -146,10 +179,12 @@ describe('WidthProvider', () => {
     const resizeCallback = mockResizeObserver.mock.calls[0][0]
     
     // Call with entry that has no contentRect
-    resizeCallback([{
-      target: document.createElement('div'),
-      contentRect: undefined
-    }])
+    act(() => {
+      resizeCallback([{
+        target: document.createElement('div'),
+        contentRect: undefined
+      }])
+    })
     
     // Should not throw and component should still be rendered
     expect(screen.getByTestId('mock-component')).toBeInTheDocument()
@@ -180,7 +215,9 @@ describe('WidthProvider', () => {
     })
     
     // Call resize handler - should return early when ref is null
-    resizeHandler()
+    act(() => {
+      resizeHandler()
+    })
     
     // Component should still be rendered
     expect(screen.getByTestId('mock-component')).toBeInTheDocument()

@@ -168,7 +168,7 @@ export function moveItems(
   _originalItem?: GridItem
 ): GridItem[] {
   const compareWith = { ...item }
-  let movedLayout = [...layout]
+  const movedLayout = [...layout]
   
   // Update the position of the moving item in the layout
   const itemIndex = movedLayout.findIndex(l => l.id === item.id)

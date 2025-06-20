@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import { render, fireEvent, act } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { GridItemComponent } from '../GridItem'
 import { GridItem } from '../../types'
@@ -127,7 +127,9 @@ describe('GridItemComponent', () => {
     )
 
     const dragHandle = container.querySelector('.grid-drag-handle') as HTMLElement
-    fireEvent.mouseDown(dragHandle)
+    act(() => {
+      fireEvent.mouseDown(dragHandle)
+    })
     
     expect(mockOnDragStart).toHaveBeenCalledWith('1', expect.any(Object))
   })
@@ -149,7 +151,9 @@ describe('GridItemComponent', () => {
     )
 
     const element = container.firstChild as HTMLElement
-    fireEvent.mouseDown(element)
+    act(() => {
+      fireEvent.mouseDown(element)
+    })
     
     expect(mockOnDragStart).toHaveBeenCalledWith('1', expect.any(Object))
   })
@@ -173,7 +177,9 @@ describe('GridItemComponent', () => {
     )
 
     const element = container.firstChild as HTMLElement
-    fireEvent.mouseDown(element)
+    act(() => {
+      fireEvent.mouseDown(element)
+    })
     
     expect(mockOnDragStart).not.toHaveBeenCalled()
   })
@@ -197,7 +203,9 @@ describe('GridItemComponent', () => {
     )
 
     const button = container.querySelector('.grid-actions') as HTMLElement
-    fireEvent.mouseDown(button)
+    act(() => {
+      fireEvent.mouseDown(button)
+    })
     
     expect(mockOnDragStart).not.toHaveBeenCalled()
   })
@@ -222,7 +230,9 @@ describe('GridItemComponent', () => {
     )
 
     const noDragElement = container.querySelector('.no-drag') as HTMLElement
-    fireEvent.mouseDown(noDragElement)
+    act(() => {
+      fireEvent.mouseDown(noDragElement)
+    })
     
     expect(mockOnDragStart).not.toHaveBeenCalled()
   })
