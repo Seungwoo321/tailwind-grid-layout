@@ -14,8 +14,8 @@ interface GridItemComponentProps {
   isResizable: boolean
   resizeHandles?: Array<'s' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'>
   draggableCancel?: string
-  onDragStart: (itemId: string, e: React.MouseEvent) => void
-  onResizeStart: (itemId: string, handle: ResizeState['resizeHandle'], e: React.MouseEvent) => void
+  onDragStart: (itemId: string, e: React.MouseEvent | React.TouchEvent) => void
+  onResizeStart: (itemId: string, handle: ResizeState['resizeHandle'], e: React.MouseEvent | React.TouchEvent) => void
   children: React.ReactNode
 }
 
@@ -32,7 +32,7 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
   onResizeStart,
   children
 }) => {
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     // Don't allow dragging static items
     if (item.static) return
     
@@ -70,6 +70,7 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
         cursor: isDraggable ? 'grab' : 'default'
       }}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleMouseDown}
     >
       {children}
       

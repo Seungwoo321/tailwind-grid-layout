@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @config "../../tailwind.config.ts";
+@import "./mobile.css";
 
 /* shadcn/ui CSS variables */
 @layer base {

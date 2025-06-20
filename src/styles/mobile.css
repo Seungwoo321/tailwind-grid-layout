@@ -1,0 +1,85 @@
+/* Mobile Touch Support Styles */
+
+/* Grid Container */
+.tailwind-grid-layout {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+}
+
+/* Grid Items */
+.tailwind-grid-layout [data-grid-id] {
+  touch-action: none; /* Prevent scrolling while dragging */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+
+/* When not dragging, allow normal touch behavior on the container */
+.tailwind-grid-layout:not(.dragging) {
+  touch-action: auto;
+}
+
+/* Drag handles */
+.grid-drag-handle {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  /* Ensure minimum touch target size */
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Resize handles - larger for touch */
+@media (hover: none) and (pointer: coarse) {
+  .react-grid-layout__resize-handle {
+    width: 44px !important;
+    height: 44px !important;
+    /* Adjust background size for larger handle */
+    background-size: 20px 20px;
+    /* Increase padding for better touch target */
+    padding: 12px !important;
+  }
+  
+  /* Edge handles also need to be larger on mobile */
+  .tailwind-grid-layout .resize-handle-n,
+  .tailwind-grid-layout .resize-handle-s {
+    height: 44px !important;
+    width: 100px !important;
+  }
+  
+  .tailwind-grid-layout .resize-handle-e,
+  .tailwind-grid-layout .resize-handle-w {
+    width: 44px !important;
+    height: 100px !important;
+  }
+}
+
+/* Prevent text selection during drag/resize */
+.tailwind-grid-layout.dragging *,
+.tailwind-grid-layout.resizing * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* Smooth transitions but not during drag/resize */
+.tailwind-grid-layout [data-grid-id] {
+  will-change: transform;
+}
+
+/* Disable transitions during drag/resize for better performance */
+.tailwind-grid-layout.dragging [data-grid-id],
+.tailwind-grid-layout.resizing [data-grid-id] {
+  transition: none !important;
+}
+
+/* Visual feedback for touch */
+@media (hover: none) and (pointer: coarse) {
+  .tailwind-grid-layout [data-grid-id]:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}

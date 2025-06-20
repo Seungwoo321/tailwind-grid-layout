@@ -7,6 +7,7 @@ export { WidthProvider } from './components/WidthProvider'
 
 export * from './types'
 export * from './utils/grid'
+export * from './utils/touch'
 export { cn } from './utils/cn'
 export type { ResponsiveGridContainerProps, BreakpointLayouts } from './components/ResponsiveGridContainer'
 export type { DroppableGridContainerProps } from './components/DroppableGridContainer'
