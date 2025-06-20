@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi as _vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { GridContainer } from '../GridContainer'
@@ -44,7 +44,7 @@ describe('GridContainer - Coverage Tests', () => {
   it('should cover lines 529-530 - droppingItem with null w and h', () => {
     const droppingItem = {} // No w or h properties, completely empty object
     
-    const { container, debug } = render(
+    const { container, debug: _debug } = render(
       <GridContainer 
         items={defaultItems} 
         droppingItem={droppingItem}
@@ -67,9 +67,9 @@ describe('GridContainer - Coverage Tests', () => {
     
     // Instead of checking exact pixel values, verify the element exists
     // and the calculation was performed (even with fallback values)
-    const hasWidthStyle = placeholder?.getAttribute('style')?.includes('width') || 
+    const _hasWidthStyle = placeholder?.getAttribute('style')?.includes('width') || 
                          placeholder?.hasAttribute('width')
-    const hasHeightStyle = placeholder?.getAttribute('style')?.includes('height') || 
+    const _hasHeightStyle = placeholder?.getAttribute('style')?.includes('height') || 
                           placeholder?.hasAttribute('height')
     
     // The element should have dimensions set (even if calculated differently)
@@ -123,7 +123,7 @@ describe('GridContainer - Coverage Tests', () => {
   it('should handle droppingItem while dragging (should not show)', () => {
     // Mock dragging state by creating a component that simulates drag
     const DraggingContainer = () => {
-      const [isDragging, setIsDragging] = React.useState(false)
+      const [_isDragging, setIsDragging] = React.useState(false)
       
       React.useEffect(() => {
         // Simulate drag start

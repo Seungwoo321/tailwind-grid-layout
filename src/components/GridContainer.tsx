@@ -136,7 +136,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     }
     
     e.preventDefault()
-  }, [isDraggable, layout, onDragStart])
+  }, [layout, onDragStart])
 
   // Handle drag move
   const handleDragMove = useCallback((e: MouseEvent) => {
@@ -152,7 +152,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     const draggedItem = layout.find(i => i.id === dragState.draggedItem)
     if (!draggedItem || draggedItem.static) return
     
-    let newPosition = {
+    const newPosition = {
       x: Math.max(0, Math.min(cols - draggedItem.w, col)),
       y: Math.max(0, row),
       w: draggedItem.w,
@@ -266,7 +266,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     
     e.preventDefault()
     e.stopPropagation()
-  }, [isResizable, layout, onResizeStart])
+  }, [layout, onResizeStart])
 
   // Handle resize move
   const handleResizeMove = useCallback((e: MouseEvent) => {

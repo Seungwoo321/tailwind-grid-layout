@@ -156,12 +156,12 @@ describe('GridContainer - Direct Branch Coverage', () => {
     ]
     
     // Spy on the internal handleResizeStart method
-    let handleResizeStartRef: any = null
+    let _handleResizeStartRef: any = null
     
     const TestWrapper = () => {
       const ref = React.useRef<any>(null)
       React.useEffect(() => {
-        handleResizeStartRef = ref.current
+        _handleResizeStartRef = ref.current
       }, [])
       
       return (

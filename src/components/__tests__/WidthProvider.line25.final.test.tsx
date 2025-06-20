@@ -76,7 +76,7 @@ describe('WidthProvider - Line 25 Final Coverage', () => {
     
     // Mock the internal implementation more directly
     const originalUseRef = React.useRef
-    let elementRefValue: { current: HTMLDivElement | null } = { current: null }
+    const elementRefValue: { current: HTMLDivElement | null } = { current: null }
     
     // Control the ref
     React.useRef = vi.fn((initial) => {
@@ -129,7 +129,7 @@ describe('WidthProvider - Line 25 Final Coverage', () => {
     
     // Control the ref
     const originalUseRef = React.useRef
-    let refValue = { current: null as HTMLDivElement | null }
+    const refValue = { current: null as HTMLDivElement | null }
     
     React.useRef = vi.fn((initial) => {
       if (initial === null) {

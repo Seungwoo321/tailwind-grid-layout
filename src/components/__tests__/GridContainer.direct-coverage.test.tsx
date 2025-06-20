@@ -88,7 +88,7 @@ describe('GridContainer - Direct 100% Branch Coverage', () => {
     )
     
     // Get the GridContainer instance and call handleDragStart with non-existent item
-    const gridContainer = container.firstChild as HTMLElement
+    const _gridContainer = container.firstChild as HTMLElement
     const instance = getComponentInstance(container)
     
     if (instance?.memoizedProps?.onDragStart) {

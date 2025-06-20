@@ -132,7 +132,7 @@ describe('WidthProvider - Null Element Coverage', () => {
     })
     
     // Mock element ref
-    let mockElementRef = { current: null as HTMLDivElement | null }
+    const mockElementRef = { current: null as HTMLDivElement | null }
     const originalUseRef = React.useRef
     React.useRef = vi.fn((initial) => {
       if (initial === null) {

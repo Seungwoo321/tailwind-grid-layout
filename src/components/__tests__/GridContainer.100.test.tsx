@@ -87,7 +87,7 @@ describe('GridContainer - 100% Branch Coverage', () => {
     ]
     
     const TestComponent = () => {
-      const [dragState, setDragState] = React.useState({ isDragging: true, draggedItem: null })
+      const [_dragState, _setDragState] = React.useState({ isDragging: true, draggedItem: null })
       
       React.useEffect(() => {
         // Simulate drag end without valid draggedItem

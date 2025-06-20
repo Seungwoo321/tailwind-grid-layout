@@ -154,7 +154,7 @@ describe('GridContainer - Absolute 100% Coverage', () => {
     
     if (resizeHandle) {
       // Mock ResizeObserver entry for precise control
-      const mockEntry = {
+      const _mockEntry = {
         target: resizeHandle,
         contentRect: { width: 50, height: 50 },
         borderBoxSize: [{ inlineSize: 50, blockSize: 50 }],
@@ -227,7 +227,7 @@ describe('GridContainer - Absolute 100% Coverage', () => {
 
     // Create a scenario where originalPosition might not be fully set
     const TestComponent = () => {
-      const [dragState, setDragState] = React.useState({
+      const [_dragState, setDragState] = React.useState({
         isDragging: false,
         draggedItem: null as GridItem | null,
         originalPosition: null as any,

@@ -118,7 +118,6 @@ testFiles.forEach(filePath => {
     writeFileSync(filePath, content, 'utf8')
     console.log(`  ✅ Fixed ${fixCount} act() issues`)
     totalFixed += fixCount
-    modified = true
   } else {
     console.log('  ℹ️  No act() issues found')
   }

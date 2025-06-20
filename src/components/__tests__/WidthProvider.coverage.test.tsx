@@ -39,7 +39,7 @@ describe('WidthProvider - Coverage Tests', () => {
     const wrapper = container.querySelector('div[style*="width: 100%"]') as HTMLElement
     
     // Create a custom ref that we can control
-    let savedOffsetWidth = wrapper.offsetWidth
+    const savedOffsetWidth = wrapper.offsetWidth
     Object.defineProperty(wrapper, 'offsetWidth', {
       get: () => {
         // Return null/undefined to simulate element not being ready

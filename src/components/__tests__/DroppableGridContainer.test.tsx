@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach as _afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import React from 'react'
 import { DroppableGridContainer } from '../DroppableGridContainer'
@@ -68,7 +68,7 @@ describe('DroppableGridContainer', () => {
     const container = document.querySelector('.relative')! as HTMLElement
     
     // Create a proper DragEvent with dataTransfer
-    const dragOverEvent = fireEvent.dragOver(container)
+    const _dragOverEvent = fireEvent.dragOver(container)
     
     // The event should be handled
     expect(container).toBeTruthy()

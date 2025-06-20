@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, fireEvent, act } from '@testing-library/react'
 import React from 'react'
 import { GridContainer } from '../GridContainer'
-import type { GridItem, GridContainerProps } from '../../types'
+import type { GridItem, GridContainerProps as _GridContainerProps } from '../../types'
 
 describe('GridContainer - Complete Branch Coverage', () => {
   beforeEach(() => {
