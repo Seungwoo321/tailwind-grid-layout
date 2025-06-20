@@ -147,9 +147,23 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     const item = layout.find(i => i.id === itemId)!
     // GridItem already checks item.isDraggable before calling this function
     
+    // Debug logging
+    console.log('🚀 handleDragStart called', {
+      itemId,
+      eventType: e.nativeEvent.type,
+      isTouchEvent: 'touches' in e.nativeEvent,
+      hasTouch: 'touches' in e.nativeEvent ? (e.nativeEvent as TouchEvent).touches.length > 0 : false
+    })
+    
     const rect = e.currentTarget.getBoundingClientRect()
     const pos = getControlPosition(e.nativeEvent)
-    if (!pos) return
+    
+    console.log('📍 Position from getControlPosition:', pos)
+    
+    if (!pos) {
+      console.warn('❌ getControlPosition returned null, aborting drag')
+      return
+    }
     
     const newDragState = {
       isDragging: true,

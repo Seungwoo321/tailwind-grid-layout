@@ -1,13 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ResponsiveGridContainer, WidthProvider } from '../../src'
 import type { GridItem, BreakpointLayouts } from '../../src'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../src/components/ui/card'
+import { enableTouchDebugging } from '../../src/utils/touch-debug'
+import { TouchTestGrid } from '../../src/components/TouchTestGrid'
 
 const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
 
 export function ShowcaseExample() {
   const [dashboardBreakpoint, setDashboardBreakpoint] = useState<string>('lg')
   const [responsiveBreakpoint, setResponsiveBreakpoint] = useState<string>('lg')
+
+  // Enable touch debugging in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      enableTouchDebugging()
+    }
+  }, [])
 
   // Responsive Dashboard Example
   const [dashboardLayouts, setDashboardLayouts] = useState<BreakpointLayouts>({
@@ -284,6 +293,15 @@ export function ShowcaseExample() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Touch Event Test Section */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">🔬 터치 이벤트 디버깅</h2>
+        <p className="text-gray-600 mb-6">
+          개발자 도구에서 터치 시뮬레이션을 테스트해보세요. 아래 박스를 드래그하면 어떤 이벤트가 발생하는지 확인할 수 있습니다.
+        </p>
+        <TouchTestGrid />
       </section>
 
       {/* Features List */}
