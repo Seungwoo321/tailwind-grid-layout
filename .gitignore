@@ -6,6 +6,16 @@ node_modules/
 # Testing
 coverage/
 .nyc_output/
+.nyc_output_e2e/
+playwright/
+playwright-report/
+playwright-report-coverage/
+test-results/
+*.txt
+.nycrc.json
+*_REPORT.md
+*_ACHIEVEMENT.md
+*_STRATEGY.md
 
 # Production
 dist/

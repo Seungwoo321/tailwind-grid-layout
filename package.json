@@ -53,9 +53,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest --coverage",
     "prepublishOnly": "pnpm run build:lib",
-    "storybook": "storybook dev -p 6006",
-    "test:browser": "vitest run --config vitest.browser.config.ts",
-    "test:browser:coverage": "vitest run --config vitest.browser.config.ts --coverage"
+    "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
     "clsx": "^2.1.0",
