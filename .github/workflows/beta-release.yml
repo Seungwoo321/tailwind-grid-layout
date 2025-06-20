@@ -6,7 +6,7 @@ on:
       - develop
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -61,15 +61,12 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub pre-release
-        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          release_name: v${{ steps.version.outputs.version }}
-          body: |
-            Beta release ${{ steps.version.outputs.version }}
-            
-            Install with: `npm install tailwind-grid-layout@beta`
-          draft: false
-          prerelease: true
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            --title "v${{ steps.version.outputs.version }}" \
+            --notes "Beta release ${{ steps.version.outputs.version }}
+          
+          Install with: \`npm install tailwind-grid-layout@beta\`" \
+            --prerelease
