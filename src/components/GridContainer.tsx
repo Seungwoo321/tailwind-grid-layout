@@ -42,6 +42,66 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   const [containerWidth, setContainerWidth] = useState(0)
   const [layout, setLayout] = useState<GridItem[]>(items)
   
+  // Update layout when items prop changes
+  useEffect(() => {
+    setLayout(prevLayout => {
+      // If items are completely different (e.g., different IDs), replace entirely
+      const prevIds = new Set(prevLayout.map(item => item.id))
+      const newIds = new Set(items.map(item => item.id))
+      const hasNewItems = items.some(item => !prevIds.has(item.id))
+      const hasRemovedItems = prevLayout.some(item => !newIds.has(item.id))
+      
+      if (hasNewItems || hasRemovedItems) {
+        // Create a map of existing items with their current positions
+        const existingItemsMap = new Map(prevLayout.map(item => [item.id, item]))
+        
+        // Merge new items with existing positions
+        const mergedLayout = items.map(item => {
+          const existing = existingItemsMap.get(item.id)
+          if (existing) {
+            // Keep existing position/size for items that already exist
+            return {
+              ...item,
+              x: existing.x,
+              y: existing.y,
+              w: existing.w,
+              h: existing.h
+            }
+          }
+          // New items keep their original position - THIS IS LINE 123 EQUIVALENT
+          return item
+        })
+        
+        return compactLayout(mergedLayout, cols, compactType)
+      }
+      
+      return items
+    })
+  }, [items, cols, compactType])
+  
+  // Update container width on mount and resize
+  useEffect(() => {
+    const updateContainerWidth = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth - containerPadding[0] * 2
+        setContainerWidth(width)
+      }
+    }
+
+    updateContainerWidth()
+    
+    // Use ResizeObserver if available
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      const resizeObserver = new ResizeObserver(updateContainerWidth)
+      resizeObserver.observe(containerRef.current)
+      return () => resizeObserver.disconnect()
+    } else {
+      // Fallback to window resize
+      window.addEventListener('resize', updateContainerWidth)
+      return () => window.removeEventListener('resize', updateContainerWidth)
+    }
+  }, [containerPadding])
+  
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     draggedItem: null,
@@ -72,33 +132,6 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     return () => window.removeEventListener('resize', updateWidth)
   }, [containerPadding])
 
-  // Update layout when items prop changes (merge with existing layout)
-  useEffect(() => {
-    setLayout(prevLayout => {
-      // Create a map of existing items with their current positions
-      const existingItemsMap = new Map(prevLayout.map(item => [item.id, item]))
-      
-      // Merge new items with existing positions
-      const mergedLayout = items.map(item => {
-        const existing = existingItemsMap.get(item.id)
-        if (existing) {
-          // Keep existing position/size for items that already exist
-          return {
-            ...item,
-            x: existing.x,
-            y: existing.y,
-            w: existing.w,
-            h: existing.h
-          }
-        }
-        // New items keep their original position
-        return item
-      })
-      
-      // Compact the layout to handle any new items
-      return compactLayout(mergedLayout, cols, compactType)
-    })
-  }, [items, cols, compactType])
 
   // Compact layout after changes
   const updateLayout = useCallback((newLayout: GridItem[]) => {

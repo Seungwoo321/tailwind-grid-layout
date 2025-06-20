@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { GridContainer } from './GridContainer'
 import type { GridItem, GridContainerProps } from '../types'
 
@@ -40,10 +40,21 @@ export function ResponsiveGridContainer({
   width,
   ...props
 }: ResponsiveGridContainerProps) {
-  const [currentBreakpoint, setCurrentBreakpoint] = useState<string>('lg')
-  const [currentCols, setCurrentCols] = useState(
-    typeof cols === 'object' && cols.lg ? cols.lg : 12
-  )
+  // Initialize with actual breakpoint based on current width
+  const [currentBreakpoint, setCurrentBreakpoint] = useState<string>(() => {
+    const initialWidth = width ?? window.innerWidth
+    const sortedBps = Object.entries(breakpoints).sort((a, b) => b[1] - a[1])
+    for (const [bp, minWidth] of sortedBps) {
+      if (initialWidth >= minWidth) {
+        return bp
+      }
+    }
+    return sortedBps[sortedBps.length - 1]?.[0] || 'lg'
+  })
+  const [currentCols, setCurrentCols] = useState(() => {
+    const colsForBreakpoint = typeof cols === 'object' ? cols[currentBreakpoint] : undefined
+    return colsForBreakpoint || (defaultCols as Record<string, number>)[currentBreakpoint] || 12
+  })
 
   // Get sorted breakpoints
   const sortedBreakpoints = useMemo(() => {
@@ -69,7 +80,9 @@ export function ResponsiveGridContainer({
     return breakpoint
   }, [sortedBreakpoints])
 
-  // Handle window resize
+  // Handle window resize with debouncing
+  const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  
   useEffect(() => {
     const handleResize = () => {
       const containerWidth = width ?? window.innerWidth
@@ -84,15 +97,40 @@ export function ResponsiveGridContainer({
       }
     }
 
-    handleResize() // Set initial breakpoint
+    // Debounced resize handler
+    const debouncedHandleResize = () => {
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+      resizeTimeoutRef.current = setTimeout(handleResize, 150)
+    }
+
+    // Call initial handleResize for setting up correct state
+    handleResize()
     
     // Only listen to window resize if width is not provided
     if (width === undefined) {
-      window.addEventListener('resize', handleResize)
-      return () => window.removeEventListener('resize', handleResize)
+      window.addEventListener('resize', debouncedHandleResize)
+      return () => {
+        window.removeEventListener('resize', debouncedHandleResize)
+        if (resizeTimeoutRef.current) {
+          clearTimeout(resizeTimeoutRef.current)
+        }
+      }
+    } else {
+      // When width is provided, we still need to check for breakpoint changes
+      handleResize()
     }
     return undefined
   }, [currentBreakpoint, cols, sortedBreakpoints, onBreakpointChange, width, getBreakpoint])
+
+  // Call onBreakpointChange on mount if provided
+  useEffect(() => {
+    if (onBreakpointChange) {
+      onBreakpointChange(currentBreakpoint, currentCols)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only on mount
 
   // Get current layout
   const currentLayout = layouts[currentBreakpoint] || []
