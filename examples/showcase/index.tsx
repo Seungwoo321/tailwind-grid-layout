@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { GridContainer, ResponsiveGridContainer, WidthProvider } from '../../src'
+import { ResponsiveGridContainer, WidthProvider } from '../../src'
 import type { GridItem, BreakpointLayouts } from '../../src'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../src/components/ui/card'
 
@@ -205,7 +205,7 @@ export function ShowcaseExample() {
             breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
             cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
             onLayoutChange={(layout, layouts) => setResponsiveLayouts(layouts)}
-            onBreakpointChange={(breakpoint, cols) => {
+            onBreakpointChange={(breakpoint, _cols) => {
               setResponsiveBreakpoint(breakpoint)
             }}
             rowHeight={100}

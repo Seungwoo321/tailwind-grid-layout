@@ -129,6 +129,7 @@ export function ResponsiveGridContainer({
     if (onBreakpointChange) {
       onBreakpointChange(currentBreakpoint, currentCols)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // Only on mount
 
   // Get current layout
