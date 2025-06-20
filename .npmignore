@@ -1,0 +1,54 @@
+# Source files
+src/
+stories/
+examples/
+docs/
+__tests__/
+
+# Config files
+.storybook/
+.github/
+.vscode/
+.eslintrc.*
+.prettierrc.*
+*.config.js
+*.config.ts
+tsconfig.json
+tsconfig.*.json
+vitest.config.ts
+vite.*.config.ts
+
+# Development files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+*.stories.ts
+*.stories.tsx
+
+# Build artifacts
+storybook-static/
+docs-dist/
+coverage/
+.nyc_output/
+
+# Misc
+.DS_Store
+*.log
+.env*
+CLAUDE.md
+NPM_SETUP.md
+.releaserc.json
+
+# Git
+.git/
+.gitignore
+
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# IDE
+.idea/
+*.swp
+*.swo
