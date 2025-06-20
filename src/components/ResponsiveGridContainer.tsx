@@ -81,7 +81,7 @@ export function ResponsiveGridContainer({
   }, [sortedBreakpoints])
 
   // Handle window resize with debouncing
-  const resizeTimeoutRef = useRef<NodeJS.Timeout>()
+  const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   
   useEffect(() => {
     const handleResize = () => {
