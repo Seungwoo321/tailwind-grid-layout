@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
 
 export function ShowcaseExample() {
-  const [currentBreakpoint, setCurrentBreakpoint] = useState<string>('lg')
+  const [dashboardBreakpoint, setDashboardBreakpoint] = useState<string>('lg')
+  const [responsiveBreakpoint, setResponsiveBreakpoint] = useState<string>('lg')
 
   // Responsive Dashboard Example
   const [dashboardLayouts, setDashboardLayouts] = useState<BreakpointLayouts>({
@@ -165,6 +166,9 @@ export function ShowcaseExample() {
         <p className="text-gray-600 mb-6">
           A typical dashboard layout using shadcn/ui Card components. All widgets are draggable and resizable.
         </p>
+        <div className="mb-4 p-3 bg-green-50 rounded-md text-green-700">
+          <strong>Current Breakpoint:</strong> <span className="font-mono text-lg">{dashboardBreakpoint}</span>
+        </div>
         <div className="bg-white rounded-lg shadow-lg p-6">
           <ResponsiveGridContainer
             layouts={dashboardLayouts}
@@ -173,6 +177,7 @@ export function ShowcaseExample() {
             rowHeight={80}
             gap={16}
             onLayoutChange={(layout, layouts) => setDashboardLayouts(layouts)}
+            onBreakpointChange={(breakpoint) => setDashboardBreakpoint(breakpoint)}
           >
             {renderDashboardItem}
           </ResponsiveGridContainer>
@@ -192,7 +197,7 @@ export function ShowcaseExample() {
           <strong>Columns:</strong> lg: 12 • md: 10 • sm: 6 • xs: 4 • xxs: 2
         </div>
         <div className="mb-6 p-3 bg-blue-50 rounded-md text-blue-700">
-          <strong>Current Breakpoint:</strong> <span className="font-mono text-lg">{currentBreakpoint}</span>
+          <strong>Current Breakpoint:</strong> <span className="font-mono text-lg">{responsiveBreakpoint}</span>
         </div>
         <div className="bg-white rounded-lg shadow-lg p-6">
           <ResponsiveGridContainer
@@ -201,8 +206,7 @@ export function ShowcaseExample() {
             cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
             onLayoutChange={(layout, layouts) => setResponsiveLayouts(layouts)}
             onBreakpointChange={(breakpoint, cols) => {
-              setCurrentBreakpoint(breakpoint)
-              console.log(`Breakpoint changed to: ${breakpoint}, Columns: ${cols}`)
+              setResponsiveBreakpoint(breakpoint)
             }}
             rowHeight={100}
             gap={16}

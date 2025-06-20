@@ -42,7 +42,7 @@ export function ResponsiveGridContainer({
 }: ResponsiveGridContainerProps) {
   // Initialize with actual breakpoint based on current width
   const [currentBreakpoint, setCurrentBreakpoint] = useState<string>(() => {
-    const initialWidth = width ?? (typeof window !== 'undefined' ? window.innerWidth : 1200)
+    const initialWidth = width ?? window.innerWidth
     const sortedBps = Object.entries(breakpoints).sort((a, b) => b[1] - a[1])
     for (const [bp, minWidth] of sortedBps) {
       if (initialWidth >= minWidth) {
@@ -87,8 +87,6 @@ export function ResponsiveGridContainer({
     const handleResize = () => {
       const containerWidth = width ?? window.innerWidth
       const newBreakpoint = getBreakpoint(containerWidth)
-      
-      
       if (newBreakpoint !== currentBreakpoint) {
         setCurrentBreakpoint(newBreakpoint)
         const newCols = (typeof cols === 'object' && cols[newBreakpoint]) || 
