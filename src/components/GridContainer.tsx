@@ -42,6 +42,29 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   const [containerWidth, setContainerWidth] = useState(0)
   const [layout, setLayout] = useState<GridItem[]>(items)
   
+  // Update container width on mount and resize
+  useEffect(() => {
+    const updateContainerWidth = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth - containerPadding[0] * 2
+        setContainerWidth(width)
+      }
+    }
+
+    updateContainerWidth()
+    
+    // Use ResizeObserver if available
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      const resizeObserver = new ResizeObserver(updateContainerWidth)
+      resizeObserver.observe(containerRef.current)
+      return () => resizeObserver.disconnect()
+    } else {
+      // Fallback to window resize
+      window.addEventListener('resize', updateContainerWidth)
+      return () => window.removeEventListener('resize', updateContainerWidth)
+    }
+  }, [containerPadding])
+  
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     draggedItem: null,
