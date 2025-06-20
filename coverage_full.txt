@@ -1,0 +1,238 @@
+
+ RUN  v3.2.3 /Users/mzc01-swlee/.claude-squad/worktrees/test-coverage_184a0a28fdbe9410
+      Coverage enabled with v8
+
+ ✓ src/utils/__tests__/cn.test.ts (8 tests) 5ms
+ ✓ src/utils/__tests__/grid.test.ts (27 tests) 9ms
+ ✓ src/utils/__tests__/layouts.test.ts (5 tests) 4ms
+stderr | src/components/__tests__/WidthProvider.test.tsx > WidthProvider > should handle resize observer entry without contentRect
+An update to WidthProviderComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/components/__tests__/WidthProvider.test.tsx > WidthProvider > should handle resize when ref is null
+An update to WidthProviderComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/components/__tests__/WidthProvider.test.tsx (10 tests) 69ms
+stderr | src/components/__tests__/ResponsiveGridContainer.test.tsx > ResponsiveGridContainer > should handle missing layout for current breakpoint
+`Infinity` is an invalid value for the `minHeight` css style property.
+
+ ✓ src/components/__tests__/GridItem.test.tsx (13 tests) 81ms
+stderr | src/components/__tests__/DroppableGridContainer.test.tsx > DroppableGridContainer > should handle dragOver with null dataTransfer
+An update to DroppableGridContainer inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/components/__tests__/ResizeHandle.test.tsx (26 tests) 169ms
+ ❯ src/components/__tests__/DroppableGridContainer.test.tsx (18 tests | 1 failed) 127ms
+   ✓ DroppableGridContainer > should render grid items 50ms
+   ✓ DroppableGridContainer > should handle drop events 9ms
+   ✓ DroppableGridContainer > should handle dragOver events 4ms
+   ✓ DroppableGridContainer > should pass through layout change events 3ms
+   ✓ DroppableGridContainer > should render with droppingItem prop 3ms
+   ✓ DroppableGridContainer > should handle drop without onDrop callback 4ms
+   ✓ DroppableGridContainer > should generate unique ID for dropped items 3ms
+   ✓ DroppableGridContainer > should handle dragLeave events when leaving container bounds 4ms
+   ✓ DroppableGridContainer > should handle dragLeave with no container rect 5ms
+   ✓ DroppableGridContainer > should not hide overlay when dragging within container 5ms
+   ✓ DroppableGridContainer > should handle drop with invalid data 3ms
+   ✓ DroppableGridContainer > should handle drop without container rect 2ms
+   ✓ DroppableGridContainer > should handle drop with empty data 2ms
+   ✓ DroppableGridContainer > should show dragging overlay when dragging over 5ms
+   ✓ DroppableGridContainer > should handle dragOver with null dataTransfer 6ms
+   ✓ DroppableGridContainer > should handle dragOver with dataTransfer and set dropEffect 5ms
+   ✓ DroppableGridContainer > should handle dragLeave when staying within container bounds 4ms
+   × DroppableGridContainer > should hide overlay when dragging leaves container bounds 10ms
+     → [2mexpect([22m[31melement[39m[2m).not.toBeInTheDocument()[22m
+
+[31mexpected document not to contain element, found <div
+  class="absolute inset-0 bg-blue-500/10 rounded-lg pointer-events-none"
+/> instead[39m
+ ❯ src/components/__tests__/ResponsiveGridContainer.test.tsx (14 tests | 1 failed) 114ms
+   ✓ ResponsiveGridContainer > should render with responsive layouts 42ms
+   ✓ ResponsiveGridContainer > should use correct layout based on width and breakpoints 4ms
+   ✓ ResponsiveGridContainer > should handle layout changes 20ms
+   ✓ ResponsiveGridContainer > should use different column counts per breakpoint 2ms
+   ✓ ResponsiveGridContainer > should pass through container props 3ms
+   ✓ ResponsiveGridContainer > should handle undefined width gracefully 5ms
+   ✓ ResponsiveGridContainer > should handle empty layouts for a breakpoint 4ms
+   ✓ ResponsiveGridContainer > should update layout when width changes 5ms
+   ✓ ResponsiveGridContainer > should handle onBreakpointChange callback 3ms
+   ✓ ResponsiveGridContainer > should use default breakpoints and cols when not provided 2ms
+   ✓ ResponsiveGridContainer > should handle missing layout for current breakpoint 2ms
+   ✓ ResponsiveGridContainer > should calculate breakpoint correctly with edge case widths 3ms
+   × ResponsiveGridContainer > should use default cols when cols object does not have breakpoint value 14ms
+     → expected "spy" to be called with arguments: [ 'md', 10 ][90m
+
+Received: 
+
+[1m  1st spy call:
+
+[22m[2m  [[22m
+[32m-   "md",[90m
+[32m-   10,[90m
+[31m+   "sm",[90m
+[31m+   6,[90m
+[2m  ][22m
+[39m[90m
+
+Number of calls: [1m1[22m
+[39m
+   ✓ ResponsiveGridContainer > should handle cols as number instead of object 2ms
+stderr | src/components/__tests__/GridContainer.test.tsx > GridContainer > should handle resize when resizedItem is not found
+`Infinity` is an invalid value for the `minHeight` css style property.
+
+ ❯ src/components/__tests__/GridContainer.test.tsx (58 tests | 1 failed) 457ms
+   ✓ GridContainer > should render grid items 58ms
+   ✓ GridContainer > should apply custom className 4ms
+   ✓ GridContainer > should handle drag start 22ms
+   ✓ GridContainer > should not allow dragging static items 2ms
+   ✓ GridContainer > should handle resize 4ms
+   ✓ GridContainer > should update layout on items change 7ms
+   ✓ GridContainer > should apply maxRows constraint 3ms
+   ✓ GridContainer > should handle different compact types 4ms
+   ✓ GridContainer > should show placeholders during drag 13ms
+   ✓ GridContainer > should handle preventCollision 5ms
+   ✓ GridContainer > should handle allowOverlap 2ms
+   ✓ GridContainer > should handle margin prop 2ms
+   ✓ GridContainer > should handle resize handles configuration 6ms
+   ✓ GridContainer > should handle draggableCancel 3ms
+   ✓ GridContainer > should handle autoSize prop 2ms
+   ✓ GridContainer > should handle autoSize=false with style height 4ms
+   ✓ GridContainer > should handle droppingItem prop 5ms
+   ✓ GridContainer > should handle onDrag callback 5ms
+   ✓ GridContainer > should handle onDragStop callback 6ms
+   ✓ GridContainer > should handle onResize callback 5ms
+   ✓ GridContainer > should handle onResizeStop callback 6ms
+   ✓ GridContainer > should handle isBounded constraint 6ms
+   ✓ GridContainer > should handle containerPadding 2ms
+   ✓ GridContainer > should handle item-specific isDraggable override 3ms
+   ✓ GridContainer > should handle item-specific isResizable override 2ms
+   ✓ GridContainer > should handle resize with different handles 8ms
+   ✓ GridContainer > should handle preventCollision with allowOverlap 8ms
+   ✓ GridContainer > should cleanup event listeners on unmount 6ms
+   ✓ GridContainer > should handle draggableHandle prop 4ms
+   ✓ GridContainer > should handle resize with north handle 5ms
+   ✓ GridContainer > should handle resize with south handle 5ms
+   ✓ GridContainer > should handle resize with east handle 5ms
+   ✓ GridContainer > should handle resize with west handle 7ms
+   ✓ GridContainer > should handle resize with northeast handle 4ms
+   ✓ GridContainer > should handle resize with northwest handle 5ms
+   ✓ GridContainer > should handle resize with southwest handle 6ms
+   ✓ GridContainer > should respect minW and minH constraints during resize 4ms
+   ✓ GridContainer > should respect maxW and maxH constraints during resize 4ms
+   ✓ GridContainer > should handle dragging with maxRows constraint at boundary 8ms
+   ✓ GridContainer > should prevent collision with static items when preventCollision is true 7ms
+   ✓ GridContainer > should handle margin array configuration 3ms
+   ✓ GridContainer > should handle resize when resizedItem is not found 4ms
+   ✓ GridContainer > should handle drag with undefined margin 5ms
+   ✓ GridContainer > should not trigger resize for non-resizable items 1ms
+   ✓ GridContainer > should handle dragging when item becomes static during drag 3ms
+   ✓ GridContainer > should handle resize position constraints to stay within bounds 4ms
+   ✓ GridContainer > should show resize placeholder during resize 6ms
+   ✓ GridContainer > should handle container width update on window resize 4ms
+   ✓ GridContainer > should handle onLayoutChange after drag 5ms
+   ✓ GridContainer > should handle onLayoutChange after resize 5ms
+   ✓ GridContainer > should prevent movement when colliding with static items in preventCollision mode 5ms
+   ✓ GridContainer > should handle drag without originalPosition in dragState 4ms
+   ✓ GridContainer > should constrain item position when maxRows is exceeded exactly at boundary 3ms
+   ✓ GridContainer > should execute maxRows constraint when item would exceed boundary 3ms
+   ✓ GridContainer > should handle resize when resizedItem is not found 3ms
+   ✓ GridContainer > should handle drag when item is not found 3ms
+   × GridContainer > should prevent movement when colliding with static items 117ms
+     → expected 2 to be 1 // Object.is equality
+   ✓ GridContainer > should handle drag without originalPosition in dragState 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/__tests__/DroppableGridContainer.test.tsx > DroppableGridContainer > should hide overlay when dragging leaves container bounds
+Error: [2mexpect([22m[31melement[39m[2m).not.toBeInTheDocument()[22m
+
+[31mexpected document not to contain element, found <div
+  class="absolute inset-0 bg-blue-500/10 rounded-lg pointer-events-none"
+/> instead[39m
+ ❯ src/components/__tests__/DroppableGridContainer.test.tsx:441:62
+    439|     
+    440|     // Should hide the dragging overlay
+    441|     expect(container.querySelector('.bg-blue-500\\/10')).not.toBeInThe…
+       |                                                              ^
+    442|   })
+    443| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/components/__tests__/GridContainer.test.tsx > GridContainer > should prevent movement when colliding with static items
+AssertionError: expected 2 to be 1 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 2[39m
+
+ ❯ src/components/__tests__/GridContainer.test.tsx:1394:38
+    1392|     
+    1393|     // The onDrag should not have been called again (or called with th…
+    1394|     expect(onDrag.mock.calls.length).toBe(validCallCount)
+       |                                      ^
+    1395|   })
+    1396| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/components/__tests__/ResponsiveGridContainer.test.tsx > ResponsiveGridContainer > should use default cols when cols object does not have breakpoint value
+AssertionError: expected "spy" to be called with arguments: [ 'md', 10 ][90m
+
+Received: 
+
+[1m  1st spy call:
+
+[22m[2m  [[22m
+[32m-   "md",[90m
+[32m-   10,[90m
+[31m+   "sm",[90m
+[31m+   6,[90m
+[2m  ][22m
+[39m[90m
+
+Number of calls: [1m1[22m
+[39m
+ ❯ src/components/__tests__/ResponsiveGridContainer.test.tsx:310:36
+    308| 
+    309|     // Should use default cols (10) for md from defaultCols
+    310|     expect(mockOnBreakpointChange).toHaveBeenCalledWith('md', 10)
+       |                                    ^
+    311|   })
+    312| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  3 failed | 6 passed (9)
+      Tests  3 failed | 176 passed (179)
+   Start at  20:37:48
+   Duration  1.82s (transform 353ms, setup 1.31s, collect 1.71s, tests 1.04s, environment 4.54s, prepare 1.08s)
+

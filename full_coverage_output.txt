@@ -1,0 +1,131 @@
+
+ RUN  v3.2.3 /Users/mzc01-swlee/.claude-squad/worktrees/test-coverage_184a0a28fdbe9410
+      Coverage enabled with v8
+
+ ✓ src/utils/__tests__/cn.test.ts (8 tests) 6ms
+ ✓ src/utils/__tests__/layouts.test.ts (5 tests) 7ms
+ ✓ src/utils/__tests__/grid.test.ts (27 tests) 7ms
+ ✓ src/components/__tests__/WidthProvider.test.tsx (10 tests) 43ms
+ ✓ src/components/__tests__/GridItem.test.tsx (13 tests) 53ms
+ ✓ src/components/__tests__/ResizeHandle.test.tsx (26 tests) 85ms
+ ❯ src/components/__tests__/ResponsiveGridContainer.test.tsx (14 tests | 1 failed) 115ms
+   ✓ ResponsiveGridContainer > should render with responsive layouts 39ms
+   ✓ ResponsiveGridContainer > should use correct layout based on width and breakpoints 9ms
+   ✓ ResponsiveGridContainer > should handle layout changes 27ms
+   ✓ ResponsiveGridContainer > should use different column counts per breakpoint 5ms
+   ✓ ResponsiveGridContainer > should pass through container props 2ms
+   ✓ ResponsiveGridContainer > should handle undefined width gracefully 2ms
+   ✓ ResponsiveGridContainer > should handle empty layouts for a breakpoint 2ms
+   ✓ ResponsiveGridContainer > should update layout when width changes 5ms
+   ✓ ResponsiveGridContainer > should handle onBreakpointChange callback 5ms
+   ✓ ResponsiveGridContainer > should use default breakpoints and cols when not provided 2ms
+   ✓ ResponsiveGridContainer > should handle missing layout for current breakpoint 2ms
+   ✓ ResponsiveGridContainer > should calculate breakpoint correctly with edge case widths 2ms
+   × ResponsiveGridContainer > should use default cols when cols object does not have breakpoint value 9ms
+     → expected "spy" to be called with arguments: [ 'md', 10 ][90m
+
+Received: 
+
+[1m  1st spy call:
+
+[22m[2m  [[22m
+[32m-   "md",[90m
+[32m-   10,[90m
+[31m+   "sm",[90m
+[31m+   6,[90m
+[2m  ][22m
+[39m[90m
+
+Number of calls: [1m1[22m
+[39m
+   ✓ ResponsiveGridContainer > should handle cols as number instead of object 2ms
+ ❯ src/components/__tests__/DroppableGridContainer.test.tsx (18 tests | 1 failed) 117ms
+   ✓ DroppableGridContainer > should render grid items 45ms
+   ✓ DroppableGridContainer > should handle drop events 7ms
+   ✓ DroppableGridContainer > should handle dragOver events 4ms
+   ✓ DroppableGridContainer > should pass through layout change events 2ms
+   ✓ DroppableGridContainer > should render with droppingItem prop 4ms
+   ✓ DroppableGridContainer > should handle drop without onDrop callback 4ms
+   ✓ DroppableGridContainer > should generate unique ID for dropped items 4ms
+   ✓ DroppableGridContainer > should handle dragLeave events when leaving container bounds 4ms
+   ✓ DroppableGridContainer > should handle dragLeave with no container rect 4ms
+   ✓ DroppableGridContainer > should not hide overlay when dragging within container 3ms
+   ✓ DroppableGridContainer > should handle drop with invalid data 2ms
+   ✓ DroppableGridContainer > should handle drop without container rect 3ms
+   ✓ DroppableGridContainer > should handle drop with empty data 2ms
+   ✓ DroppableGridContainer > should show dragging overlay when dragging over 4ms
+   ✓ DroppableGridContainer > should handle dragOver with null dataTransfer 5ms
+   ✓ DroppableGridContainer > should handle dragOver with dataTransfer and set dropEffect 3ms
+   ✓ DroppableGridContainer > should handle dragLeave when staying within container bounds 3ms
+   × DroppableGridContainer > should hide overlay when dragging leaves container bounds 11ms
+     → [2mexpect([22m[31melement[39m[2m).not.toBeInTheDocument()[22m
+
+[31mexpected document not to contain element, found <div
+  class="absolute inset-0 bg-blue-500/10 rounded-lg pointer-events-none"
+/> instead[39m
+ ❯ src/components/__tests__/GridContainer.test.tsx (58 tests | 1 failed) 412ms
+   ✓ GridContainer > should render grid items 30ms
+   ✓ GridContainer > should apply custom className 4ms
+   ✓ GridContainer > should handle drag start 32ms
+   ✓ GridContainer > should not allow dragging static items 3ms
+   ✓ GridContainer > should handle resize 4ms
+   ✓ GridContainer > should update layout on items change 4ms
+   ✓ GridContainer > should apply maxRows constraint 2ms
+   ✓ GridContainer > should handle different compact types 5ms
+   ✓ GridContainer > should show placeholders during drag 8ms
+   ✓ GridContainer > should handle preventCollision 5ms
+   ✓ GridContainer > should handle allowOverlap 2ms
+   ✓ GridContainer > should handle margin prop 2ms
+   ✓ GridContainer > should handle resize handles configuration 6ms
+   ✓ GridContainer > should handle draggableCancel 3ms
+   ✓ GridContainer > should handle autoSize prop 2ms
+   ✓ GridContainer > should handle autoSize=false with style height 2ms
+   ✓ GridContainer > should handle droppingItem prop 4ms
+   ✓ GridContainer > should handle onDrag callback 6ms
+   ✓ GridContainer > should handle onDragStop callback 6ms
+   ✓ GridContainer > should handle onResize callback 5ms
+   ✓ GridContainer > should handle onResizeStop callback 5ms
+   ✓ GridContainer > should handle isBounded constraint 5ms
+   ✓ GridContainer > should handle containerPadding 2ms
+   ✓ GridContainer > should handle item-specific isDraggable override 3ms
+   ✓ GridContainer > should handle item-specific isResizable override 3ms
+   ✓ GridContainer > should handle resize with different handles 9ms
+   ✓ GridContainer > should handle preventCollision with allowOverlap 5ms
+   ✓ GridContainer > should cleanup event listeners on unmount 4ms
+   ✓ GridContainer > should handle draggableHandle prop 3ms
+   ✓ GridContainer > should handle resize with north handle 5ms
+   ✓ GridContainer > should handle resize with south handle 4ms
+   ✓ GridContainer > should handle resize with east handle 7ms
+   ✓ GridContainer > should handle resize with west handle 6ms
+   ✓ GridContainer > should handle resize with northeast handle 5ms
+   ✓ GridContainer > should handle resize with northwest handle 5ms
+   ✓ GridContainer > should handle resize with southwest handle 4ms
+   ✓ GridContainer > should respect minW and minH constraints during resize 4ms
+   ✓ GridContainer > should respect maxW and maxH constraints during resize 4ms
+   ✓ GridContainer > should handle dragging with maxRows constraint at boundary 4ms
+   ✓ GridContainer > should prevent collision with static items when preventCollision is true 5ms
+   ✓ GridContainer > should handle margin array configuration 2ms
+   ✓ GridContainer > should handle resize when resizedItem is not found 4ms
+   ✓ GridContainer > should handle drag with undefined margin 4ms
+   ✓ GridContainer > should not trigger resize for non-resizable items 1ms
+   ✓ GridContainer > should handle dragging when item becomes static during drag 3ms
+   ✓ GridContainer > should handle resize position constraints to stay within bounds 4ms
+   ✓ GridContainer > should show resize placeholder during resize 4ms
+   ✓ GridContainer > should handle container width update on window resize 3ms
+   ✓ GridContainer > should handle onLayoutChange after drag 5ms
+   ✓ GridContainer > should handle onLayoutChange after resize 5ms
+   ✓ GridContainer > should prevent movement when colliding with static items in preventCollision mode 6ms
+   ✓ GridContainer > should handle drag without originalPosition in dragState 4ms
+   ✓ GridContainer > should constrain item position when maxRows is exceeded exactly at boundary 4ms
+   ✓ GridContainer > should execute maxRows constraint when item would exceed boundary 4ms
+   ✓ GridContainer > should handle resize when resizedItem is not found 3ms
+   ✓ GridContainer > should handle drag when item is not found 3ms
+   × GridContainer > should prevent movement when colliding with static items 116ms
+     → expected 2 to be 1 // Object.is equality
+   ✓ GridContainer > should handle drag without originalPosition in dragState 6ms
+
+ Test Files  3 failed | 6 passed (9)
+      Tests  3 failed | 176 passed (179)
+   Start at  20:29:56
+   Duration  1.89s (transform 454ms, setup 1.62s, collect 1.84s, tests 845ms, environment 5.16s, prepare 1.12s)
+

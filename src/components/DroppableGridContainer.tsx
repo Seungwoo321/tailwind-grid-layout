@@ -30,12 +30,13 @@ export function DroppableGridContainer({
     const rect = containerRef.current?.getBoundingClientRect()
     if (rect) {
       const { clientX, clientY } = e
-      if (
+      const isOutsideBounds = 
         clientX < rect.left ||
         clientX > rect.right ||
         clientY < rect.top ||
         clientY > rect.bottom
-      ) {
+      
+      if (isOutsideBounds) {
         setIsDraggingOver(false)
       }
     }

@@ -8,12 +8,15 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
+    exclude: ['src/**/*.browser.test.{ts,tsx}', 'e2e/**', 'node_modules/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
+      include: ['src/**'],
       exclude: [
-        'node_modules/',
-        'src/test/',
+        'node_modules/**',
+        'src/test/**',
         '**/*.d.ts',
         '**/*.config.*',
         '**/mockData.ts',
@@ -26,8 +29,11 @@ export default defineConfig({
         'src/lib/**',
         'src/types/index.ts',
         '**/*.stories.tsx',
-        '**/node_modules/**',
-        'dist/**'
+        'dist/**',
+        'playwright/**',
+        'scripts/**',
+        'e2e/**',
+        '**/*.browser.test.*'
       ],
       thresholds: {
         lines: 100,

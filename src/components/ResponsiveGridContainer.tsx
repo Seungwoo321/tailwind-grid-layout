@@ -56,9 +56,8 @@ export function ResponsiveGridContainer({
     if (sortedBreakpoints.length === 0) return 'lg'
     
     const lastEntry = sortedBreakpoints[sortedBreakpoints.length - 1]
-    if (!lastEntry) return 'lg'
-    
-    let breakpoint = lastEntry[0]
+    // lastEntry cannot be undefined here since we checked length > 0
+    let breakpoint = lastEntry![0]
     
     for (const [bp, minWidth] of sortedBreakpoints) {
       if (width >= minWidth) {

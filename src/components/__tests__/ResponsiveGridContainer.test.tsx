@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { ResponsiveGridContainer } from '../ResponsiveGridContainer'
 import type { GridItem, ResponsiveLayouts } from '../../types'
 
@@ -80,9 +80,15 @@ describe('ResponsiveGridContainer', () => {
 
     // Simulate drag to trigger layout change
     const gridItem = screen.getByTestId('item-1').parentElement!
-    fireEvent.mouseDown(gridItem)
-    fireEvent.mouseMove(gridItem, { clientX: 100, clientY: 100 })
-    fireEvent.mouseUp(gridItem)
+    act(() => {
+      fireEvent.mouseDown(gridItem)
+    })
+    act(() => {
+      fireEvent.mouseMove(gridItem, { clientX: 100, clientY: 100 })
+    })
+    act(() => {
+      fireEvent.mouseUp(gridItem)
+    })
 
     // onLayoutChange should be defined
     expect(mockOnLayoutChange).toBeDefined()
@@ -297,7 +303,7 @@ describe('ResponsiveGridContainer', () => {
     rerender(
       <ResponsiveGridContainer 
         layouts={mockLayouts} 
-        width={900}
+        width={1000}
         breakpoints={{ lg: 1200, md: 996, sm: 768 }}
         cols={incompleteColsConfig}
         onBreakpointChange={mockOnBreakpointChange}
@@ -308,6 +314,44 @@ describe('ResponsiveGridContainer', () => {
 
     // Should use default cols (10) for md from defaultCols
     expect(mockOnBreakpointChange).toHaveBeenCalledWith('md', 10)
+  })
+
+  it('should fallback to 12 columns when breakpoint not in cols or defaultCols', () => {
+    const mockOnBreakpointChange = vi.fn()
+    const customBreakpoints = { xl: 1400, lg: 1200, custom: 900 } // 'custom' not in defaultCols
+    
+    render(
+      <ResponsiveGridContainer 
+        layouts={mockLayouts} 
+        width={950}
+        breakpoints={customBreakpoints}
+        cols={{ xl: 24, lg: 16 }} // No 'custom' defined
+        onBreakpointChange={mockOnBreakpointChange}
+      >
+        {(item) => <div>Item {item.id}</div>}
+      </ResponsiveGridContainer>
+    )
+
+    // Should fallback to 12 columns for 'custom' breakpoint
+    expect(mockOnBreakpointChange).toHaveBeenCalledWith('custom', 12)
+  })
+
+  it('should handle empty breakpoints object (line 56)', () => {
+    const { container } = render(
+      <ResponsiveGridContainer 
+        layouts={mockLayouts}
+        width={1200}
+        breakpoints={{}} // Empty breakpoints object
+      >
+        {(item) => <div>Item {item.id}</div>}
+      </ResponsiveGridContainer>
+    )
+    
+    // Should render with default 'lg' breakpoint
+    expect(container.querySelector('[data-grid-id="1"]')).toBeInTheDocument()
+    
+    // The component should handle empty breakpoints gracefully
+    // Just verify it renders without crashing
   })
 
   it('should handle cols as number instead of object', () => {

@@ -1,0 +1,25 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "all": true,
+  "reporter": ["html", "json", "lcov", "text"],
+  "exclude": [
+    "**/*.d.ts",
+    "**/*.config.*",
+    "**/*.stories.tsx",
+    "**/test/**",
+    "**/tests/**",
+    "**/__tests__/**",
+    "**/e2e/**",
+    "docs/**",
+    "examples/**",
+    "stories/**",
+    "dist/**",
+    ".storybook/**",
+    "playwright/**",
+    "scripts/**",
+    "src/components/ui/**",
+    "src/lib/**"
+  ],
+  "temp-dir": "./coverage/.nyc_output",
+  "report-dir": "./coverage/e2e"
+}
