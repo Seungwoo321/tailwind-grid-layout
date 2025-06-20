@@ -245,7 +245,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     setDragState(prev => ({
       ...prev,
       placeholder: newPosition,
-      currentMousePos: { x: e.clientX, y: e.clientY }
+      currentMousePos: pos
     }))
     
     // Call onDrag callback

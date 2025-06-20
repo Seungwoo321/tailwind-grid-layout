@@ -42,7 +42,7 @@ export function getTouchIdentifier(e: TouchEvent): number | null {
  */
 export function isPrimaryTouch(e: TouchEvent): boolean {
   return e.touches.length === 1 || 
-         (e.touches.length > 1 && e.touches[0].identifier === getTouchIdentifier(e))
+         (e.touches.length > 1 && e.touches[0]?.identifier === getTouchIdentifier(e))
 }
 
 /**
