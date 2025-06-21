@@ -45,6 +45,18 @@ describe('touch utilities', () => {
       const position = getControlPosition(touchEvent)
       expect(position).toBeNull()
     })
+
+    it('should get position from pointer event', () => {
+      const pointerEvent = {
+        type: 'pointerdown',
+        pointerId: 1,
+        clientX: 500,
+        clientY: 600
+      } as PointerEvent
+      
+      const position = getControlPosition(pointerEvent)
+      expect(position).toEqual({ x: 500, y: 600 })
+    })
   })
 
   describe('getTouchIdentifier', () => {

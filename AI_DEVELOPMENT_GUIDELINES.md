@@ -74,6 +74,169 @@ pnpm preview
 #### 2.2 스타일 및 UI 검증
 디자인 시스템과의 충돌, 기존 스타일 덮어쓰기, 반응형 동작 등을 실제로 확인합니다.
 
+#### 2.3 Tailwind CSS v4 스타일링 규칙
+Tailwind CSS v4 사용 시 반드시 CSS-first 접근법을 준수합니다:
+
+**기본 원칙:**
+- CSS 파일에서 `@import "tailwindcss"` 사용
+- 커스텀 스타일은 CSS 파일에 작성
+- 컴포넌트 레벨에서는 순수 Tailwind 유틸리티 클래스만 사용
+
+**참조 프로젝트: `/Users/mzc01-swlee/dev/repository/etorch-project`**
+```css
+/* globals.css 예시 */
+@import "tailwindcss";
+
+/* 커스텀 스타일 */
+.custom-component {
+  @apply bg-blue-500 text-white;
+}
+```
+
+**금지 사항:**
+- CSS-in-JS 사용 금지
+- 인라인 스타일 사용 지양 (위치 계산 등 동적 값 제외)
+- postcss.config.js 추가 금지 (Tailwind v4에서 불필요)
+
+**다른 방법이 필요한 경우:**
+1. context7 MCP 서버를 통해 최신 Tailwind v4 문서 확인
+2. 기술적 근거와 해결책 제시
+3. 사용자 승인 후 적용
+
+**검증 방법:**
+```bash
+# 빌드 시 CSS 파일 확인
+pnpm build
+ls -la dist/assets/*.css
+
+# CSS 충돌 여부 확인
+grep -r "@apply" src/
+grep -r "style=" src/ --exclude-dir=node_modules
+```
+
+#### 2.4 보고 전 필수 검증 절차
+작업 완료 후 보고 전에 반드시 수행해야 할 검증 절차:
+
+1. **실제 서버 실행 및 확인**
+   - 개발 서버를 백그라운드로 실행 (`pnpm dev &` 또는 별도 터미널)
+   - 실제 브라우저나 curl로 직접 접속하여 동작 확인
+   - Next.js 서버 로그를 실시간으로 모니터링
+   - API 엔드포인트 응답 확인
+   - 에러 로그 및 경고 메시지 확인
+
+2. **서버 로그 모니터링**
+   ```bash
+   # Next.js 개발 서버 실행 및 로그 확인
+   pnpm dev
+   # 별도 터미널에서 접속 테스트
+   curl http://localhost:3000/[페이지경로]
+   # 브라우저 개발자 도구 콘솔 확인
+   ```
+   - 페이지 로드 시 서버 사이드 렌더링 로그 확인
+   - 클라이언트 사이드 하이드레이션 에러 확인
+   - API 라우트 호출 로그 확인
+   - 정적 자원 로딩 에러 확인
+
+3. **직접 확인이 어려운 경우**
+   - 빌드를 수행하고 빌드 결과물 검증
+   - 빌드된 파일의 존재 여부와 내용 확인
+   - 정적 파일 분석을 통한 간접 검증
+
+4. **재확인 지시 대응**
+   - 사용자가 다시 확인하라는 지시를 내린 경우
+   - 처음부터 모든 작업을 순차적으로 재점검
+   - 이전 보고 내용과 실제 상태 간 불일치 파악
+
+5. **코드 레벨 검증**
+   - 직접 확인이 불가능한 경우 코드를 1줄씩 검토
+   - 잠재적 문제가 될 수 있는 부분 식별
+   - 로직 흐름과 데이터 플로우 검증
+   - 타입 안정성과 런타임 에러 가능성 확인
+
+#### 2.5 실시간 디버깅을 위한 서버 실행 및 로그 추적
+복잡한 문제를 해결하기 위한 체계적인 디버깅 프로세스:
+
+1. **서버 실행 및 로그 파일 생성**
+   ```bash
+   # 기존 서버 프로세스 확인 및 종료
+   ps aux | grep "next dev" | grep -v grep
+   kill $(ps aux | grep "next dev" | grep -v grep | awk '{print $2}')
+   
+   # 로그 파일로 서버 실행
+   pnpm dev > /tmp/nextjs-log.txt 2>&1 &
+   
+   # 포트가 이미 사용 중인 경우 다른 포트로 실행
+   pnpm dev --port 3001 > /tmp/nextjs-log-3001.txt 2>&1 &
+   ```
+
+2. **접속 로그 추적**
+   ```bash
+   # 서버 시작 대기
+   sleep 3
+   
+   # 페이지 접속하여 로그 생성
+   curl http://localhost:3000/[문제경로] > /dev/null
+   
+   # 로그 확인
+   tail -50 /tmp/nextjs-log.txt
+   
+   # 에러 필터링
+   grep -E "error|Error|warning|Warning|failed|Failed" /tmp/nextjs-log.txt
+   ```
+
+3. **무한 루프 및 과도한 로그 관리**
+   ```bash
+   # 로그 파일 크기 모니터링
+   watch -n 1 'ls -lh /tmp/nextjs-log.txt'
+   
+   # 로그가 너무 빠르게 증가하는 경우
+   # 1. 사용자에게 보고
+   # 2. 서버 강제 종료
+   kill -9 $(ps aux | grep "next dev" | grep -v grep | awk '{print $2}')
+   
+   # 3. 로그 초기화 후 재시작
+   echo "" > /tmp/nextjs-log.txt
+   pnpm dev > /tmp/nextjs-log.txt 2>&1 &
+   ```
+
+4. **포트 관리**
+   ```bash
+   # 사용 중인 포트 확인
+   lsof -i :3000
+   netstat -an | grep 3000
+   
+   # 특정 포트만 종료
+   kill $(lsof -t -i:3000)
+   
+   # 빈 포트 찾기 (3000-3010 범위)
+   for port in {3000..3010}; do
+     if ! lsof -i:$port > /dev/null 2>&1; then
+       echo "Available port: $port"
+       break
+     fi
+   done
+   ```
+
+5. **체계적인 디버깅 사이클**
+   - **단계 1**: 서버 실행 → 로그 파일 생성
+   - **단계 2**: 문제 재현 → 접속하여 에러 발생
+   - **단계 3**: 로그 분석 → 에러 원인 파악
+   - **단계 4**: 코드 수정 → 문제 해결
+   - **단계 5**: 서버 재시작 → 수정사항 확인
+   - **단계 6**: 반복 → 모든 문제 해결까지
+
+6. **로그 분석 팁**
+   ```bash
+   # 최근 에러만 확인
+   tail -f /tmp/nextjs-log.txt | grep -E "error|Error"
+   
+   # 특정 파일 관련 로그
+   grep "CallStackLibrary" /tmp/nextjs-log.txt
+   
+   # 타임스탬프 추가하여 로그 확인
+   tail -f /tmp/nextjs-log.txt | while read line; do echo "$(date '+%Y-%m-%d %H:%M:%S') $line"; done
+   ```
+
 ### 3. 문서 참조 및 기술 스택 확인
 
 #### 3.1 최신 정보 확인
@@ -196,6 +359,22 @@ pnpm build:all # 전체 빌드
 - 검증용 문서
 - 불필요한 console.log
 - 테스트 데이터
+
+로그 파일 생성 시 프로젝트별 경로 구분:
+```bash
+# 로그 파일 경로 예시
+/tmp/[프로젝트명]/debug-[날짜].log
+/tmp/tailwind-grid-layout/build-20250621.log
+
+# 이전 로그 파일 정리
+rm -f /tmp/[프로젝트명]/*.log  # 필요없는 경우
+```
+
+로그 파일 관리 원칙:
+- 프로젝트명으로 디렉토리 생성하여 구분
+- 날짜나 용도를 파일명에 포함
+- 작업 시작 시 이전 로그 파일 확인 및 정리
+- 작업 완료 후 불필요한 로그 삭제
 
 ### 문서 업데이트
 문서 수정 시 자연스러운 흐름 유지:
