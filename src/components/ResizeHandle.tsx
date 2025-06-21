@@ -5,7 +5,7 @@ import { cn } from '../utils/cn'
 
 interface ResizeHandleProps {
   position: 'se' | 'sw' | 'ne' | 'nw' | 'n' | 's' | 'e' | 'w'
-  onMouseDown: (e: React.MouseEvent) => void
+  onMouseDown: (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => void
   isActive?: boolean
   isVisible?: boolean
 }
@@ -33,9 +33,13 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
           'react-grid-layout__resize-handle',
           'absolute w-5 h-5',
           isActive ? corner.cursor : 'cursor-not-allowed opacity-50',
-          'z-20'
+          'z-20',
+          'touch-action-none'
         )}
         onMouseDown={isActive ? onMouseDown : undefined}
+        onTouchStart={isActive ? onMouseDown : undefined}
+        onPointerDown={isActive ? onMouseDown : undefined}
+        onDoubleClick={(e) => e.preventDefault()}
         style={{
           ...(position === 'se' && { bottom: '0px', right: '0px' }),
           ...(position === 'sw' && { bottom: '0px', left: '0px' }),
@@ -72,9 +76,13 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
           handleClasses[position],
           !isActive && 'pointer-events-none',
           ['n', 's', 'e', 'w'].includes(position) ? '' : 'w-5 h-5',
-          'z-20'
+          'z-20',
+          'touch-action-none'
         )}
         onMouseDown={isActive ? onMouseDown : undefined}
+        onTouchStart={isActive ? onMouseDown : undefined}
+        onPointerDown={isActive ? onMouseDown : undefined}
+        onDoubleClick={(e) => e.preventDefault()}
       />
     )
   }

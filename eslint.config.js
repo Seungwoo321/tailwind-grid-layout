@@ -103,5 +103,27 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'off'
     }
+  },
+  
+  // Node.js scripts
+  {
+    files: ['**/*.cjs'],
+    languageOptions: {
+      globals: {
+        require: 'readonly',
+        module: 'readonly',
+        exports: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        global: 'readonly'
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+      'no-undef': 'error'
+    }
   }
 )

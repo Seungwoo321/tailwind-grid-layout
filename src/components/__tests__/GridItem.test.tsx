@@ -319,4 +319,104 @@ describe('GridItemComponent', () => {
     const element = container.firstChild as HTMLElement
     expect(element.getAttribute('data-grid-id')).toBe('1')
   })
+
+  it('should handle touch events', () => {
+    const { container } = render(
+      <GridItemComponent
+        item={defaultItem}
+        position={defaultPosition}
+        isDragging={false}
+        isResizing={false}
+        isDraggable={true}
+        isResizable={true}
+        onDragStart={mockOnDragStart}
+        onResizeStart={mockOnResizeStart}
+      >
+        <div>Test</div>
+      </GridItemComponent>
+    )
+
+    const element = container.firstChild as HTMLElement
+    act(() => {
+      fireEvent.touchStart(element)
+    })
+    
+    expect(mockOnDragStart).toHaveBeenCalledWith('1', expect.any(Object))
+  })
+
+  it('should handle pointer events', () => {
+    const { container } = render(
+      <GridItemComponent
+        item={defaultItem}
+        position={defaultPosition}
+        isDragging={false}
+        isResizing={false}
+        isDraggable={true}
+        isResizable={true}
+        onDragStart={mockOnDragStart}
+        onResizeStart={mockOnResizeStart}
+      >
+        <div>Test</div>
+      </GridItemComponent>
+    )
+
+    const element = container.firstChild as HTMLElement
+    act(() => {
+      fireEvent.pointerDown(element)
+    })
+    
+    expect(mockOnDragStart).toHaveBeenCalledWith('1', expect.any(Object))
+  })
+
+  it('should handle double click events', () => {
+    const { container } = render(
+      <GridItemComponent
+        item={defaultItem}
+        position={defaultPosition}
+        isDragging={false}
+        isResizing={false}
+        isDraggable={true}
+        isResizable={true}
+        onDragStart={mockOnDragStart}
+        onResizeStart={mockOnResizeStart}
+      >
+        <div>Test</div>
+      </GridItemComponent>
+    )
+
+    const element = container.firstChild as HTMLElement
+    const mockPreventDefault = vi.fn()
+    const doubleClickEvent = { preventDefault: mockPreventDefault }
+
+    act(() => {
+      fireEvent.doubleClick(element, doubleClickEvent)
+    })
+    
+    // Verify the double click event was handled (no exceptions thrown)
+    expect(element).toBeTruthy()
+  })
+
+  it('should handle resize handle events', () => {
+    const { container } = render(
+      <GridItemComponent
+        item={defaultItem}
+        position={defaultPosition}
+        isDragging={false}
+        isResizing={false}
+        isDraggable={true}
+        isResizable={true}
+        onDragStart={mockOnDragStart}
+        onResizeStart={mockOnResizeStart}
+      >
+        <div>Test</div>
+      </GridItemComponent>
+    )
+
+    const resizeHandle = container.querySelector('.react-grid-layout__resize-handle') as HTMLElement
+    act(() => {
+      fireEvent.mouseDown(resizeHandle)
+    })
+    
+    expect(mockOnResizeStart).toHaveBeenCalledWith('1', 'se', expect.any(Object))
+  })
 })

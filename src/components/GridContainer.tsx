@@ -5,6 +5,7 @@ import { cn } from '../utils/cn'
 import { GridItem, DragState, ResizeState, GridContainerProps } from '../types'
 import { getPixelPosition, calculateGridPosition, compactLayout, moveItems, getAllCollisions } from '../utils/grid'
 import { GridItemComponent } from './GridItem'
+import { getControlPosition, preventDefaultTouchEvent, touchEventOptions } from '../utils/touch'
 
 export const GridContainer: React.FC<GridContainerProps> = ({
   cols = 12,
@@ -141,25 +142,40 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   }, [cols, compactType, onLayoutChange])
 
   // Handle drag start
-  const handleDragStart = useCallback((itemId: string, e: React.MouseEvent) => {
+  const handleDragStart = useCallback((itemId: string, e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
+    console.log('[GridContainer] handleDragStart called', {
+      itemId,
+      eventType: e.type,
+      isTouch: 'touches' in e.nativeEvent
+    })
+    
     // GridItem already checks isDraggable before calling this function
     const item = layout.find(i => i.id === itemId)!
     // GridItem already checks item.isDraggable before calling this function
     
     const rect = e.currentTarget.getBoundingClientRect()
+    const pos = getControlPosition(e.nativeEvent as MouseEvent | TouchEvent | PointerEvent)
+    
+    console.log('[GridContainer] Control position:', pos)
+    
+    if (!pos) {
+      console.log('[GridContainer] No position from getControlPosition')
+      return
+    }
     
     const newDragState = {
       isDragging: true,
       draggedItem: itemId,
       dragOffset: {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
+        x: pos.x - rect.left,
+        y: pos.y - rect.top
       },
       placeholder: { ...item },
       originalPosition: { ...item },
-      currentMousePos: { x: e.clientX, y: e.clientY }
+      currentMousePos: { x: pos.x, y: pos.y }
     }
     
+    console.log('[GridContainer] Setting drag state:', newDragState)
     setDragState(newDragState)
     
     // Call onDragStart callback
@@ -168,19 +184,62 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       onDragStart(layout, item, item, { ...item }, e.nativeEvent, element)
     }
     
-    e.preventDefault()
+    // Don't call preventDefault here as it's already handled in GridItem for touch events
+    // This allows mouse events to work normally
+    if (!('touches' in e.nativeEvent)) {
+      e.preventDefault()
+    }
   }, [layout, onDragStart])
 
   // Handle drag move
-  const handleDragMove = useCallback((e: MouseEvent) => {
+  const handleDragMove = useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
+    // Early return if not dragging
+    if (!dragState.isDragging || !dragState.draggedItem) {
+      console.log('[GridContainer] Not dragging, early return')
+      return
+    }
+    
+    console.log('[GridContainer] handleDragMove called', {
+      eventType: e.type,
+      isTouch: 'touches' in e,
+      isDragging: dragState.isDragging,
+      draggedItem: dragState.draggedItem
+    })
+    
     // This function is only called when dragging is active
     if (!containerRef.current) return
     
+    const pos = getControlPosition(e)
+    console.log('[GridContainer] Move position:', pos)
+    
+    if (!pos) return
+    
     const containerRect = containerRef.current.getBoundingClientRect()
-    const x = e.clientX - containerRect.left - dragState.dragOffset.x - containerPadding[0]
-    const y = e.clientY - containerRect.top - dragState.dragOffset.y - containerPadding[1]
+    const x = pos.x - containerRect.left - dragState.dragOffset.x - containerPadding[0]
+    const y = pos.y - containerRect.top - dragState.dragOffset.y - containerPadding[1]
+    
+    console.log('[GridContainer] Position calculation:', {
+      posX: pos.x,
+      posY: pos.y,
+      containerLeft: containerRect.left,
+      containerTop: containerRect.top,
+      dragOffsetX: dragState.dragOffset.x,
+      dragOffsetY: dragState.dragOffset.y,
+      calculatedX: x,
+      calculatedY: y,
+      rowHeight,
+      gap
+    })
     
     const { col, row } = calculateGridPosition(x, y, cols, rowHeight, gap, containerWidth, margin)
+    
+    console.log('[GridContainer] Grid position:', {
+      col,
+      row,
+      containerWidth,
+      cols,
+      rowHeight
+    })
     
     const draggedItem = layout.find(i => i.id === dragState.draggedItem)
     if (!draggedItem || draggedItem.static) return
@@ -236,7 +295,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     setDragState(prev => ({
       ...prev,
       placeholder: newPosition,
-      currentMousePos: { x: e.clientX, y: e.clientY }
+      currentMousePos: pos
     }))
     
     // Call onDrag callback
@@ -246,10 +305,15 @@ export const GridContainer: React.FC<GridContainerProps> = ({
         onDrag(compactedLayout, { ...draggedItem, ...dragState.originalPosition }, { ...draggedItem, ...newPosition }, { ...draggedItem, ...newPosition }, e, element)
       }
     }
+    
+    // Prevent default for touch events to stop scrolling during drag
+    if ('touches' in e) {
+      e.preventDefault()
+    }
   }, [dragState, layout, cols, rowHeight, gap, containerWidth, containerPadding, preventCollision, allowOverlap, isBounded, compactType, margin, maxRows, onDrag])
 
   // Handle drag end
-  const handleDragEnd = useCallback((e: MouseEvent) => {
+  const handleDragEnd = useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
     // This function is only called when dragging is active
     
     const draggedItem = layout.find(i => i.id === dragState.draggedItem)
@@ -277,17 +341,19 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   const handleResizeStart = useCallback((
     itemId: string,
     handle: ResizeState['resizeHandle'],
-    e: React.MouseEvent
+    e: React.MouseEvent | React.TouchEvent | React.PointerEvent
   ) => {
     // ResizeHandle component already checks isResizable before calling this
     const item = layout.find(i => i.id === itemId)!
+    const pos = getControlPosition(e.nativeEvent)
+    if (!pos) return
     
     setResizeState({
       isResizing: true,
       resizedItem: itemId,
       resizeHandle: handle,
       startSize: { w: item.w, h: item.h },
-      startPos: { x: e.clientX, y: e.clientY },
+      startPos: { x: pos.x, y: pos.y },
       originalPos: { x: item.x, y: item.y }
     })
     
@@ -299,20 +365,26 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     
     e.preventDefault()
     e.stopPropagation()
+    if ('touches' in e.nativeEvent) {
+      preventDefaultTouchEvent(e.nativeEvent as TouchEvent)
+    }
   }, [layout, onResizeStart])
 
   // Handle resize move
-  const handleResizeMove = useCallback((e: MouseEvent) => {
+  const handleResizeMove = useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
     // This function is only called when resizing is active
     
     const item = layout.find(i => i.id === resizeState.resizedItem)
     if (!item) return
     
+    const pos = getControlPosition(e)
+    if (!pos) return
+    
     const horizontalMargin = margin ? margin[0] : gap
     const verticalMargin = margin ? margin[1] : gap
     const colWidth = (containerWidth - horizontalMargin * (cols - 1)) / cols
-    const deltaX = e.clientX - resizeState.startPos.x
-    const deltaY = e.clientY - resizeState.startPos.y
+    const deltaX = pos.x - resizeState.startPos.x
+    const deltaY = pos.y - resizeState.startPos.y
     
     // Use threshold for smoother grid snapping
     const threshold = 0.3 // Snap when 30% into the next grid unit
@@ -400,10 +472,15 @@ export const GridContainer: React.FC<GridContainerProps> = ({
         onResize(newLayout, originalItem, newItem, newItem, e, element)
       }
     }
+    
+    // Prevent default for touch events to stop scrolling during drag
+    if ('touches' in e) {
+      e.preventDefault()
+    }
   }, [resizeState, layout, containerWidth, cols, rowHeight, gap, margin, onResize])
 
   // Handle resize end
-  const handleResizeEnd = useCallback((e: MouseEvent) => {
+  const handleResizeEnd = useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
     // This function is only called when resizing is active
     
     const resizedItem = layout.find(i => i.id === resizeState.resizedItem)
@@ -426,34 +503,72 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     })
   }, [resizeState, layout, updateLayout, onResizeStop])
 
-  // Add global mouse event listeners
+  // Add global mouse, touch, and pointer event listeners
   useEffect(() => {
     if (dragState.isDragging) {
+      // Mouse events
       document.addEventListener('mousemove', handleDragMove)
       document.addEventListener('mouseup', handleDragEnd)
+      
+      // Touch events
+      document.addEventListener('touchmove', handleDragMove, touchEventOptions)
+      document.addEventListener('touchend', handleDragEnd, touchEventOptions)
+      document.addEventListener('touchcancel', handleDragEnd, touchEventOptions)
+      
+      // Pointer events (for better dev tools support)
+      document.addEventListener('pointermove', handleDragMove)
+      document.addEventListener('pointerup', handleDragEnd)
+      document.addEventListener('pointercancel', handleDragEnd)
+      
       document.body.style.cursor = 'grabbing'
       document.body.style.userSelect = 'none'
+      document.body.classList.add('grid-dragging')
       
       return () => {
         document.removeEventListener('mousemove', handleDragMove)
         document.removeEventListener('mouseup', handleDragEnd)
+        document.removeEventListener('touchmove', handleDragMove, touchEventOptions)
+        document.removeEventListener('touchend', handleDragEnd, touchEventOptions)
+        document.removeEventListener('touchcancel', handleDragEnd, touchEventOptions)
+        document.removeEventListener('pointermove', handleDragMove)
+        document.removeEventListener('pointerup', handleDragEnd)
+        document.removeEventListener('pointercancel', handleDragEnd)
         document.body.style.cursor = ''
         document.body.style.userSelect = ''
+        document.body.classList.remove('grid-dragging')
       }
     }
     // Return undefined when not dragging
     return undefined
-  }, [dragState.isDragging, handleDragMove, handleDragEnd])
+  }, [dragState.isDragging, dragState.draggedItem, dragState.dragOffset, handleDragMove, handleDragEnd])
 
   useEffect(() => {
     if (resizeState.isResizing) {
+      // Mouse events
       document.addEventListener('mousemove', handleResizeMove)
       document.addEventListener('mouseup', handleResizeEnd)
+      
+      // Touch events
+      document.addEventListener('touchmove', handleResizeMove, touchEventOptions)
+      document.addEventListener('touchend', handleResizeEnd, touchEventOptions)
+      document.addEventListener('touchcancel', handleResizeEnd, touchEventOptions)
+      
+      // Pointer events (for better dev tools support)
+      document.addEventListener('pointermove', handleResizeMove)
+      document.addEventListener('pointerup', handleResizeEnd)
+      document.addEventListener('pointercancel', handleResizeEnd)
+      
       document.body.style.userSelect = 'none'
       
       return () => {
         document.removeEventListener('mousemove', handleResizeMove)
         document.removeEventListener('mouseup', handleResizeEnd)
+        document.removeEventListener('touchmove', handleResizeMove, touchEventOptions)
+        document.removeEventListener('touchend', handleResizeEnd, touchEventOptions)
+        document.removeEventListener('touchcancel', handleResizeEnd, touchEventOptions)
+        document.removeEventListener('pointermove', handleResizeMove)
+        document.removeEventListener('pointerup', handleResizeEnd)
+        document.removeEventListener('pointercancel', handleResizeEnd)
         document.body.style.userSelect = ''
       }
     }
@@ -473,8 +588,9 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     <div
       ref={containerRef}
       className={cn(
-        'relative w-full overflow-auto',
-        dragState.isDragging && 'select-none',
+        'tailwind-grid-layout relative w-full overflow-auto',
+        dragState.isDragging && 'dragging select-none',
+        resizeState.isResizing && 'resizing',
         className
       )}
       style={{
