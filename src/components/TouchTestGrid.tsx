@@ -14,14 +14,14 @@ export const TouchTestGrid: React.FC<TouchTestGridProps> = ({ className }) => {
     setEvents(prev => [...prev.slice(-9), `${new Date().toLocaleTimeString()}: ${message}`])
   }
 
-  const getEventPosition = (e: any) => {
+  const getEventPosition = (e: MouseEvent | TouchEvent | PointerEvent) => {
     // Try PointerEvent first (dev tools touch simulation)
     if ('pointerId' in e) {
       return { x: e.clientX, y: e.clientY, type: 'pointer' }
     }
     // Try TouchEvent (real mobile)
     if ('touches' in e && e.touches.length > 0) {
-      return { x: e.touches[0].clientX, y: e.touches[0].clientY, type: 'touch' }
+      return { x: e.touches[0]?.clientX || 0, y: e.touches[0]?.clientY || 0, type: 'touch' }
     }
     // Fallback to MouseEvent
     if ('clientX' in e) {
@@ -30,7 +30,7 @@ export const TouchTestGrid: React.FC<TouchTestGridProps> = ({ className }) => {
     return null
   }
 
-  const handleStart = (e: any) => {
+  const handleStart = React.useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
     const pos = getEventPosition(e)
     if (!pos) return
 
@@ -38,9 +38,9 @@ export const TouchTestGrid: React.FC<TouchTestGridProps> = ({ className }) => {
     setDragState({ isDragging: true, x: pos.x, y: pos.y })
     
     e.preventDefault()
-  }
+  }, [])
 
-  const handleMove = (e: any) => {
+  const handleMove = React.useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
     if (!dragState.isDragging) return
     
     const pos = getEventPosition(e)
@@ -55,9 +55,9 @@ export const TouchTestGrid: React.FC<TouchTestGridProps> = ({ className }) => {
     }
     
     e.preventDefault()
-  }
+  }, [dragState.isDragging, dragState.x, dragState.y])
 
-  const handleEnd = (e: any) => {
+  const handleEnd = React.useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
     if (!dragState.isDragging) return
     
     const pos = getEventPosition(e) || { x: 0, y: 0, type: 'unknown' }
@@ -67,7 +67,7 @@ export const TouchTestGrid: React.FC<TouchTestGridProps> = ({ className }) => {
     if (itemRef.current) {
       itemRef.current.style.transform = 'translate(0px, 0px)'
     }
-  }
+  }, [dragState.isDragging])
 
   // Add event listeners for all event types
   React.useEffect(() => {
@@ -86,12 +86,13 @@ export const TouchTestGrid: React.FC<TouchTestGridProps> = ({ className }) => {
       userAgent: navigator.userAgent
     })
 
-    startEvents.forEach(event => {
-      item.addEventListener(event, handleStart, { passive: false })
-    })
+    const handleStartEvent = (e: Event) => handleStart(e as MouseEvent | TouchEvent | PointerEvent)
+    const handleDocumentMove = (e: Event) => handleMove(e as MouseEvent | TouchEvent | PointerEvent)
+    const handleDocumentEnd = (e: Event) => handleEnd(e as MouseEvent | TouchEvent | PointerEvent)
 
-    const handleDocumentMove = (e: any) => handleMove(e)
-    const handleDocumentEnd = (e: any) => handleEnd(e)
+    startEvents.forEach(event => {
+      item.addEventListener(event, handleStartEvent, { passive: false })
+    })
 
     moveEvents.forEach(event => {
       document.addEventListener(event, handleDocumentMove, { passive: false })
@@ -103,7 +104,7 @@ export const TouchTestGrid: React.FC<TouchTestGridProps> = ({ className }) => {
 
     return () => {
       startEvents.forEach(event => {
-        item.removeEventListener(event, handleStart)
+        item.removeEventListener(event, handleStartEvent)
       })
       moveEvents.forEach(event => {
         document.removeEventListener(event, handleDocumentMove)
@@ -112,7 +113,7 @@ export const TouchTestGrid: React.FC<TouchTestGridProps> = ({ className }) => {
         document.removeEventListener(event, handleDocumentEnd)
       })
     }
-  }, [dragState.isDragging])
+  }, [handleEnd, handleMove, handleStart])
 
   return (
     <div className={cn('p-6 bg-white rounded-lg shadow-lg', className)}>

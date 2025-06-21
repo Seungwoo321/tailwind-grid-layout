@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-env node */
 
 // Touch functionality verification script
 const fs = require('fs');
