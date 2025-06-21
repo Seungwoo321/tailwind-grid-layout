@@ -79,6 +79,13 @@ export const TouchTestGrid: React.FC<TouchTestGridProps> = ({ className }) => {
     const moveEvents = ['mousemove', 'touchmove', 'pointermove']
     const endEvents = ['mouseup', 'touchend', 'pointerup', 'touchcancel', 'pointercancel']
 
+    // Log which events are supported
+    console.log('🔧 Touch Test Grid initialized', {
+      pointerEventsSupported: 'PointerEvent' in window,
+      touchEventsSupported: 'TouchEvent' in window,
+      userAgent: navigator.userAgent
+    })
+
     startEvents.forEach(event => {
       item.addEventListener(event, handleStart, { passive: false })
     })

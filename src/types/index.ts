@@ -34,12 +34,12 @@ export interface GridConfig {
   resizeHandles?: Array<'s' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'>
   draggableCancel?: string
   onLayoutChange?: (layout: GridItem[]) => void
-  onDragStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
-  onDrag?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
-  onDragStop?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
-  onResizeStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
-  onResize?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
-  onResizeStop?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
+  onDragStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
+  onDrag?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
+  onDragStop?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
+  onResizeStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
+  onResize?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
+  onResizeStop?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
   onDrop?: (layout: GridItem[], item: GridItem, e: Event) => void
 }
 
@@ -89,11 +89,11 @@ export interface GridContainerProps {
   transformScale?: number // 스케일 변환 지원
   droppingItem?: Partial<GridItem> // 드롭 중인 아이템 미리보기
   onLayoutChange?: (layout: GridItem[]) => void
-  onDragStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
-  onDrag?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
-  onDragStop?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
-  onResizeStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
-  onResize?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
-  onResizeStop?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent, element: HTMLElement) => void
+  onDragStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
+  onDrag?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
+  onDragStop?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
+  onResizeStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
+  onResize?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
+  onResizeStop?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
   onDrop?: (e: DragEvent) => void
 }

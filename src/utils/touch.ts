@@ -6,27 +6,22 @@ export interface Position {
 /**
  * Get the position from a mouse or touch event
  */
-export function getControlPosition(e: MouseEvent | TouchEvent): Position | null {
-  console.log('🔍 getControlPosition called', {
-    type: e.type,
-    isTouchEvent: 'touches' in e,
-    touches: 'touches' in e ? (e as TouchEvent).touches.length : 'N/A',
-    changedTouches: 'touches' in e ? (e as TouchEvent).changedTouches.length : 'N/A'
-  })
+export function getControlPosition(e: MouseEvent | TouchEvent | PointerEvent): Position | null {
+  // Handle PointerEvent (used by Chrome DevTools touch simulation)
+  if ('pointerId' in e) {
+    const pointerEvent = e as PointerEvent
+    return {
+      x: pointerEvent.clientX,
+      y: pointerEvent.clientY
+    }
+  }
   
   // Handle touch events
   if ('touches' in e) {
     const touchEvent = e as TouchEvent
     const touch = touchEvent.touches[0] || touchEvent.changedTouches[0]
     
-    console.log('👆 Touch details:', {
-      touchesLength: touchEvent.touches.length,
-      changedTouchesLength: touchEvent.changedTouches.length,
-      touch: touch ? { x: touch.clientX, y: touch.clientY } : null
-    })
-    
     if (!touch) {
-      console.warn('❌ No valid touch found in touch event')
       return null
     }
     
@@ -37,7 +32,6 @@ export function getControlPosition(e: MouseEvent | TouchEvent): Position | null 
   }
   
   // Handle mouse events
-  console.log('🖱️ Mouse event:', { x: e.clientX, y: e.clientY })
   return {
     x: e.clientX,
     y: e.clientY

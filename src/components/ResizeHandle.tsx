@@ -5,7 +5,7 @@ import { cn } from '../utils/cn'
 
 interface ResizeHandleProps {
   position: 'se' | 'sw' | 'ne' | 'nw' | 'n' | 's' | 'e' | 'w'
-  onMouseDown: (e: React.MouseEvent | React.TouchEvent) => void
+  onMouseDown: (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => void
   isActive?: boolean
   isVisible?: boolean
 }
@@ -38,6 +38,8 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
         )}
         onMouseDown={isActive ? onMouseDown : undefined}
         onTouchStart={isActive ? onMouseDown : undefined}
+        onPointerDown={isActive ? onMouseDown : undefined}
+        onDoubleClick={(e) => e.preventDefault()}
         style={{
           ...(position === 'se' && { bottom: '0px', right: '0px' }),
           ...(position === 'sw' && { bottom: '0px', left: '0px' }),
@@ -79,6 +81,8 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
         )}
         onMouseDown={isActive ? onMouseDown : undefined}
         onTouchStart={isActive ? onMouseDown : undefined}
+        onPointerDown={isActive ? onMouseDown : undefined}
+        onDoubleClick={(e) => e.preventDefault()}
       />
     )
   }

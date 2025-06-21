@@ -1,9 +1,15 @@
 /* Mobile Touch Support Styles */
 
+/* Prevent double-tap zoom on entire document */
+html {
+  touch-action: manipulation; /* Allow pan/scroll but prevent double-tap zoom */
+}
+
 /* Grid Container */
 .tailwind-grid-layout {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
+  touch-action: manipulation; /* Prevent double-tap zoom */
 }
 
 /* Grid Items */
@@ -11,6 +17,9 @@
   touch-action: none; /* Prevent scrolling while dragging */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
+  -webkit-touch-action: none; /* iOS Safari */
+  -ms-touch-action: none; /* IE/Edge */
 }
 
 /* When not dragging, allow normal touch behavior on the container */
