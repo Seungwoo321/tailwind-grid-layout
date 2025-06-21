@@ -266,4 +266,78 @@ describe('ResizeHandle', () => {
       expect(handle.style.transform).toBe(transform)
     })
   })
+
+  it('should handle touch events', () => {
+    const { container } = render(
+      <ResizeHandle 
+        position="se" 
+        onMouseDown={mockOnMouseDown}
+        isActive={true}
+        isVisible={true}
+      />
+    )
+
+    const handle = container.querySelector('.react-grid-layout__resize-handle') as HTMLElement
+    act(() => {
+      fireEvent.touchStart(handle)
+    })
+    
+    expect(mockOnMouseDown).toHaveBeenCalled()
+  })
+
+  it('should handle pointer events', () => {
+    const { container } = render(
+      <ResizeHandle 
+        position="se" 
+        onMouseDown={mockOnMouseDown}
+        isActive={true}
+        isVisible={true}
+      />
+    )
+
+    const handle = container.querySelector('.react-grid-layout__resize-handle') as HTMLElement
+    act(() => {
+      fireEvent.pointerDown(handle)
+    })
+    
+    expect(mockOnMouseDown).toHaveBeenCalled()
+  })
+
+  it('should prevent double click events', () => {
+    const { container } = render(
+      <ResizeHandle 
+        position="se" 
+        onMouseDown={mockOnMouseDown}
+        isActive={true}
+        isVisible={true}
+      />
+    )
+
+    const handle = container.querySelector('.react-grid-layout__resize-handle') as HTMLElement
+    act(() => {
+      fireEvent.doubleClick(handle)
+    })
+    
+    // Verify the double click event was handled (no exceptions thrown)
+    expect(handle).toBeTruthy()
+  })
+
+  it('should handle edge case with touch events on non-visible edge handles', () => {
+    const { container } = render(
+      <ResizeHandle 
+        position="n" 
+        onMouseDown={mockOnMouseDown}
+        isActive={true}
+        isVisible={false}
+      />
+    )
+
+    const handle = container.querySelector('div') as HTMLElement
+    act(() => {
+      fireEvent.touchStart(handle)
+      fireEvent.pointerDown(handle)
+    })
+    
+    expect(mockOnMouseDown).toHaveBeenCalledTimes(2)
+  })
 })

@@ -39,10 +39,10 @@ export default defineConfig({
         '**/*.browser.test.*'
       ],
       thresholds: {
-        lines: 98,
-        branches: 98,
-        functions: 85,
-        statements: 98
+        lines: 100,
+        branches: 100,
+        functions: 100,
+        statements: 100
       }
     }
   },
