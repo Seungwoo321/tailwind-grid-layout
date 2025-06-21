@@ -61,8 +61,10 @@ export function isPrimaryTouch(e: TouchEvent): boolean {
 
 /**
  * Add event listener options for better mobile performance
+ * passive: false - allows preventDefault to work
+ * capture: false - use bubbling phase for better compatibility
  */
-export const touchEventOptions = { passive: false, capture: true }
+export const touchEventOptions = { passive: false, capture: false }
 
 /**
  * Prevent default behavior for touch events

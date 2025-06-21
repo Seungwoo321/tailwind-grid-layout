@@ -143,6 +143,12 @@ export const GridContainer: React.FC<GridContainerProps> = ({
 
   // Handle drag start
   const handleDragStart = useCallback((itemId: string, e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
+    console.log('[GridContainer] handleDragStart called', {
+      itemId,
+      eventType: e.type,
+      isTouch: 'touches' in e.nativeEvent
+    })
+    
     // GridItem already checks isDraggable before calling this function
     const item = layout.find(i => i.id === itemId)!
     // GridItem already checks item.isDraggable before calling this function
@@ -150,7 +156,10 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     const rect = e.currentTarget.getBoundingClientRect()
     const pos = getControlPosition(e.nativeEvent as MouseEvent | TouchEvent | PointerEvent)
     
+    console.log('[GridContainer] Control position:', pos)
+    
     if (!pos) {
+      console.log('[GridContainer] No position from getControlPosition')
       return
     }
     
@@ -166,6 +175,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       currentMousePos: { x: pos.x, y: pos.y }
     }
     
+    console.log('[GridContainer] Setting drag state:', newDragState)
     setDragState(newDragState)
     
     // Call onDragStart callback
@@ -174,25 +184,62 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       onDragStart(layout, item, item, { ...item }, e.nativeEvent, element)
     }
     
-    e.preventDefault()
-    if ('touches' in e.nativeEvent) {
-      preventDefaultTouchEvent(e.nativeEvent as TouchEvent)
+    // Don't call preventDefault here as it's already handled in GridItem for touch events
+    // This allows mouse events to work normally
+    if (!('touches' in e.nativeEvent)) {
+      e.preventDefault()
     }
   }, [layout, onDragStart])
 
   // Handle drag move
   const handleDragMove = useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
+    // Early return if not dragging
+    if (!dragState.isDragging || !dragState.draggedItem) {
+      console.log('[GridContainer] Not dragging, early return')
+      return
+    }
+    
+    console.log('[GridContainer] handleDragMove called', {
+      eventType: e.type,
+      isTouch: 'touches' in e,
+      isDragging: dragState.isDragging,
+      draggedItem: dragState.draggedItem
+    })
+    
     // This function is only called when dragging is active
     if (!containerRef.current) return
     
     const pos = getControlPosition(e)
+    console.log('[GridContainer] Move position:', pos)
+    
     if (!pos) return
     
     const containerRect = containerRef.current.getBoundingClientRect()
     const x = pos.x - containerRect.left - dragState.dragOffset.x - containerPadding[0]
     const y = pos.y - containerRect.top - dragState.dragOffset.y - containerPadding[1]
     
+    console.log('[GridContainer] Position calculation:', {
+      posX: pos.x,
+      posY: pos.y,
+      containerLeft: containerRect.left,
+      containerTop: containerRect.top,
+      dragOffsetX: dragState.dragOffset.x,
+      dragOffsetY: dragState.dragOffset.y,
+      calculatedX: x,
+      calculatedY: y,
+      rowHeight,
+      gap
+    })
+    
     const { col, row } = calculateGridPosition(x, y, cols, rowHeight, gap, containerWidth, margin)
+    
+    console.log('[GridContainer] Grid position:', {
+      col,
+      row,
+      containerWidth,
+      cols,
+      rowHeight
+    })
     
     const draggedItem = layout.find(i => i.id === dragState.draggedItem)
     if (!draggedItem || draggedItem.static) return
@@ -259,9 +306,9 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       }
     }
     
-    // Prevent default for touch events
+    // Prevent default for touch events to stop scrolling during drag
     if ('touches' in e) {
-      preventDefaultTouchEvent(e as TouchEvent)
+      e.preventDefault()
     }
   }, [dragState, layout, cols, rowHeight, gap, containerWidth, containerPadding, preventCollision, allowOverlap, isBounded, compactType, margin, maxRows, onDrag])
 
@@ -426,9 +473,9 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       }
     }
     
-    // Prevent default for touch events
+    // Prevent default for touch events to stop scrolling during drag
     if ('touches' in e) {
-      preventDefaultTouchEvent(e as TouchEvent)
+      e.preventDefault()
     }
   }, [resizeState, layout, containerWidth, cols, rowHeight, gap, margin, onResize])
 
@@ -475,6 +522,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       
       document.body.style.cursor = 'grabbing'
       document.body.style.userSelect = 'none'
+      document.body.classList.add('grid-dragging')
       
       return () => {
         document.removeEventListener('mousemove', handleDragMove)
@@ -487,11 +535,12 @@ export const GridContainer: React.FC<GridContainerProps> = ({
         document.removeEventListener('pointercancel', handleDragEnd)
         document.body.style.cursor = ''
         document.body.style.userSelect = ''
+        document.body.classList.remove('grid-dragging')
       }
     }
     // Return undefined when not dragging
     return undefined
-  }, [dragState.isDragging, handleDragMove, handleDragEnd])
+  }, [dragState.isDragging, dragState.draggedItem, dragState.dragOffset, handleDragMove, handleDragEnd])
 
   useEffect(() => {
     if (resizeState.isResizing) {

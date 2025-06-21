@@ -33,8 +33,15 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
   children
 }) => {
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
-    // Prevent double-tap zoom
-    e.preventDefault()
+    // Debug log for mobile
+    if ('touches' in e) {
+      console.log('[GridItem] Touch event detected', {
+        itemId: item.id,
+        isDraggable,
+        static: item.static,
+        touches: (e as React.TouchEvent).touches.length
+      })
+    }
     
     // Don't allow dragging static items
     if (item.static) return
@@ -47,7 +54,27 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
     // Check draggableCancel selector
     const isCancelled = draggableCancel && target.closest(draggableCancel)
     
-    if (isDraggable && !e.defaultPrevented && (isDragHandle || !target.closest('.grid-drag-handle')) && !isActionButton && !isCancelled) {
+    // Debug log conditions
+    if ('touches' in e) {
+      console.log('[GridItem] Drag conditions', {
+        isDraggable,
+        isDragHandle,
+        hasGridDragHandle: !!target.closest('.grid-drag-handle'),
+        isActionButton,
+        isCancelled,
+        shouldStartDrag: isDraggable && (isDragHandle || !target.closest('.grid-drag-handle')) && !isActionButton && !isCancelled
+      })
+    }
+    
+    if (isDraggable && (isDragHandle || !target.closest('.grid-drag-handle')) && !isActionButton && !isCancelled) {
+      console.log('[GridItem] Starting drag for item:', item.id)
+      
+      // For touch events, we need to call preventDefault to prevent scrolling
+      // But we should do it before calling onDragStart to ensure the event is not consumed
+      if ('touches' in e) {
+        e.preventDefault()
+      }
+      
       onDragStart(item.id, e)
     }
   }
@@ -73,7 +100,12 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
         cursor: isDraggable ? 'grab' : 'default'
       }}
       onMouseDown={handleMouseDown}
-      onTouchStart={handleMouseDown}
+      onTouchStart={(e) => {
+        // Call handleMouseDown with synthetic event
+        handleMouseDown(e)
+        // Stop propagation to prevent bubbling issues
+        e.stopPropagation()
+      }}
       onPointerDown={handleMouseDown}
       onDoubleClick={(e) => e.preventDefault()}
     >

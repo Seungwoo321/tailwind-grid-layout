@@ -5,26 +5,26 @@ html {
   touch-action: manipulation; /* Allow pan/scroll but prevent double-tap zoom */
 }
 
+/* Prevent default touch behaviors on body during dragging */
+body.grid-dragging {
+  touch-action: none !important;
+  overflow: hidden;
+}
+
 /* Grid Container */
 .tailwind-grid-layout {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
-  touch-action: manipulation; /* Prevent double-tap zoom */
+  /* Don't set touch-action here to allow grid items to control it */
 }
 
-/* Grid Items */
+/* Grid Items - Always allow touch manipulation */
 .tailwind-grid-layout [data-grid-id] {
-  touch-action: none; /* Prevent scrolling while dragging */
+  touch-action: none; /* Critical: Prevent all default touch behaviors */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
-  -webkit-touch-action: none; /* iOS Safari */
-  -ms-touch-action: none; /* IE/Edge */
-}
-
-/* When not dragging, allow normal touch behavior on the container */
-.tailwind-grid-layout:not(.dragging) {
-  touch-action: auto;
+  /* Remove webkit/ms prefixed touch-action as they can conflict */
 }
 
 /* Drag handles */

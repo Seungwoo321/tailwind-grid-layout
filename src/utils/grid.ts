@@ -12,8 +12,22 @@ export function calculateGridPosition(
   const horizontalMargin = margin ? margin[0] : gap
   const verticalMargin = margin ? margin[1] : gap
   const colWidth = (containerWidth - horizontalMargin * (cols - 1)) / cols
-  const col = Math.round(x / (colWidth + horizontalMargin))
-  const row = Math.round(y / (rowHeight + verticalMargin))
+  
+  // Use threshold for smoother grid snapping
+  const threshold = 0.3 // Snap when 30% into the next grid unit
+  
+  // Calculate grid positions with threshold
+  const colFloat = x / (colWidth + horizontalMargin)
+  const rowFloat = y / (rowHeight + verticalMargin)
+  
+  // Apply threshold for smoother snapping
+  const col = Math.floor(colFloat + threshold)
+  const row = Math.floor(rowFloat + threshold)
+  
+  console.log('[Grid] Position calculation:', {
+    x, y, colFloat, rowFloat, col, row, 
+    colWidth, rowHeight, threshold
+  })
   
   return {
     col: Math.max(0, col),
