@@ -33,15 +33,6 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
   children
 }) => {
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
-    // Debug log for mobile
-    if ('touches' in e) {
-      console.log('[GridItem] Touch event detected', {
-        itemId: item.id,
-        isDraggable,
-        static: item.static,
-        touches: (e as React.TouchEvent).touches.length
-      })
-    }
     
     // Don't allow dragging static items
     if (item.static) return
@@ -54,20 +45,8 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
     // Check draggableCancel selector
     const isCancelled = draggableCancel && target.closest(draggableCancel)
     
-    // Debug log conditions
-    if ('touches' in e) {
-      console.log('[GridItem] Drag conditions', {
-        isDraggable,
-        isDragHandle,
-        hasGridDragHandle: !!target.closest('.grid-drag-handle'),
-        isActionButton,
-        isCancelled,
-        shouldStartDrag: isDraggable && (isDragHandle || !target.closest('.grid-drag-handle')) && !isActionButton && !isCancelled
-      })
-    }
     
     if (isDraggable && (isDragHandle || !target.closest('.grid-drag-handle')) && !isActionButton && !isCancelled) {
-      console.log('[GridItem] Starting drag for item:', item.id)
       
       // For touch events, we need to call preventDefault to prevent scrolling
       // But we should do it before calling onDragStart to ensure the event is not consumed

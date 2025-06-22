@@ -11,7 +11,10 @@ export function calculateGridPosition(
 ): { col: number; row: number } {
   const horizontalMargin = margin ? margin[0] : gap
   const verticalMargin = margin ? margin[1] : gap
-  const colWidth = (containerWidth - horizontalMargin * (cols - 1)) / cols
+  // 사용 가능 전체 너비를 cols로 균등 분할 (여백 없이)
+  const totalGaps = horizontalMargin * (cols - 1)
+  const availableWidth = containerWidth - totalGaps
+  const colWidth = availableWidth / cols
   
   // Use threshold for smoother grid snapping
   const threshold = 0.3 // Snap when 30% into the next grid unit
@@ -24,10 +27,6 @@ export function calculateGridPosition(
   const col = Math.floor(colFloat + threshold)
   const row = Math.floor(rowFloat + threshold)
   
-  console.log('[Grid] Position calculation:', {
-    x, y, colFloat, rowFloat, col, row, 
-    colWidth, rowHeight, threshold
-  })
   
   return {
     col: Math.max(0, col),
@@ -45,12 +44,30 @@ export function getPixelPosition(
 ): { left: number; top: number; width: number; height: number } {
   const horizontalMargin = margin ? margin[0] : gap
   const verticalMargin = margin ? margin[1] : gap
-  const colWidth = (containerWidth - horizontalMargin * (cols - 1)) / cols
+  
+  // 아이템이 전체 너비를 차지하는 경우 (w === cols)
+  if (item.w === cols && item.x === 0) {
+    return {
+      left: 0,
+      top: item.y * (rowHeight + verticalMargin),
+      width: containerWidth,
+      height: item.h * rowHeight + (item.h - 1) * verticalMargin
+    }
+  }
+  
+  // 일반적인 경우
+  const totalGaps = horizontalMargin * (cols - 1)
+  const availableWidth = containerWidth - totalGaps
+  const colWidth = availableWidth / cols
+  
+  const calculatedWidth = item.w * colWidth + (item.w - 1) * horizontalMargin
+  const calculatedLeft = item.x * (colWidth + horizontalMargin)
+  
   
   return {
-    left: item.x * (colWidth + horizontalMargin),
+    left: calculatedLeft,
     top: item.y * (rowHeight + verticalMargin),
-    width: item.w * colWidth + (item.w - 1) * horizontalMargin,
+    width: calculatedWidth,
     height: item.h * rowHeight + (item.h - 1) * verticalMargin
   }
 }
@@ -175,53 +192,77 @@ export function compactLayout(
   return compacted
 }
 
+export function shouldSwapItems(
+  draggingItem: GridPosition,
+  targetItem: GridPosition,
+  originalItem: GridPosition
+): boolean {
+  const draggingCenterX = draggingItem.x + draggingItem.w / 2
+  const draggingCenterY = draggingItem.y + draggingItem.h / 2
+  const targetCenterX = targetItem.x + targetItem.w / 2
+  const targetCenterY = targetItem.y + targetItem.h / 2
+  
+  const isMovingDown = draggingItem.y > originalItem.y
+  const isMovingUp = draggingItem.y < originalItem.y
+  const isMovingRight = draggingItem.x > originalItem.x
+  const isMovingLeft = draggingItem.x < originalItem.x
+  
+  if (isMovingDown && draggingCenterY > targetCenterY) return true
+  if (isMovingUp && draggingCenterY < targetCenterY) return true
+  if (isMovingRight && draggingCenterX > targetCenterX) return true
+  if (isMovingLeft && draggingCenterX < targetCenterX) return true
+  
+  return false
+}
+
 export function moveItems(
   layout: GridItem[],
   item: GridItem,
   _cols: number,
-  _originalItem?: GridItem
+  originalItem?: GridItem
 ): GridItem[] {
-  const compareWith = { ...item }
-  const movedLayout = [...layout]
+  if (!originalItem) return layout
   
-  // Update the position of the moving item in the layout
+  const movedLayout = [...layout]
   const itemIndex = movedLayout.findIndex(l => l.id === item.id)
   if (itemIndex !== -1) {
-    movedLayout[itemIndex] = compareWith
+    movedLayout[itemIndex] = { ...item }
   }
   
-  // React Grid Layout style: check for collisions
-  const getCollisions = (checkItem: GridItem): GridItem[] => {
-    return movedLayout.filter(l => {
-      if (l.id === checkItem.id || l.static) return false
-      return checkCollision(checkItem, l)
-    })
-  }
+  // 충돌하는 아이템들 찾기
+  const collisions = movedLayout.filter(l => {
+    if (l.id === item.id || l.static) return false
+    return checkCollision(item, l)
+  })
   
-  // Process collisions iteratively until no more collisions
-  const processedIds = new Set<string>()
-  const itemsToMove: GridItem[] = [compareWith]
+  // 충돌하는 아이템들을 밀어내기
+  const isMovingUp = item.y < originalItem.y
+  const isMovingDown = item.y > originalItem.y
   
-  while (itemsToMove.length > 0) {
-    const currentItem = itemsToMove.shift()!
-    if (processedIds.has(currentItem.id)) continue
-    processedIds.add(currentItem.id)
-    
-    const collisions = getCollisions(currentItem)
-    
-    for (const collision of collisions) {
-      if (processedIds.has(collision.id)) continue
-      
-      // Calculate new position for the colliding item
-      const newY = currentItem.y + currentItem.h
-      const movedCollision = { ...collision, y: newY }
-      
-      // Update in layout
-      const collisionIndex = movedLayout.findIndex(l => l.id === collision.id)
-      if (collisionIndex !== -1) {
-        movedLayout[collisionIndex] = movedCollision
-        // Add to queue to check for further collisions
-        itemsToMove.push(movedCollision)
+  for (const collision of collisions) {
+    const collisionIndex = movedLayout.findIndex(l => l.id === collision.id)
+    if (collisionIndex !== -1) {
+      if (isMovingUp) {
+        // 위로 이동할 때는 충돌 아이템을 아래로 밀기
+        movedLayout[collisionIndex] = { 
+          ...collision, 
+          y: item.y + item.h 
+        }
+      } else if (isMovingDown) {
+        // 아래로 이동할 때는 충돌 아이템을 위로 밀기
+        movedLayout[collisionIndex] = { 
+          ...collision, 
+          y: Math.max(0, item.y - collision.h) 
+        }
+      } else {
+        // 좌우 이동시 원래 로직 사용
+        if (shouldSwapItems(item, collision, originalItem)) {
+          movedLayout[collisionIndex] = { 
+            ...collision, 
+            x: originalItem.x, 
+            y: originalItem.y 
+          }
+        }
       }
     }
   }
