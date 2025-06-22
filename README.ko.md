@@ -14,6 +14,7 @@ React용 현대적이고 가벼운 그리드 레이아웃 시스템으로, Tailw
 - 🪶 **경량화** - Tailwind CSS를 사용한 더 작은 번들 크기
 - 🎨 **Tailwind 네이티브** - Tailwind CSS 유틸리티로 구축
 - 📱 **반응형** - 모든 화면 크기에서 작동
+- 📱 **모바일 터치** - 향상된 제스처 지원으로 터치 디바이스 완전 최적화
 - 🔧 **TypeScript** - 완전한 TypeScript 지원
 - ⚡ **고성능** - 최적화된 렌더링과 애니메이션
 - 🧪 **철저한 테스트** - 100% 테스트 커버리지
@@ -173,7 +174,7 @@ function App() {
 | 커스텀 클래스 | ✅ | ✅ | 완전 지원 |
 | 애니메이션 | ✅ | ✅ | Tailwind 트랜지션 |
 | **성능** |
-| 번들 크기 | ~30KB | ~15KB | 50% 작음 |
+| 번들 크기 | ~30KB | ~22KB (gzip) | 더 작은 번들 |
 | 의존성 | React만 | React + Tailwind | |
 | Tree-shaking | ✅ | ✅ | 완전 지원 |
 
@@ -185,7 +186,7 @@ function App() {
 <GridContainer items={items}>
   {(item) => (
     <div className="bg-white rounded-lg shadow p-4">
-      <div className="grid-drag-handle cursor-move p-2 bg-gray-100 rounded">
+      <div className="cursor-move p-2 bg-gray-100 rounded" data-drag-handle>
         <GripIcon className="w-4 h-4" />
       </div>
       <div className="p-4">
@@ -534,12 +535,24 @@ const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
 }
 ```
 
+## 성능 최적화
+
+- **하드웨어 가속**: will-change와 함께 CSS transform 사용
+- **제스처 디바운싱**: 최적화된 터치 이벤트 처리
+- **메모리 관리**: 이벤트 리스너의 적절한 정리
+- **번들 분할**: Tree-shakable exports
+- **ResizeObserver**: 효율적인 컨테이너 너비 감지
+- **애니메이션 제어**: 상호작용 중 트랜지션 비활성화
+
 ## 브라우저 지원
 
 - Chrome (최신)
 - Firefox (최신)
 - Safari (최신)
 - Edge (최신)
+- **Mobile Safari** (iOS 12+)
+- **Chrome Mobile** (Android 7+)
+- **ResizeObserver 지원**이 최적 성능을 위해 필요
 
 ## 기여하기
 

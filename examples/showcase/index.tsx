@@ -200,14 +200,14 @@ export function ShowcaseExample() {
         <div className="mb-4 p-3 bg-green-50 rounded-md text-green-700">
           <strong>Current Breakpoint:</strong> <span className="font-mono text-lg">{dashboardBreakpoint}</span>
         </div>
-        <div className="bg-white rounded-lg shadow-lg p-6 max-[479px]:p-3">
+        <div className="bg-white rounded-lg shadow-lg">
           <ResponsiveGridContainer
             layouts={dashboardLayouts}
             breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
             cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
             rowHeight={80}
-            gap={dashboardBreakpoint === 'xxs' ? 0 : 16}
-            containerPadding={dashboardBreakpoint === 'xxs' ? [0, 16] : [16, 16]}
+            gap={dashboardBreakpoint === 'xxs' ? 8 : 16}
+            containerPadding={dashboardBreakpoint === 'xxs' ? [12, 16] : [16, 16]}
             onLayoutChange={(layout, layouts) => setDashboardLayouts(layouts)}
             onBreakpointChange={(breakpoint) => setDashboardBreakpoint(breakpoint)}
           >
@@ -231,18 +231,18 @@ export function ShowcaseExample() {
         <div className="mb-6 p-3 bg-blue-50 rounded-md text-blue-700">
           <strong>Current Breakpoint:</strong> <span className="font-mono text-lg">{responsiveBreakpoint}</span>
         </div>
-        <div className="bg-white rounded-lg shadow-lg p-6 max-[479px]:p-3">
+        <div className="bg-white rounded-lg shadow-lg">
           <ResponsiveGridContainer
             layouts={responsiveLayouts}
             breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
             cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-            containerPadding={responsiveBreakpoint === 'xxs' ? [0, 16] : [16, 16]}
+            containerPadding={responsiveBreakpoint === 'xxs' ? [12, 16] : [16, 16]}
             onLayoutChange={(layout, layouts) => setResponsiveLayouts(layouts)}
             onBreakpointChange={(breakpoint, _cols) => {
               setResponsiveBreakpoint(breakpoint)
             }}
             rowHeight={100}
-            gap={responsiveBreakpoint === 'xxs' ? 0 : 16}
+            gap={responsiveBreakpoint === 'xxs' ? 8 : 16}
           >
             {renderResponsiveItem}
           </ResponsiveGridContainer>
@@ -255,15 +255,15 @@ export function ShowcaseExample() {
         <p className="text-gray-600 mb-6">
           Using WidthProvider HOC for automatic container width detection. This is useful when the grid container's width is dynamic.
         </p>
-        <div className="bg-white rounded-lg shadow-lg p-6 max-[479px]:p-3">
+        <div className="bg-white rounded-lg shadow-lg">
           <ResponsiveGridWithWidth
             layouts={responsiveLayouts}
             breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
             cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-            containerPadding={responsiveBreakpoint === 'xxs' ? [0, 16] : [16, 16]}
+            containerPadding={responsiveBreakpoint === 'xxs' ? [12, 16] : [16, 16]}
             onLayoutChange={(layout, layouts) => setResponsiveLayouts(layouts)}
             rowHeight={100}
-            gap={responsiveBreakpoint === 'xxs' ? 0 : 16}
+            gap={responsiveBreakpoint === 'xxs' ? 8 : 16}
           >
             {renderResponsiveItem}
           </ResponsiveGridWithWidth>

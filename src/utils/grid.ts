@@ -9,24 +9,21 @@ export function calculateGridPosition(
   containerWidth: number,
   margin?: [number, number]
 ): { col: number; row: number } {
-  const horizontalMargin = margin ? margin[0] : gap
   const verticalMargin = margin ? margin[1] : gap
-  // 사용 가능 전체 너비를 cols로 균등 분할 (여백 없이)
-  const totalGaps = horizontalMargin * (cols - 1)
-  const availableWidth = containerWidth - totalGaps
-  const colWidth = availableWidth / cols
   
-  // Use threshold for smoother grid snapping
-  const threshold = 0.3 // Snap when 30% into the next grid unit
+  // React Grid Layout과 동일한 방식으로 계산  
+  const unitWidth = containerWidth / cols
   
-  // Calculate grid positions with threshold
-  const colFloat = x / (colWidth + horizontalMargin)
+  // 사용 임계값으로 스무스한 그리드 스냅
+  const threshold = 0.3 // 30% 진입 시 스냅
+  
+  // 그리드 위치 계산 with threshold
+  const colFloat = x / unitWidth
   const rowFloat = y / (rowHeight + verticalMargin)
   
-  // Apply threshold for smoother snapping
+  // 임계값을 적용한 스냅
   const col = Math.floor(colFloat + threshold)
   const row = Math.floor(rowFloat + threshold)
-  
   
   return {
     col: Math.max(0, col),
@@ -40,34 +37,29 @@ export function getPixelPosition(
   rowHeight: number,
   gap: number,
   containerWidth: number,
-  margin?: [number, number]
+  margin?: [number, number],
+  containerPadding?: [number, number]
 ): { left: number; top: number; width: number; height: number } {
   const horizontalMargin = margin ? margin[0] : gap
   const verticalMargin = margin ? margin[1] : gap
+  const leftPadding = containerPadding ? containerPadding[0] : 0
+  const topPadding = containerPadding ? containerPadding[1] : 0
   
-  // 아이템이 전체 너비를 차지하는 경우 (w === cols)
-  if (item.w === cols && item.x === 0) {
-    return {
-      left: 0,
-      top: item.y * (rowHeight + verticalMargin),
-      width: containerWidth,
-      height: item.h * rowHeight + (item.h - 1) * verticalMargin
-    }
-  }
+  // React Grid Layout과 동일한 계산 방식
+  // 컨테이너 패딩을 제외한 실제 그리드 영역
+  const gridWidth = containerWidth - (leftPadding * 2)
+  const totalMarginWidth = (cols - 1) * horizontalMargin
+  const availableWidth = gridWidth - totalMarginWidth
+  const unitWidth = availableWidth / cols
   
-  // 일반적인 경우
-  const totalGaps = horizontalMargin * (cols - 1)
-  const availableWidth = containerWidth - totalGaps
-  const colWidth = availableWidth / cols
-  
-  const calculatedWidth = item.w * colWidth + (item.w - 1) * horizontalMargin
-  const calculatedLeft = item.x * (colWidth + horizontalMargin)
-  
+  // 위치 계산 (컨테이너 패딩 포함)
+  const left = leftPadding + item.x * (unitWidth + horizontalMargin)
+  const width = item.w * unitWidth + (item.w - 1) * horizontalMargin
   
   return {
-    left: calculatedLeft,
-    top: item.y * (rowHeight + verticalMargin),
-    width: calculatedWidth,
+    left: Math.round(left),
+    top: topPadding + item.y * (rowHeight + verticalMargin),
+    width: Math.round(width),
     height: item.h * rowHeight + (item.h - 1) * verticalMargin
   }
 }

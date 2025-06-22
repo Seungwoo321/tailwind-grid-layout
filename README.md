@@ -14,6 +14,7 @@ A modern, lightweight grid layout system for React built with Tailwind CSS. A po
 - 🪶 **Lightweight** - Smaller bundle size using Tailwind CSS
 - 🎨 **Tailwind Native** - Built with Tailwind CSS utilities
 - 📱 **Responsive** - Works on all screen sizes
+- 📱 **Mobile Touch** - Full touch device optimization with enhanced gesture support
 - 🔧 **TypeScript** - Full TypeScript support
 - ⚡ **Performance** - Optimized rendering and animations
 - 🧪 **Well Tested** - 100% test coverage
@@ -173,7 +174,7 @@ function App() {
 | Custom Classes | ✅ | ✅ | Full support |
 | Animations | ✅ | ✅ | Tailwind transitions |
 | **Performance** |
-| Bundle Size | ~30KB | ~15KB | 50% smaller |
+| Bundle Size | ~30KB | ~22KB (gzip) | Smaller bundle |
 | Dependencies | React only | React + Tailwind | |
 | Tree-shaking | ✅ | ✅ | Full support |
 
@@ -185,7 +186,7 @@ function App() {
 <GridContainer items={items}>
   {(item) => (
     <div className="bg-white rounded-lg shadow p-4">
-      <div className="grid-drag-handle cursor-move p-2 bg-gray-100 rounded">
+      <div className="cursor-move p-2 bg-gray-100 rounded" data-drag-handle>
         <GripIcon className="w-4 h-4" />
       </div>
       <div className="p-4">
@@ -534,12 +535,24 @@ The drag and resize placeholders can be styled via CSS:
 }
 ```
 
+## Performance Optimizations
+
+- **Hardware Acceleration**: Uses CSS transforms with will-change
+- **Gesture Debouncing**: Optimized touch event handling  
+- **Memory Management**: Proper cleanup of event listeners
+- **Bundle Splitting**: Tree-shakable exports
+- **ResizeObserver**: Efficient container width detection
+- **Animation Control**: Transitions disabled during interactions
+
 ## Browser Support
 
 - Chrome (latest)
 - Firefox (latest)
 - Safari (latest)
 - Edge (latest)
+- **Mobile Safari** (iOS 12+)
+- **Chrome Mobile** (Android 7+)
+- **ResizeObserver support** required for optimal performance
 
 ## Contributing
 

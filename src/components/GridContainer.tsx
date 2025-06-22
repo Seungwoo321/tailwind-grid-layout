@@ -84,8 +84,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   useEffect(() => {
     const updateContainerWidth = () => {
       if (containerRef.current) {
-        const width = containerRef.current.offsetWidth - containerPadding[0] * 2
-        setContainerWidth(width)
+        setContainerWidth(containerRef.current.offsetWidth)
       }
     }
 
@@ -124,7 +123,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth - containerPadding[0] * 2)
+        setContainerWidth(containerRef.current.offsetWidth)
       }
     }
     
@@ -143,12 +142,6 @@ export const GridContainer: React.FC<GridContainerProps> = ({
 
   // Handle drag start
   const handleDragStart = useCallback((itemId: string, e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
-    console.log('[GridContainer] handleDragStart called', {
-      itemId,
-      eventType: e.type,
-      isTouch: 'touches' in e.nativeEvent
-    })
-    
     // GridItem already checks isDraggable before calling this function
     const item = layout.find(i => i.id === itemId)!
     // GridItem already checks item.isDraggable before calling this function
@@ -156,10 +149,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     const rect = e.currentTarget.getBoundingClientRect()
     const pos = getControlPosition(e.nativeEvent as MouseEvent | TouchEvent | PointerEvent)
     
-    console.log('[GridContainer] Control position:', pos)
-    
     if (!pos) {
-      console.log('[GridContainer] No position from getControlPosition')
       return
     }
     
@@ -175,7 +165,6 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       currentMousePos: { x: pos.x, y: pos.y }
     }
     
-    console.log('[GridContainer] Setting drag state:', newDragState)
     setDragState(newDragState)
     
     // Call onDragStart callback
@@ -193,53 +182,17 @@ export const GridContainer: React.FC<GridContainerProps> = ({
 
   // Handle drag move
   const handleDragMove = useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
-    // Early return if not dragging
-    if (!dragState.isDragging || !dragState.draggedItem) {
-      console.log('[GridContainer] Not dragging, early return')
-      return
-    }
-    
-    console.log('[GridContainer] handleDragMove called', {
-      eventType: e.type,
-      isTouch: 'touches' in e,
-      isDragging: dragState.isDragging,
-      draggedItem: dragState.draggedItem
-    })
-    
     // This function is only called when dragging is active
     if (!containerRef.current) return
     
     const pos = getControlPosition(e)
-    console.log('[GridContainer] Move position:', pos)
-    
     if (!pos) return
     
     const containerRect = containerRef.current.getBoundingClientRect()
     const x = pos.x - containerRect.left - dragState.dragOffset.x - containerPadding[0]
     const y = pos.y - containerRect.top - dragState.dragOffset.y - containerPadding[1]
     
-    console.log('[GridContainer] Position calculation:', {
-      posX: pos.x,
-      posY: pos.y,
-      containerLeft: containerRect.left,
-      containerTop: containerRect.top,
-      dragOffsetX: dragState.dragOffset.x,
-      dragOffsetY: dragState.dragOffset.y,
-      calculatedX: x,
-      calculatedY: y,
-      rowHeight,
-      gap
-    })
-    
     const { col, row } = calculateGridPosition(x, y, cols, rowHeight, gap, containerWidth, margin)
-    
-    console.log('[GridContainer] Grid position:', {
-      col,
-      row,
-      containerWidth,
-      cols,
-      rowHeight
-    })
     
     const draggedItem = layout.find(i => i.id === dragState.draggedItem)
     if (!draggedItem || draggedItem.static) return
@@ -348,13 +301,29 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     const pos = getControlPosition(e.nativeEvent)
     if (!pos) return
     
+    // Calculate initial pixel size
+    const horizontalMargin = margin ? margin[0] : gap
+    const verticalMargin = margin ? margin[1] : gap
+    const gridWidth = containerWidth - containerPadding[0] * 2
+    const colWidth = (gridWidth - horizontalMargin * (cols - 1)) / cols
+    const gridUnitW = colWidth + horizontalMargin
+    const gridUnitH = rowHeight + verticalMargin
+    
     setResizeState({
       isResizing: true,
       resizedItem: itemId,
       resizeHandle: handle,
       startSize: { w: item.w, h: item.h },
       startPos: { x: pos.x, y: pos.y },
-      originalPos: { x: item.x, y: item.y }
+      originalPos: { x: item.x, y: item.y },
+      currentPixelSize: { 
+        w: item.w * colWidth + (item.w - 1) * horizontalMargin,
+        h: item.h * rowHeight + (item.h - 1) * verticalMargin
+      },
+      currentPixelPos: {
+        x: item.x * gridUnitW,
+        y: item.y * gridUnitH
+      }
     })
     
     // Call onResizeStart callback
@@ -382,93 +351,130 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     
     const horizontalMargin = margin ? margin[0] : gap
     const verticalMargin = margin ? margin[1] : gap
-    const colWidth = (containerWidth - horizontalMargin * (cols - 1)) / cols
-    const deltaX = pos.x - resizeState.startPos.x
-    const deltaY = pos.y - resizeState.startPos.y
+    const gridWidth = containerWidth - containerPadding[0] * 2
+    const colWidth = (gridWidth - horizontalMargin * (cols - 1)) / cols
     
-    // Use threshold for smoother grid snapping
-    const threshold = 0.3 // Snap when 30% into the next grid unit
+    const gridUnitW = colWidth + horizontalMargin
+    const gridUnitH = rowHeight + verticalMargin
     
-    // Calculate grid unit changes with threshold
-    const gridDeltaX = deltaX / (colWidth + horizontalMargin)
-    const gridDeltaY = deltaY / (rowHeight + verticalMargin)
+    // Calculate continuous pixel deltas from start position
+    const pixelDeltaX = pos.x - resizeState.startPos.x
+    const pixelDeltaY = pos.y - resizeState.startPos.y
     
-    // Apply threshold for smoother snapping
-    const deltaW = Math.round(gridDeltaX + (gridDeltaX > 0 ? -threshold : threshold))
-    const deltaH = Math.round(gridDeltaY + (gridDeltaY > 0 ? -threshold : threshold))
     
-    let newW = resizeState.startSize.w
-    let newH = resizeState.startSize.h
-    let newX = item.x
-    let newY = item.y
+    // Get initial pixel values using correct calculation
+    const startPixelW = resizeState.currentPixelSize?.w || (resizeState.startSize.w * colWidth + (resizeState.startSize.w - 1) * horizontalMargin)
+    const startPixelH = resizeState.currentPixelSize?.h || (resizeState.startSize.h * rowHeight + (resizeState.startSize.h - 1) * verticalMargin)
+    const startPixelX = resizeState.currentPixelPos?.x || (resizeState.originalPos?.x || item.x) * gridUnitW
+    const startPixelY = resizeState.currentPixelPos?.y || (resizeState.originalPos?.y || item.y) * gridUnitH
     
-    const originalX = resizeState.originalPos?.x || item.x
-    const originalY = resizeState.originalPos?.y || item.y
+    // Calculate new pixel dimensions based on handle
+    let newPixelX = startPixelX
+    let newPixelY = startPixelY
+    let newPixelW = startPixelW
+    let newPixelH = startPixelH
     
+    // 단순한 그리드 기반 리사이즈로 접근
+    // 마우스 델타를 그리드 단위로 변환
+    const gridDeltaX = pixelDeltaX / gridUnitW
+    const gridDeltaY = pixelDeltaY / gridUnitH
+    
+    // 현재 그리드 크기
+    let newGridW = resizeState.startSize.w
+    let newGridH = resizeState.startSize.h
+    let newGridX = resizeState.originalPos?.x || item.x
+    let newGridY = resizeState.originalPos?.y || item.y
+    
+    // 핸들에 따른 그리드 크기 조정
     switch (resizeState.resizeHandle) {
-      case 'se':
-        newW = resizeState.startSize.w + deltaW
-        newH = resizeState.startSize.h + deltaH
+      case 'se': {
+        newGridW = Math.max(1, Math.round(resizeState.startSize.w + gridDeltaX))
+        newGridH = Math.max(1, Math.round(resizeState.startSize.h + gridDeltaY))
         break
-      case 'sw':
-        newW = resizeState.startSize.w - deltaW
-        newH = resizeState.startSize.h + deltaH
-        newX = originalX + deltaW
+      }
+      case 'sw': {
+        const deltaW = Math.round(gridDeltaX)
+        newGridX = Math.max(0, (resizeState.originalPos?.x || item.x) + deltaW)
+        newGridW = Math.max(1, resizeState.startSize.w - deltaW)
+        newGridH = Math.max(1, Math.round(resizeState.startSize.h + gridDeltaY))
         break
-      case 'ne':
-        newW = resizeState.startSize.w + deltaW
-        newH = resizeState.startSize.h - deltaH
-        newY = originalY + deltaH
+      }
+      case 'ne': {
+        const deltaH = Math.round(gridDeltaY)
+        newGridY = Math.max(0, (resizeState.originalPos?.y || item.y) + deltaH)
+        newGridW = Math.max(1, Math.round(resizeState.startSize.w + gridDeltaX))
+        newGridH = Math.max(1, resizeState.startSize.h - deltaH)
         break
-      case 'nw':
-        newW = resizeState.startSize.w - deltaW
-        newH = resizeState.startSize.h - deltaH
-        newX = originalX + deltaW
-        newY = originalY + deltaH
+      }
+      case 'nw': {
+        const deltaW = Math.round(gridDeltaX)
+        const deltaH = Math.round(gridDeltaY)
+        newGridX = Math.max(0, (resizeState.originalPos?.x || item.x) + deltaW)
+        newGridY = Math.max(0, (resizeState.originalPos?.y || item.y) + deltaH)
+        newGridW = Math.max(1, resizeState.startSize.w - deltaW)
+        newGridH = Math.max(1, resizeState.startSize.h - deltaH)
         break
-      case 'e':
-        newW = resizeState.startSize.w + deltaW
+      }
+      case 'e': {
+        newGridW = Math.max(1, Math.round(resizeState.startSize.w + gridDeltaX))
         break
-      case 'w':
-        newW = resizeState.startSize.w - deltaW
-        newX = originalX + deltaW
+      }
+      case 'w': {
+        const deltaW = Math.round(gridDeltaX)
+        newGridX = Math.max(0, (resizeState.originalPos?.x || item.x) + deltaW)
+        newGridW = Math.max(1, resizeState.startSize.w - deltaW)
         break
-      case 's':
-        newH = resizeState.startSize.h + deltaH
+      }
+      case 's': {
+        newGridH = Math.max(1, Math.round(resizeState.startSize.h + gridDeltaY))
         break
-      case 'n':
-        newH = resizeState.startSize.h - deltaH
-        newY = originalY + deltaH
+      }
+      case 'n': {
+        const deltaH = Math.round(gridDeltaY)
+        newGridY = Math.max(0, (resizeState.originalPos?.y || item.y) + deltaH)
+        newGridH = Math.max(1, resizeState.startSize.h - deltaH)
         break
+      }
     }
     
-    // Apply min/max constraints
-    newW = Math.max(item.minW || 1, newW)
-    newH = Math.max(item.minH || 1, newH)
-    if (item.maxW) newW = Math.min(newW, item.maxW)
-    if (item.maxH) newH = Math.min(newH, item.maxH)
+    // 경계 제한 적용
+    newGridX = Math.max(0, Math.min(cols - newGridW, newGridX))
+    newGridW = Math.min(newGridW, cols - newGridX)
     
-    // Ensure position stays within bounds
-    newX = Math.max(0, newX)
-    newY = Math.max(0, newY)
+    // 픽셀 크기로 다시 계산 (표시용)
+    newPixelX = newGridX * gridUnitW
+    newPixelY = newGridY * gridUnitH
+    newPixelW = newGridW * colWidth + (newGridW - 1) * horizontalMargin
+    newPixelH = newGridH * rowHeight + (newGridH - 1) * verticalMargin
     
-    // Ensure within grid bounds
-    newW = Math.min(newW, cols - newX)
+    // 그리드 기반으로 직접 계산된 값 사용 (minW/maxW 제약 조건 적용)
+    const constrainedW = Math.min(Math.max(item.minW || 1, newGridW), item.maxW || Infinity)
+    const constrainedH = Math.max(item.minH || 1, Math.min(newGridH, item.maxH || Infinity))
+    const constrainedX = Math.max(0, Math.min(cols - constrainedW, newGridX))
+    const constrainedY = Math.max(0, newGridY)
+    
     
     const newLayout = layout.map(i => 
       i.id === resizeState.resizedItem
-        ? { ...i, x: newX, y: newY, w: newW, h: newH }
+        ? { ...i, x: constrainedX, y: constrainedY, w: constrainedW, h: constrainedH }
         : i
     )
     
     setLayout(newLayout)
+    
+    // Update pixel positions for smooth resizing
+    setResizeState(prev => ({
+      ...prev,
+      currentPixelSize: { w: newPixelW, h: newPixelH },
+      currentPixelPos: { x: newPixelX, y: newPixelY }
+    }))
     
     // Call onResize callback
     if (onResize && resizeState.originalPos) {
       const element = containerRef.current?.querySelector(`[data-grid-id="${resizeState.resizedItem}"]`) as HTMLElement
       if (element) {
         const originalItem = { ...item, x: resizeState.originalPos.x, y: resizeState.originalPos.y, w: resizeState.startSize.w, h: resizeState.startSize.h }
-        const newItem = { ...item, x: newX, y: newY, w: newW, h: newH }
+        const newItem = { ...item, x: constrainedX, y: constrainedY, w: constrainedW, h: constrainedH }
         onResize(newLayout, originalItem, newItem, newItem, e, element)
       }
     }
@@ -499,7 +505,9 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       resizedItem: null,
       resizeHandle: null,
       startSize: { w: 0, h: 0 },
-      startPos: { x: 0, y: 0 }
+      startPos: { x: 0, y: 0 },
+      currentPixelSize: undefined,
+      currentPixelPos: undefined
     })
   }, [resizeState, layout, updateLayout, onResizeStop])
 
@@ -602,7 +610,8 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       {/* Grid items */}
       {layout.map(item => {
         const isDragging = dragState.draggedItem === item.id
-        let position = getPixelPosition(item, cols, rowHeight, gap, containerWidth, margin)
+        const isResizing = resizeState.resizedItem === item.id
+        let position = getPixelPosition(item, cols, rowHeight, gap, containerWidth, margin, containerPadding)
         
         // If this item is being dragged, position it at the mouse cursor
         if (isDragging && dragState.currentMousePos && containerRef.current) {
@@ -614,13 +623,23 @@ export const GridContainer: React.FC<GridContainerProps> = ({
           }
         }
         
+        // If this item is being resized, use pixel position for smooth resizing
+        if (isResizing && resizeState.currentPixelSize && resizeState.currentPixelPos) {
+          position = {
+            left: resizeState.currentPixelPos.x,
+            top: resizeState.currentPixelPos.y,
+            width: resizeState.currentPixelSize.w,
+            height: resizeState.currentPixelSize.h
+          }
+        }
+        
         return (
           <GridItemComponent
             key={item.id}
             item={item}
             position={position}
             isDragging={isDragging}
-            isResizing={resizeState.resizedItem === item.id}
+            isResizing={isResizing}
             isDraggable={isDraggable && item.isDraggable !== false}
             isResizable={isResizable && item.isResizable !== false}
             resizeHandles={resizeHandles}
@@ -638,7 +657,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
         <div
           className="absolute rounded-lg transition-all duration-300 pointer-events-none"
           style={{
-            ...getPixelPosition(dragState.placeholder, cols, rowHeight, gap, containerWidth, margin),
+            ...getPixelPosition(dragState.placeholder, cols, rowHeight, gap, containerWidth, margin, containerPadding),
             zIndex: 9,
             background: 'rgba(59, 130, 246, 0.15)',
             border: '2px dashed rgb(59, 130, 246)',
@@ -656,7 +675,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
           <div
             className="absolute rounded-lg transition-all duration-200 pointer-events-none"
             style={{
-              ...getPixelPosition(resizedItem, cols, rowHeight, gap, containerWidth, margin),
+              ...getPixelPosition(resizedItem, cols, rowHeight, gap, containerWidth, margin, containerPadding),
               zIndex: 8,
               background: 'rgba(59, 130, 246, 0.1)',
               border: '2px dashed rgb(59, 130, 246)',
@@ -671,7 +690,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
         <div
           className="absolute bg-gray-200 border-2 border-dashed border-gray-400 rounded opacity-75 pointer-events-none flex items-center justify-center"
           style={{
-            width: ((droppingItem.w || 1) * containerWidth / cols) - gap,
+            width: ((droppingItem.w || 1) * (containerWidth - containerPadding[0] * 2) / cols) - gap,
             height: ((droppingItem.h || 1) * rowHeight) - gap,
             left: containerPadding[0],
             top: containerPadding[1]
