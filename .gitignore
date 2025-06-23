@@ -57,5 +57,11 @@ Thumbs.db
 # Storybook
 storybook-static/
 
+# Documentation
+docs-dist/
+
+# Logs
+*.log
+
 # Vitest
 *.timestamp-*
