@@ -6,6 +6,8 @@ React용 현대적이고 가벼운 그리드 레이아웃 시스템으로, Tailw
 [![license](https://img.shields.io/npm/l/tailwind-grid-layout.svg)](https://github.com/Seungwoo321/tailwind-grid-layout/blob/main/LICENSE)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/tailwind-grid-layout)](https://bundlephobia.com/package/tailwind-grid-layout)
 
+> 버전 0.1.0 - 첫 번째 안정 릴리스
+
 > [English](./README.md) | 한국어
 
 ## 특징
@@ -15,6 +17,10 @@ React용 현대적이고 가벼운 그리드 레이아웃 시스템으로, Tailw
 - 🎨 **Tailwind 네이티브** - Tailwind CSS 유틸리티로 구축
 - 📱 **반응형** - 모든 화면 크기에서 작동
 - 📱 **모바일 터치** - 향상된 제스처 지원으로 터치 디바이스 완전 최적화
+  - 터치 포인트 정확도 향상
+  - 롱프레스 제스처 지원
+  - 스크롤과 드래그 충돌 방지
+  - 멀티터치 방지로 안정성 확보
 - 🔧 **TypeScript** - 완전한 TypeScript 지원
 - ⚡ **고성능** - 최적화된 렌더링과 애니메이션
 - 🧪 **철저한 테스트** - 100% 테스트 커버리지
@@ -79,6 +85,28 @@ function App() {
   )
 }
 ```
+
+## 테스트
+
+```bash
+# 테스트 실행
+pnpm test
+
+# 테스트 감시 모드
+pnpm test:watch
+
+# 테스트 커버리지 리포트
+pnpm test:coverage
+```
+
+### 테스트 커버리지
+
+이 라이브러리는 100% 테스트 커버리지를 유지하고 있습니다:
+
+- ✅ Lines: 100%
+- ✅ Statements: 100%
+- ✅ Functions: 100%
+- ✅ Branches: 100%
 
 ## Props 참조
 
@@ -539,10 +567,21 @@ const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
 
 - **하드웨어 가속**: will-change와 함께 CSS transform 사용
 - **제스처 디바운싱**: 최적화된 터치 이벤트 처리
+  - 터치 이벤트는 16ms (60fps) 단위로 디바운싱
+  - 불필요한 렌더링 최소화
 - **메모리 관리**: 이벤트 리스너의 적절한 정리
 - **번들 분할**: Tree-shakable exports
 - **ResizeObserver**: 효율적인 컨테이너 너비 감지
 - **애니메이션 제어**: 상호작용 중 트랜지션 비활성화
+
+### 터치 이벤트 처리
+
+모바일 환경에서 최적의 성능을 위한 터치 이벤트 처리:
+
+- **Passive 리스너**: 스크롤 성능 향상을 위해 passive 터치 이벤트 사용
+- **제스처 인식**: 탭, 롱프레스, 드래그를 정확하게 구분
+- **관성 스크롤**: 터치 종료 후 자연스러운 관성 효과
+- **Pointer Events API**: 터치, 마우스, 펜 입력 통합 처리
 
 ## 브라우저 지원
 
