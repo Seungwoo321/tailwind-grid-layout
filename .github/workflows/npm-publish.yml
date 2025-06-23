@@ -9,6 +9,11 @@ on:
         description: 'Version to publish (leave empty to use package.json version)'
         required: false
         type: string
+      tag:
+        description: 'npm tag (latest, beta, next, etc.)'
+        required: false
+        type: string
+        default: 'latest'
 
 jobs:
   publish:
@@ -53,8 +58,22 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      - name: Determine npm tag
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            # For GitHub releases, use beta tag if it's a prerelease
+            if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+              echo "NPM_TAG=beta" >> $GITHUB_ENV
+            else
+              echo "NPM_TAG=latest" >> $GITHUB_ENV
+            fi
+          else
+            # For manual dispatch, use the provided tag
+            echo "NPM_TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          fi
+
       - name: Publish to npm
-        run: npm publish --access public
+        run: npm publish --access public --tag ${{ env.NPM_TAG }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

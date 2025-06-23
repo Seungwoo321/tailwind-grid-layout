@@ -6,6 +6,8 @@ A modern, lightweight grid layout system for React built with Tailwind CSS. A po
 [![license](https://img.shields.io/npm/l/tailwind-grid-layout.svg)](https://github.com/Seungwoo321/tailwind-grid-layout/blob/main/LICENSE)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/tailwind-grid-layout)](https://bundlephobia.com/package/tailwind-grid-layout)
 
+> Version 0.1.0 - First stable release
+
 > English | [한국어](./README.ko.md)
 
 ## Features
@@ -14,6 +16,11 @@ A modern, lightweight grid layout system for React built with Tailwind CSS. A po
 - 🪶 **Lightweight** - Smaller bundle size using Tailwind CSS
 - 🎨 **Tailwind Native** - Built with Tailwind CSS utilities
 - 📱 **Responsive** - Works on all screen sizes
+- 📱 **Mobile Touch** - Full touch device optimization with enhanced gesture support
+  - Improved touch point accuracy
+  - Long press gesture support
+  - Prevent scroll-drag conflicts
+  - Multi-touch prevention for stability
 - 🔧 **TypeScript** - Full TypeScript support
 - ⚡ **Performance** - Optimized rendering and animations
 - 🧪 **Well Tested** - 100% test coverage
@@ -78,6 +85,28 @@ function App() {
   )
 }
 ```
+
+## Testing
+
+```bash
+# Run tests
+pnpm test
+
+# Watch mode
+pnpm test:watch
+
+# Coverage report
+pnpm test:coverage
+```
+
+### Test Coverage
+
+This library maintains 100% test coverage:
+
+- ✅ Lines: 100%
+- ✅ Statements: 100%
+- ✅ Functions: 100%
+- ✅ Branches: 100%
 
 ## Props Reference
 
@@ -173,7 +202,7 @@ function App() {
 | Custom Classes | ✅ | ✅ | Full support |
 | Animations | ✅ | ✅ | Tailwind transitions |
 | **Performance** |
-| Bundle Size | ~30KB | ~15KB | 50% smaller |
+| Bundle Size | ~30KB | ~22KB (gzip) | Smaller bundle |
 | Dependencies | React only | React + Tailwind | |
 | Tree-shaking | ✅ | ✅ | Full support |
 
@@ -185,7 +214,7 @@ function App() {
 <GridContainer items={items}>
   {(item) => (
     <div className="bg-white rounded-lg shadow p-4">
-      <div className="grid-drag-handle cursor-move p-2 bg-gray-100 rounded">
+      <div className="cursor-move p-2 bg-gray-100 rounded" data-drag-handle>
         <GripIcon className="w-4 h-4" />
       </div>
       <div className="p-4">
@@ -534,12 +563,35 @@ The drag and resize placeholders can be styled via CSS:
 }
 ```
 
+## Performance Optimizations
+
+- **Hardware Acceleration**: Uses CSS transforms with will-change
+- **Gesture Debouncing**: Optimized touch event handling
+  - Touch events are debounced at 16ms (60fps)
+  - Minimizes unnecessary re-renders
+- **Memory Management**: Proper cleanup of event listeners
+- **Bundle Splitting**: Tree-shakable exports
+- **ResizeObserver**: Efficient container width detection
+- **Animation Control**: Transitions disabled during interactions
+
+### Touch Event Handling
+
+Optimized touch event handling for best performance on mobile devices:
+
+- **Passive Listeners**: Uses passive touch events for improved scroll performance
+- **Gesture Recognition**: Accurately distinguishes between tap, long press, and drag gestures
+- **Momentum Scrolling**: Natural momentum effects after touch release
+- **Pointer Events API**: Unified handling for touch, mouse, and pen input
+
 ## Browser Support
 
 - Chrome (latest)
 - Firefox (latest)
 - Safari (latest)
 - Edge (latest)
+- **Mobile Safari** (iOS 12+)
+- **Chrome Mobile** (Android 7+)
+- **ResizeObserver support** required for optimal performance
 
 ## Contributing
 

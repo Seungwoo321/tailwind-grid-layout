@@ -6,6 +6,8 @@ React용 현대적이고 가벼운 그리드 레이아웃 시스템으로, Tailw
 [![license](https://img.shields.io/npm/l/tailwind-grid-layout.svg)](https://github.com/Seungwoo321/tailwind-grid-layout/blob/main/LICENSE)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/tailwind-grid-layout)](https://bundlephobia.com/package/tailwind-grid-layout)
 
+> 버전 0.1.0 - 첫 번째 안정 릴리스
+
 > [English](./README.md) | 한국어
 
 ## 특징
@@ -14,6 +16,11 @@ React용 현대적이고 가벼운 그리드 레이아웃 시스템으로, Tailw
 - 🪶 **경량화** - Tailwind CSS를 사용한 더 작은 번들 크기
 - 🎨 **Tailwind 네이티브** - Tailwind CSS 유틸리티로 구축
 - 📱 **반응형** - 모든 화면 크기에서 작동
+- 📱 **모바일 터치** - 향상된 제스처 지원으로 터치 디바이스 완전 최적화
+  - 터치 포인트 정확도 향상
+  - 롱프레스 제스처 지원
+  - 스크롤과 드래그 충돌 방지
+  - 멀티터치 방지로 안정성 확보
 - 🔧 **TypeScript** - 완전한 TypeScript 지원
 - ⚡ **고성능** - 최적화된 렌더링과 애니메이션
 - 🧪 **철저한 테스트** - 100% 테스트 커버리지
@@ -78,6 +85,28 @@ function App() {
   )
 }
 ```
+
+## 테스트
+
+```bash
+# 테스트 실행
+pnpm test
+
+# 테스트 감시 모드
+pnpm test:watch
+
+# 테스트 커버리지 리포트
+pnpm test:coverage
+```
+
+### 테스트 커버리지
+
+이 라이브러리는 100% 테스트 커버리지를 유지하고 있습니다:
+
+- ✅ Lines: 100%
+- ✅ Statements: 100%
+- ✅ Functions: 100%
+- ✅ Branches: 100%
 
 ## Props 참조
 
@@ -173,7 +202,7 @@ function App() {
 | 커스텀 클래스 | ✅ | ✅ | 완전 지원 |
 | 애니메이션 | ✅ | ✅ | Tailwind 트랜지션 |
 | **성능** |
-| 번들 크기 | ~30KB | ~15KB | 50% 작음 |
+| 번들 크기 | ~30KB | ~22KB (gzip) | 더 작은 번들 |
 | 의존성 | React만 | React + Tailwind | |
 | Tree-shaking | ✅ | ✅ | 완전 지원 |
 
@@ -185,7 +214,7 @@ function App() {
 <GridContainer items={items}>
   {(item) => (
     <div className="bg-white rounded-lg shadow p-4">
-      <div className="grid-drag-handle cursor-move p-2 bg-gray-100 rounded">
+      <div className="cursor-move p-2 bg-gray-100 rounded" data-drag-handle>
         <GripIcon className="w-4 h-4" />
       </div>
       <div className="p-4">
@@ -534,12 +563,35 @@ const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
 }
 ```
 
+## 성능 최적화
+
+- **하드웨어 가속**: will-change와 함께 CSS transform 사용
+- **제스처 디바운싱**: 최적화된 터치 이벤트 처리
+  - 터치 이벤트는 16ms (60fps) 단위로 디바운싱
+  - 불필요한 렌더링 최소화
+- **메모리 관리**: 이벤트 리스너의 적절한 정리
+- **번들 분할**: Tree-shakable exports
+- **ResizeObserver**: 효율적인 컨테이너 너비 감지
+- **애니메이션 제어**: 상호작용 중 트랜지션 비활성화
+
+### 터치 이벤트 처리
+
+모바일 환경에서 최적의 성능을 위한 터치 이벤트 처리:
+
+- **Passive 리스너**: 스크롤 성능 향상을 위해 passive 터치 이벤트 사용
+- **제스처 인식**: 탭, 롱프레스, 드래그를 정확하게 구분
+- **관성 스크롤**: 터치 종료 후 자연스러운 관성 효과
+- **Pointer Events API**: 터치, 마우스, 펜 입력 통합 처리
+
 ## 브라우저 지원
 
 - Chrome (최신)
 - Firefox (최신)
 - Safari (최신)
 - Edge (최신)
+- **Mobile Safari** (iOS 12+)
+- **Chrome Mobile** (Android 7+)
+- **ResizeObserver 지원**이 최적 성능을 위해 필요
 
 ## 기여하기
 

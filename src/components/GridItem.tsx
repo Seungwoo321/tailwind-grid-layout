@@ -14,8 +14,8 @@ interface GridItemComponentProps {
   isResizable: boolean
   resizeHandles?: Array<'s' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'>
   draggableCancel?: string
-  onDragStart: (itemId: string, e: React.MouseEvent) => void
-  onResizeStart: (itemId: string, handle: ResizeState['resizeHandle'], e: React.MouseEvent) => void
+  onDragStart: (itemId: string, e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => void
+  onResizeStart: (itemId: string, handle: ResizeState['resizeHandle'], e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => void
   children: React.ReactNode
 }
 
@@ -32,7 +32,8 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
   onResizeStart,
   children
 }) => {
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
+    
     // Don't allow dragging static items
     if (item.static) return
     
@@ -44,7 +45,15 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
     // Check draggableCancel selector
     const isCancelled = draggableCancel && target.closest(draggableCancel)
     
-    if (isDraggable && !e.defaultPrevented && (isDragHandle || !target.closest('.grid-drag-handle')) && !isActionButton && !isCancelled) {
+    
+    if (isDraggable && (isDragHandle || !target.closest('.grid-drag-handle')) && !isActionButton && !isCancelled) {
+      
+      // For touch events, we need to call preventDefault to prevent scrolling
+      // But we should do it before calling onDragStart to ensure the event is not consumed
+      if ('touches' in e) {
+        e.preventDefault()
+      }
+      
       onDragStart(item.id, e)
     }
   }
@@ -70,6 +79,14 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
         cursor: isDraggable ? 'grab' : 'default'
       }}
       onMouseDown={handleMouseDown}
+      onTouchStart={(e) => {
+        // Call handleMouseDown with synthetic event
+        handleMouseDown(e)
+        // Stop propagation to prevent bubbling issues
+        e.stopPropagation()
+      }}
+      onPointerDown={handleMouseDown}
+      onDoubleClick={(e) => e.preventDefault()}
     >
       {children}
       

@@ -1,13 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ResponsiveGridContainer, WidthProvider } from '../../src'
 import type { GridItem, BreakpointLayouts } from '../../src'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../src/components/ui/card'
+import { enableTouchDebugging } from '../../src/utils/touch-debug'
+import { TouchTestGrid } from '../../src/components/TouchTestGrid'
 
 const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
 
 export function ShowcaseExample() {
   const [dashboardBreakpoint, setDashboardBreakpoint] = useState<string>('lg')
   const [responsiveBreakpoint, setResponsiveBreakpoint] = useState<string>('lg')
+
+  // Enable touch debugging in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      enableTouchDebugging()
+    }
+  }, [])
 
   // Responsive Dashboard Example
   const [dashboardLayouts, setDashboardLayouts] = useState<BreakpointLayouts>({
@@ -158,6 +167,10 @@ export function ShowcaseExample() {
         <h1 className="text-4xl font-bold mb-4">Tailwind Grid Layout</h1>
         <p className="text-xl text-gray-600 mb-2">A modern grid system built with Tailwind CSS</p>
         <p className="text-gray-500">Drag, resize, and organize your content with ease</p>
+        {/* Mobile Touch Support Notice */}
+        <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200 text-blue-700 text-sm max-w-md mx-auto md:hidden">
+          <span className="font-semibold">📱 Mobile Ready!</span> Touch to drag and resize grid items on your mobile device.
+        </div>
         {/* GitHub Icon */}
         <a
           href="https://github.com/Seungwoo321/tailwind-grid-layout"
@@ -187,13 +200,14 @@ export function ShowcaseExample() {
         <div className="mb-4 p-3 bg-green-50 rounded-md text-green-700">
           <strong>Current Breakpoint:</strong> <span className="font-mono text-lg">{dashboardBreakpoint}</span>
         </div>
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow-lg">
           <ResponsiveGridContainer
             layouts={dashboardLayouts}
             breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
             cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
             rowHeight={80}
-            gap={16}
+            gap={dashboardBreakpoint === 'xxs' ? 8 : 16}
+            containerPadding={dashboardBreakpoint === 'xxs' ? [12, 16] : [16, 16]}
             onLayoutChange={(layout, layouts) => setDashboardLayouts(layouts)}
             onBreakpointChange={(breakpoint) => setDashboardBreakpoint(breakpoint)}
           >
@@ -217,17 +231,18 @@ export function ShowcaseExample() {
         <div className="mb-6 p-3 bg-blue-50 rounded-md text-blue-700">
           <strong>Current Breakpoint:</strong> <span className="font-mono text-lg">{responsiveBreakpoint}</span>
         </div>
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow-lg">
           <ResponsiveGridContainer
             layouts={responsiveLayouts}
             breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
             cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+            containerPadding={responsiveBreakpoint === 'xxs' ? [12, 16] : [16, 16]}
             onLayoutChange={(layout, layouts) => setResponsiveLayouts(layouts)}
             onBreakpointChange={(breakpoint, _cols) => {
               setResponsiveBreakpoint(breakpoint)
             }}
             rowHeight={100}
-            gap={16}
+            gap={responsiveBreakpoint === 'xxs' ? 8 : 16}
           >
             {renderResponsiveItem}
           </ResponsiveGridContainer>
@@ -240,18 +255,56 @@ export function ShowcaseExample() {
         <p className="text-gray-600 mb-6">
           Using WidthProvider HOC for automatic container width detection. This is useful when the grid container's width is dynamic.
         </p>
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow-lg">
           <ResponsiveGridWithWidth
             layouts={responsiveLayouts}
             breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
             cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+            containerPadding={responsiveBreakpoint === 'xxs' ? [12, 16] : [16, 16]}
             onLayoutChange={(layout, layouts) => setResponsiveLayouts(layouts)}
             rowHeight={100}
-            gap={16}
+            gap={responsiveBreakpoint === 'xxs' ? 8 : 16}
           >
             {renderResponsiveItem}
           </ResponsiveGridWithWidth>
         </div>
+      </section>
+
+      {/* Mobile Touch Instructions */}
+      <section className="lg:hidden">
+        <h2 className="text-2xl font-semibold mb-4">📱 Mobile Touch Guide</h2>
+        <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">1</div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Drag to Move</h3>
+              <p className="text-gray-600 text-sm">Touch and hold any grid item, then drag to move it to a new position.</p>
+            </div>
+          </div>
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-semibold text-sm">2</div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Resize Handle</h3>
+              <p className="text-gray-600 text-sm">Look for the resize handle (⌽) at the bottom-right corner of each item to resize.</p>
+            </div>
+          </div>
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-semibold text-sm">3</div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Responsive Layout</h3>
+              <p className="text-gray-600 text-sm">Items automatically rearrange when you rotate your device or change screen size.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Touch Event Test Section */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">🔬 터치 이벤트 디버깅</h2>
+        <p className="text-gray-600 mb-6">
+          개발자 도구에서 터치 시뮬레이션을 테스트해보세요. 아래 박스를 드래그하면 어떤 이벤트가 발생하는지 확인할 수 있습니다.
+        </p>
+        <TouchTestGrid />
       </section>
 
       {/* Features List */}
@@ -278,6 +331,30 @@ export function ShowcaseExample() {
           </CardHeader>
           <CardContent>
             <p>50% smaller bundle size compared to react-grid-layout while maintaining all functionality.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>📱 Mobile Touch Support</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Full touch event support for mobile devices. Drag and resize grid items with touch gestures seamlessly.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>⚡ High Performance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Optimized for performance with efficient event handling and smooth animations on all devices.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>🔧 TypeScript Ready</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Built with TypeScript for excellent type safety and developer experience out of the box.</p>
           </CardContent>
         </Card>
       </section>

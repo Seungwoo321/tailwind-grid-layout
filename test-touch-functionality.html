@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touch/Drag Functionality Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .draggable-box {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            position: relative;
+            margin: 20px 0;
+        }
+        .draggable-box.dragging {
+            cursor: grabbing;
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+        .event-log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        .event-entry {
+            padding: 2px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .clear-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .clear-btn:hover {
+            background: #5a6268;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .stat-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Touch/Drag Functionality Test</h1>
+        
+        <div class="info-box">
+            <h3>Testing Instructions:</h3>
+            <ol>
+                <li>Open Chrome DevTools (F12)</li>
+                <li>Toggle device toolbar (Ctrl+Shift+M or Cmd+Shift+M)</li>
+                <li>Select a mobile device or use responsive mode</li>
+                <li>Try to drag the purple box below</li>
+                <li>Check the event log to see which events are firing</li>
+            </ol>
+        </div>
+
+        <div id="dragBox" class="draggable-box">
+            Drag Me!
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">Pointer Events</div>
+                <div class="stat-value" id="pointerSupport">❓</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Touch Events</div>
+                <div class="stat-value" id="touchSupport">❓</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Device Type</div>
+                <div class="stat-value" id="deviceType">❓</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Events Fired</div>
+                <div class="stat-value" id="eventCount">0</div>
+            </div>
+        </div>
+
+        <h3>Event Log:</h3>
+        <div id="eventLog" class="event-log">
+            <div class="event-entry">Waiting for events...</div>
+        </div>
+        
+        <button class="clear-btn" onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script>
+        // Check support
+        document.getElementById('pointerSupport').textContent = 'PointerEvent' in window ? '✅' : '❌';
+        document.getElementById('touchSupport').textContent = 'TouchEvent' in window ? '✅' : '❌';
+        document.getElementById('deviceType').textContent = /Mobi|Android/i.test(navigator.userAgent) ? '📱' : '💻';
+
+        const dragBox = document.getElementById('dragBox');
+        const eventLog = document.getElementById('eventLog');
+        const eventCount = document.getElementById('eventCount');
+        let eventCounter = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        function logEvent(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
+            const entry = document.createElement('div');
+            entry.className = 'event-entry';
+            entry.innerHTML = `<span style="color: ${type === 'error' ? 'red' : type === 'success' ? 'green' : 'black'}">[${timestamp}] ${message}</span>`;
+            eventLog.insertBefore(entry, eventLog.firstChild);
+            
+            // Keep only last 50 entries
+            while (eventLog.children.length > 50) {
+                eventLog.removeChild(eventLog.lastChild);
+            }
+            
+            eventCounter++;
+            eventCount.textContent = eventCounter;
+        }
+
+        function getEventPosition(e) {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY, type: 'touch' };
+            } else if (e.changedTouches && e.changedTouches.length > 0) {
+                return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY, type: 'touch' };
+            } else if ('clientX' in e) {
+                return { x: e.clientX, y: e.clientY, type: e.pointerType || 'mouse' };
+            }
+            return null;
+        }
+
+        function handleStart(e) {
+            const pos = getEventPosition(e);
+            if (!pos) {
+                logEvent(`${e.type} fired but couldn't get position`, 'error');
+                return;
+            }
+
+            isDragging = true;
+            startX = pos.x;
+            startY = pos.y;
+            currentX = parseInt(dragBox.style.left || 0);
+            currentY = parseInt(dragBox.style.top || 0);
+            
+            dragBox.classList.add('dragging');
+            dragBox.style.position = 'relative';
+            
+            logEvent(`START: ${e.type} (${pos.type}) at (${Math.round(pos.x)}, ${Math.round(pos.y)})`, 'success');
+            
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleMove(e) {
+            if (!isDragging) return;
+            
+            const pos = getEventPosition(e);
+            if (!pos) {
+                logEvent(`${e.type} fired during drag but couldn't get position`, 'error');
+                return;
+            }
+
+            const deltaX = pos.x - startX;
+            const deltaY = pos.y - startY;
+            
+            dragBox.style.left = (currentX + deltaX) + 'px';
+            dragBox.style.top = (currentY + deltaY) + 'px';
+            
+            logEvent(`MOVE: ${e.type} (${pos.type}) Δ(${Math.round(deltaX)}, ${Math.round(deltaY)})`);
+            
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleEnd(e) {
+            if (!isDragging) return;
+            
+            isDragging = false;
+            dragBox.classList.remove('dragging');
+            
+            const pos = getEventPosition(e);
+            logEvent(`END: ${e.type} ${pos ? `(${pos.type})` : '(no position)'}`, 'success');
+            
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Add all event listeners
+        // Pointer events (preferred for modern browsers)
+        dragBox.addEventListener('pointerdown', handleStart, { passive: false });
+        document.addEventListener('pointermove', handleMove, { passive: false });
+        document.addEventListener('pointerup', handleEnd, { passive: false });
+        document.addEventListener('pointercancel', handleEnd, { passive: false });
+
+        // Touch events (fallback for older browsers)
+        dragBox.addEventListener('touchstart', handleStart, { passive: false });
+        document.addEventListener('touchmove', handleMove, { passive: false });
+        document.addEventListener('touchend', handleEnd, { passive: false });
+        document.addEventListener('touchcancel', handleEnd, { passive: false });
+
+        // Mouse events (additional fallback)
+        dragBox.addEventListener('mousedown', handleStart, { passive: false });
+        document.addEventListener('mousemove', handleMove, { passive: false });
+        document.addEventListener('mouseup', handleEnd, { passive: false });
+
+        // Log when events are registered
+        logEvent('Event listeners registered for pointer, touch, and mouse events');
+        
+        // Log browser info
+        logEvent(`User Agent: ${navigator.userAgent.substring(0, 50)}...`);
+        logEvent(`Platform: ${navigator.platform}`);
+
+        function clearLog() {
+            eventLog.innerHTML = '<div class="event-entry">Log cleared. Waiting for events...</div>';
+            eventCounter = 0;
+            eventCount.textContent = '0';
+        }
+    </script>
+</body>
+</html>
