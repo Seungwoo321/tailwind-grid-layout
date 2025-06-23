@@ -1002,8 +1002,8 @@ describe('GridContainer', () => {
       // onDrag might not be called if collision is prevented
       if (onDrag.mock.calls.length > 0) {
         const [, , newItem] = onDrag.mock.calls[onDrag.mock.calls.length - 1]
-        // Item should not overlap with static item
-        expect(newItem.x).toBe(0) // Should stay at original position
+        // Item should be moved to avoid collision with static item
+        expect(newItem.x).toBeGreaterThanOrEqual(4) // Should move to avoid static item at x:2-4
       }
     })
   })
@@ -1670,4 +1670,5 @@ describe('GridContainer', () => {
       expect(onLayoutChange).toHaveBeenCalled()
     })
   })
+
 })

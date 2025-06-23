@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Grid Touch Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .grid-item {
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: grab;
+        }
+        .grid-item.dragging {
+            cursor: grabbing;
+            opacity: 0.8;
+            z-index: 50;
+        }
+        .event-log {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Grid Touch/Drag Test</h1>
+        
+        <div class="bg-white p-4 rounded-lg shadow mb-4">
+            <h2 class="font-semibold mb-2">Instructions:</h2>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+                <li>Open Chrome DevTools (F12)</li>
+                <li>Toggle device mode (Ctrl+Shift+M)</li>
+                <li>Try dragging the grid items below</li>
+                <li>Check if onPointerDown events are firing</li>
+            </ol>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg shadow mb-4">
+            <h3 class="font-semibold mb-2">Event Support:</h3>
+            <div class="grid grid-cols-3 gap-2">
+                <div id="pointerSupport" class="p-2 text-center rounded"></div>
+                <div id="touchSupport" class="p-2 text-center rounded"></div>
+                <div id="mouseSupport" class="p-2 text-center rounded bg-green-100">Mouse: ✅</div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow mb-4">
+            <h3 class="font-semibold mb-4">Grid Container</h3>
+            <div id="gridContainer" class="relative bg-gray-50 min-h-[400px] rounded">
+                <div class="grid-item absolute bg-blue-500 text-white p-4 rounded" 
+                     style="width: 150px; height: 100px; left: 0; top: 0;"
+                     data-id="1">
+                    Item 1
+                </div>
+                <div class="grid-item absolute bg-green-500 text-white p-4 rounded" 
+                     style="width: 150px; height: 100px; left: 170px; top: 0;"
+                     data-id="2">
+                    Item 2
+                </div>
+                <div class="grid-item absolute bg-purple-500 text-white p-4 rounded" 
+                     style="width: 150px; height: 100px; left: 0; top: 120px;"
+                     data-id="3">
+                    Item 3
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg shadow">
+            <h3 class="font-semibold mb-2">Event Log:</h3>
+            <div id="eventLog" class="event-log bg-gray-50 p-2 rounded border">
+                <div>Waiting for events...</div>
+            </div>
+            <button onclick="clearLog()" class="mt-2 px-3 py-1 bg-gray-200 rounded text-sm hover:bg-gray-300">
+                Clear Log
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Check support
+        const pointerSupported = 'PointerEvent' in window;
+        const touchSupported = 'TouchEvent' in window;
+        
+        document.getElementById('pointerSupport').className = pointerSupported ? 'p-2 text-center rounded bg-green-100' : 'p-2 text-center rounded bg-red-100';
+        document.getElementById('pointerSupport').textContent = `Pointer: ${pointerSupported ? '✅' : '❌'}`;
+        
+        document.getElementById('touchSupport').className = touchSupported ? 'p-2 text-center rounded bg-green-100' : 'p-2 text-center rounded bg-red-100';
+        document.getElementById('touchSupport').textContent = `Touch: ${touchSupported ? '✅' : '❌'}`;
+
+        // Event logging
+        const eventLog = document.getElementById('eventLog');
+        let eventCount = 0;
+        
+        function log(message, type = 'info') {
+            eventCount++;
+            const timestamp = new Date().toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                fractionalSecondDigits: 3 
+            });
+            const entry = document.createElement('div');
+            entry.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            entry.textContent = `[${timestamp}] ${message}`;
+            eventLog.insertBefore(entry, eventLog.firstChild);
+            
+            // Keep only last 50 entries
+            while (eventLog.children.length > 50) {
+                eventLog.removeChild(eventLog.lastChild);
+            }
+        }
+
+        function clearLog() {
+            eventLog.innerHTML = '<div>Log cleared. Waiting for events...</div>';
+            eventCount = 0;
+        }
+
+        // Get position from event
+        function getControlPosition(e) {
+            // Handle PointerEvent (Chrome DevTools)
+            if ('pointerId' in e) {
+                log(`PointerEvent detected: pointerId=${e.pointerId}, pointerType=${e.pointerType}`);
+                return {
+                    x: e.clientX,
+                    y: e.clientY,
+                    type: 'pointer'
+                };
+            }
+            
+            // Handle TouchEvent
+            if ('touches' in e) {
+                const touch = e.touches[0] || e.changedTouches[0];
+                if (touch) {
+                    log(`TouchEvent detected: touches=${e.touches.length}`);
+                    return {
+                        x: touch.clientX,
+                        y: touch.clientY,
+                        type: 'touch'
+                    };
+                }
+            }
+            
+            // Handle MouseEvent
+            log(`MouseEvent detected`);
+            return {
+                x: e.clientX,
+                y: e.clientY,
+                type: 'mouse'
+            };
+        }
+
+        // Drag state
+        let dragState = {
+            isDragging: false,
+            element: null,
+            startX: 0,
+            startY: 0,
+            initialLeft: 0,
+            initialTop: 0
+        };
+
+        // Handle drag start
+        function handleDragStart(e) {
+            const element = e.currentTarget;
+            const pos = getControlPosition(e);
+            
+            log(`DRAG START: ${e.type} on item ${element.dataset.id} at (${Math.round(pos.x)}, ${Math.round(pos.y)})`, 'success');
+            
+            dragState = {
+                isDragging: true,
+                element: element,
+                startX: pos.x,
+                startY: pos.y,
+                initialLeft: parseInt(element.style.left),
+                initialTop: parseInt(element.style.top)
+            };
+            
+            element.classList.add('dragging');
+            
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Handle drag move
+        function handleDragMove(e) {
+            if (!dragState.isDragging) return;
+            
+            const pos = getControlPosition(e);
+            const deltaX = pos.x - dragState.startX;
+            const deltaY = pos.y - dragState.startY;
+            
+            dragState.element.style.left = (dragState.initialLeft + deltaX) + 'px';
+            dragState.element.style.top = (dragState.initialTop + deltaY) + 'px';
+            
+            log(`DRAG MOVE: ${e.type} Δ(${Math.round(deltaX)}, ${Math.round(deltaY)})`);
+            
+            e.preventDefault();
+        }
+
+        // Handle drag end
+        function handleDragEnd(e) {
+            if (!dragState.isDragging) return;
+            
+            log(`DRAG END: ${e.type}`, 'success');
+            
+            dragState.element.classList.remove('dragging');
+            dragState.isDragging = false;
+            
+            e.preventDefault();
+        }
+
+        // Set up event listeners for each grid item
+        document.querySelectorAll('.grid-item').forEach(item => {
+            // Pointer events (preferred)
+            item.addEventListener('pointerdown', handleDragStart, { passive: false });
+            
+            // Touch events (fallback)
+            item.addEventListener('touchstart', handleDragStart, { passive: false });
+            
+            // Mouse events (fallback)
+            item.addEventListener('mousedown', handleDragStart, { passive: false });
+            
+            // Log all events for debugging
+            ['pointerdown', 'touchstart', 'mousedown'].forEach(eventType => {
+                item.addEventListener(eventType, (e) => {
+                    log(`${eventType} fired on item ${item.dataset.id}`, 'info');
+                }, { passive: false, capture: true });
+            });
+        });
+
+        // Global move/end listeners
+        document.addEventListener('pointermove', handleDragMove, { passive: false });
+        document.addEventListener('pointerup', handleDragEnd, { passive: false });
+        document.addEventListener('pointercancel', handleDragEnd, { passive: false });
+        
+        document.addEventListener('touchmove', handleDragMove, { passive: false });
+        document.addEventListener('touchend', handleDragEnd, { passive: false });
+        document.addEventListener('touchcancel', handleDragEnd, { passive: false });
+        
+        document.addEventListener('mousemove', handleDragMove, { passive: false });
+        document.addEventListener('mouseup', handleDragEnd, { passive: false });
+
+        // Log initial state
+        log(`Page loaded. Pointer: ${pointerSupported ? 'YES' : 'NO'}, Touch: ${touchSupported ? 'YES' : 'NO'}`);
+        log(`User Agent: ${navigator.userAgent.substring(0, 50)}...`);
+    </script>
+</body>
+</html>
