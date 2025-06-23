@@ -492,37 +492,14 @@ describe('DroppableGridContainer', () => {
   })
 
   it('should hide overlay when dragging leaves container bounds (lines 39-40)', async () => {
-    // Since existing tests show that drag leave handling works,
-    // but the specific lines 39-40 aren't covered, let's focus on that specific path
-    
-    // The issue is that lines 39-40 only execute when:
-    // 1. containerRef.current exists
-    // 2. getBoundingClientRect returns a rect
-    // 3. The coordinates are outside the bounds
-    
-    // Looking at existing tests, none trigger the exact condition, so let's try a more direct approach
-    const { container } = render(
-      <DroppableGridContainer items={defaultItems}>
+    const onDrop = vi.fn()
+    const { container, rerender } = render(
+      <DroppableGridContainer items={defaultItems} onDrop={onDrop}>
         {(item) => <div>Item {item.id}</div>}
       </DroppableGridContainer>
     )
     
     const droppableContainer = container.querySelector('.relative')! as HTMLElement
-    
-    // Override getBoundingClientRect to return a small rect 
-    // This makes it easier to have coordinates outside the bounds
-    const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect
-    Element.prototype.getBoundingClientRect = vi.fn().mockReturnValue({
-      left: 200,
-      top: 200, 
-      right: 300,  // Small width of 100
-      bottom: 300, // Small height of 100
-      width: 100,
-      height: 100,
-      x: 200,
-      y: 200,
-      toJSON: () => ({})
-    } as DOMRect)
     
     // Trigger dragOver to show overlay
     fireEvent.dragOver(droppableContainer)
@@ -530,37 +507,121 @@ describe('DroppableGridContainer', () => {
     // Verify overlay is shown
     expect(droppableContainer.querySelector('.bg-blue-500\\/10')).toBeInTheDocument()
     
-    // Fire dragLeave with coordinates far outside the small bounds
-    // This should definitely trigger lines 39-40
-    fireEvent.dragLeave(droppableContainer, {
-      clientX: 10,   // far less than rect.left (200)
-      clientY: 10    // far less than rect.top (200)
+    // Now we need to trigger the exact conditions for lines 39-40:
+    // We'll use a more direct approach - accessing the component's internal state
+    
+    // Create a custom event that will definitely trigger the outside bounds check
+    const dragLeaveEvent = new Event('dragleave', { bubbles: true })
+    Object.defineProperty(dragLeaveEvent, 'clientX', { value: -100, writable: false })
+    Object.defineProperty(dragLeaveEvent, 'clientY', { value: -100, writable: false })
+    
+    // Mock getBoundingClientRect to return a specific rect
+    const originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
+    HTMLElement.prototype.getBoundingClientRect = vi.fn().mockReturnValue({
+      left: 0,
+      top: 0,
+      right: 100,
+      bottom: 100,
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({})
+    } as DOMRect)
+    
+    // Dispatch the custom event wrapped in act
+    act(() => {
+      droppableContainer.dispatchEvent(dragLeaveEvent)
     })
     
-    // Check if getBoundingClientRect was called
-    expect(Element.prototype.getBoundingClientRect).toHaveBeenCalled()
-    
-    // The component behavior suggests the overlay might not hide immediately in tests
-    // Let's also verify that we're testing the right scenario
-    // by checking if another condition works (drop event)
-    
-    // Alternative: trigger drop which we know hides the overlay
-    const dataTransfer = {
-      getData: vi.fn(() => JSON.stringify({ x: 4, y: 0, w: 2, h: 2 }))
-    }
-    
-    fireEvent.drop(droppableContainer, {
-      dataTransfer,
-      clientX: 250,
-      clientY: 250
-    })
-    
-    // After drop, overlay should be hidden
+    // Wait for React to update
     await waitFor(() => {
       expect(droppableContainer.querySelector('.bg-blue-500\\/10')).not.toBeInTheDocument()
     })
     
     // Restore
-    Element.prototype.getBoundingClientRect = originalGetBoundingClientRect
+    HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect
+  })
+
+  // Additional tests for lines 73-76 coverage
+  it('should use fallback dimensions when droppingItem has no w/h', () => {
+    const onDrop = vi.fn()
+    
+    render(
+      <DroppableGridContainer 
+        items={defaultItems} 
+        onDrop={onDrop}
+        droppingItem={{}} // No w or h - should use fallback
+      >
+        {(item) => <div>Item {item.id}</div>}
+      </DroppableGridContainer>
+    )
+
+    const container = document.querySelector('.relative')! as HTMLElement
+    
+    // Set up a working getBoundingClientRect
+    container.getBoundingClientRect = () => ({
+      left: 0, top: 0, right: 400, bottom: 300,
+      width: 400, height: 300, x: 0, y: 0,
+      toJSON: () => ({})
+    })
+
+    const dataTransfer = {
+      getData: vi.fn(() => JSON.stringify({ id: 'test-item' }))
+    }
+
+    fireEvent.drop(container, {
+      dataTransfer,
+      clientX: 100,
+      clientY: 100
+    })
+
+    // Should use fallback values: droppingItem.w || 2, droppingItem.h || 2 (lines 75, 76)
+    expect(onDrop).toHaveBeenCalledWith(
+      expect.objectContaining({
+        w: 2, // fallback from line 75
+        h: 2  // fallback from line 76
+      })
+    )
+  })
+
+  it('should use fallback when droppingItem w/h are 0', () => {
+    const onDrop = vi.fn()
+    
+    render(
+      <DroppableGridContainer 
+        items={defaultItems} 
+        onDrop={onDrop}
+        droppingItem={{ w: 0, h: 0 }} // Falsy values
+      >
+        {(item) => <div>Item {item.id}</div>}
+      </DroppableGridContainer>
+    )
+
+    const container = document.querySelector('.relative')! as HTMLElement
+    
+    container.getBoundingClientRect = () => ({
+      left: 0, top: 0, right: 400, bottom: 300,
+      width: 400, height: 300, x: 0, y: 0,
+      toJSON: () => ({})
+    })
+
+    const dataTransfer = {
+      getData: vi.fn(() => JSON.stringify({ id: 'test-item' }))
+    }
+
+    fireEvent.drop(container, {
+      dataTransfer,
+      clientX: 100,
+      clientY: 100
+    })
+
+    // Should use fallback: 0 || 2 = 2 (lines 75, 76)
+    expect(onDrop).toHaveBeenCalledWith(
+      expect.objectContaining({
+        w: 2,
+        h: 2
+      })
+    )
   })
 })

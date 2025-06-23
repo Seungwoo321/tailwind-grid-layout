@@ -116,7 +116,9 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     resizedItem: null,
     resizeHandle: null,
     startSize: { w: 0, h: 0 },
-    startPos: { x: 0, y: 0 }
+    startPos: { x: 0, y: 0 },
+    currentPixelSize: { w: 0, h: 0 },
+    currentPixelPos: { x: 0, y: 0 }
   })
 
   // Update container width on mount and resize
@@ -362,11 +364,11 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     const pixelDeltaY = pos.y - resizeState.startPos.y
     
     
-    // Get initial pixel values using correct calculation
-    const startPixelW = resizeState.currentPixelSize?.w || (resizeState.startSize.w * colWidth + (resizeState.startSize.w - 1) * horizontalMargin)
-    const startPixelH = resizeState.currentPixelSize?.h || (resizeState.startSize.h * rowHeight + (resizeState.startSize.h - 1) * verticalMargin)
-    const startPixelX = resizeState.currentPixelPos?.x || (resizeState.originalPos?.x || item.x) * gridUnitW
-    const startPixelY = resizeState.currentPixelPos?.y || (resizeState.originalPos?.y || item.y) * gridUnitH
+    // Get initial pixel values - these are always set in handleResizeStart
+    const startPixelW = resizeState.currentPixelSize!.w
+    const startPixelH = resizeState.currentPixelSize!.h
+    const startPixelX = resizeState.currentPixelPos!.x
+    const startPixelY = resizeState.currentPixelPos!.y
     
     // Calculate new pixel dimensions based on handle
     let newPixelX = startPixelX
@@ -506,8 +508,8 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       resizeHandle: null,
       startSize: { w: 0, h: 0 },
       startPos: { x: 0, y: 0 },
-      currentPixelSize: undefined,
-      currentPixelPos: undefined
+      currentPixelSize: { w: 0, h: 0 },
+      currentPixelPos: { x: 0, y: 0 }
     })
   }, [resizeState, layout, updateLayout, onResizeStop])
 

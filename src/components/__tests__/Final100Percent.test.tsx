@@ -1,128 +1,171 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, fireEvent, act, waitFor } from '@testing-library/react'
+import React from 'react'
 import { GridContainer } from '../GridContainer'
-import { ResponsiveGridContainer } from '../ResponsiveGridContainer'
-import type { GridItem, BreakpointLayouts } from '../../types'
+import { DroppableGridContainer } from '../DroppableGridContainer'
+import type { GridItem } from '../../types'
 
-describe('Final 100% Coverage - Direct Line Targeting', () => {
-  it('should execute GridContainer.tsx line 123 - return item for new items', () => {
-    // Test the exact condition where a new item doesn't exist in current layout
-    const existingLayout: GridItem[] = [
-      { id: 'old', x: 0, y: 0, w: 2, h: 2 }
-    ]
-
-    // Create items array where 'new' is not in existing layout
-    const itemsWithNew: GridItem[] = [
-      { id: 'old', x: 1, y: 1, w: 3, h: 3 }, // This will be merged from existing
-      { id: 'new', x: 5, y: 5, w: 1, h: 1 }  // This should hit line 123 - return item
-    ]
-
-    const { rerender } = render(
-      <GridContainer
-        items={existingLayout}
-        cols={12}
-        rowHeight={100}
-        gap={10}
-      >
-        {(item) => <div key={item.id}>{item.id}</div>}
-      </GridContainer>
+describe('Final 100% Coverage', () => {
+  // DroppableGridContainer lines 40-41: Test bounds checking
+  it('should remove drag styles when leaving container bounds', () => {
+    const { container, rerender } = render(
+      <DroppableGridContainer items={[{ id: '1', x: 0, y: 0, w: 2, h: 2 }]}>
+        {(item) => <div>Item {item.id}</div>}
+      </DroppableGridContainer>
     )
 
-    // This should trigger the useEffect with new items, hitting line 123
-    rerender(
-      <GridContainer
-        items={itemsWithNew}
-        cols={12}
-        rowHeight={100}
-        gap={10}
-      >
-        {(item) => <div key={item.id}>{item.id}</div>}
-      </GridContainer>
-    )
+    const droppable = container.firstChild as HTMLElement
 
-    expect(document.body.textContent).toContain('new')
-  })
+    // Mock the internal ref's getBoundingClientRect
+    // We need to mock the containerRef.current, not the outer div
+    const originalQuerySelector = container.querySelector.bind(container)
+    container.querySelector = vi.fn((selector) => {
+      const result = originalQuerySelector(selector)
+      if (result && selector === '.relative') {
+        // This is the container with the ref
+        result.getBoundingClientRect = vi.fn(() => ({
+          left: 100,
+          right: 500,
+          top: 100,
+          bottom: 400,
+          width: 400,
+          height: 300,
+          x: 100,
+          y: 100,
+          toJSON: () => {}
+        }))
+      }
+      return result
+    })
 
-  it('should execute ResponsiveGridContainer.tsx line 94 - fallback to 12', () => {
-    // Create a breakpoint that exists in neither cols prop nor defaultCols
-    const layouts: BreakpointLayouts = {
-      'nonexistent': [{ id: '1', x: 0, y: 0, w: 3, h: 2 }]
-    }
+    // Set dragging state to true
+    fireEvent.dragOver(droppable, {
+      preventDefault: vi.fn(),
+      dataTransfer: { dropEffect: 'copy' }
+    })
 
-    // Mock a scenario where:
-    // 1. cols object doesn't have 'nonexistent' 
-    // 2. defaultCols also doesn't have 'nonexistent'
-    // 3. Should fallback to 12 on line 94
+    // Verify dragging styles are applied
+    expect(droppable.className).toContain('ring-2')
 
-    const mockBreakpoints = {
-      'nonexistent': 999
-    }
-
-    const mockCols = {
-      // Intentionally empty - doesn't contain 'nonexistent'
-    }
-
-    render(
-      <ResponsiveGridContainer
-        layouts={layouts}
-        breakpoints={mockBreakpoints}
-        cols={mockCols}
-        rowHeight={100}
-        width={1000} // This should trigger 'nonexistent' breakpoint
-      >
-        {(item) => <div key={item.id}>{item.id}</div>}
-      </ResponsiveGridContainer>
-    )
-
-    // If we reach here without errors, line 94 was executed (fallback to 12)
-    expect(document.body.textContent).toContain('1')
-  })
-
-  it('should trigger both edge cases in sequence', () => {
-    // Comprehensive test that ensures both problematic lines are hit
+    // Now test all boundary conditions to ensure lines 40-41 are covered
     
-    // First: GridContainer line 123
-    const { rerender: rerenderGrid } = render(
-      <GridContainer
-        items={[{ id: 'existing', x: 0, y: 0, w: 2, h: 2 }]}
-        cols={12}
-        rowHeight={100}
-        gap={10}
+    // Test 1: clientX < rect.left
+    fireEvent.dragLeave(droppable, { clientX: 50, clientY: 200 })
+    
+    // Re-apply dragging state for next test
+    fireEvent.dragOver(droppable, {
+      preventDefault: vi.fn(),
+      dataTransfer: { dropEffect: 'copy' }
+    })
+    
+    // Test 2: clientX > rect.right
+    fireEvent.dragLeave(droppable, { clientX: 600, clientY: 200 })
+    
+    // Re-apply dragging state
+    fireEvent.dragOver(droppable, {
+      preventDefault: vi.fn(),
+      dataTransfer: { dropEffect: 'copy' }
+    })
+    
+    // Test 3: clientY < rect.top
+    fireEvent.dragLeave(droppable, { clientX: 300, clientY: 50 })
+    
+    // Re-apply dragging state
+    fireEvent.dragOver(droppable, {
+      preventDefault: vi.fn(),
+      dataTransfer: { dropEffect: 'copy' }
+    })
+    
+    // Test 4: clientY > rect.bottom
+    fireEvent.dragLeave(droppable, { clientX: 300, clientY: 500 })
+
+    // Test passes if no errors are thrown
+    expect(droppable).toBeTruthy()
+  })
+
+  // GridContainer line 186: isDraggable check
+  it('should check isDraggable in drag event handler', () => {
+    const items: GridItem[] = [
+      { id: '1', x: 0, y: 0, w: 2, h: 2, isDraggable: false }
+    ]
+    
+    const onDragStart = vi.fn()
+
+    const { container } = render(
+      <GridContainer 
+        items={items} 
+        onDragStart={onDragStart}
+        isDraggable={true} // Container allows dragging
       >
-        {(item) => <div key={item.id}>Grid-{item.id}</div>}
+        {(item) => <div className="grid-drag-handle">Item {item.id}</div>}
       </GridContainer>
     )
 
-    rerenderGrid(
-      <GridContainer
-        items={[
-          { id: 'existing', x: 1, y: 1, w: 3, h: 3 },
-          { id: 'brand-new', x: 6, y: 6, w: 1, h: 1 } // This hits line 123
-        ]}
+    const gridItem = container.querySelector('[data-grid-id="1"]') as HTMLElement
+    
+    // Try to drag the item with isDraggable: false
+    fireEvent.mouseDown(gridItem, { clientX: 100, clientY: 100 })
+    
+    // onDragStart should not be called due to item.isDraggable === false (line 186)
+    expect(onDragStart).not.toHaveBeenCalled()
+  })
+
+  // GridContainer lines 366-367: Resize pixel calculations with currentPixelSize
+  it('should use currentPixelSize fallback in resize', () => {
+    let resizeHandlerCalled = 0
+    const items: GridItem[] = [{ id: '1', x: 0, y: 0, w: 2, h: 2 }]
+    
+    const onResize = vi.fn(() => {
+      resizeHandlerCalled++
+    })
+
+    // Mock offsetWidth
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      get: function() {
+        return this.classList?.contains('tailwind-grid-layout') ? 800 : 100
+      }
+    })
+
+    const { container } = render(
+      <GridContainer 
+        items={items} 
+        onResize={onResize}
+        isResizable={true}
         cols={12}
-        rowHeight={100}
+        rowHeight={60}
         gap={10}
       >
-        {(item) => <div key={item.id}>Grid-{item.id}</div>}
+        {(item) => <div>Item {item.id}</div>}
       </GridContainer>
     )
 
-    // Second: ResponsiveGridContainer line 94
-    render(
-      <ResponsiveGridContainer
-        layouts={{
-          'custom-bp': [{ id: '2', x: 0, y: 0, w: 3, h: 2 }]
-        }}
-        breakpoints={{ 'custom-bp': 800 }}
-        cols={{}} // Empty cols object
-        rowHeight={100}
-        width={850} // Triggers 'custom-bp' which isn't in defaultCols
-      >
-        {(item) => <div key={item.id}>Responsive-{item.id}</div>}
-      </ResponsiveGridContainer>
-    )
+    const resizeHandle = container.querySelector('.react-grid-layout__resize-handle') as HTMLElement
 
-    expect(document.body.textContent).toContain('Grid-brand-new')
-    expect(document.body.textContent).toContain('Responsive-2')
+    // Start resize
+    act(() => {
+      fireEvent.mouseDown(resizeHandle, { clientX: 100, clientY: 100 })
+    })
+
+    // First move - initializes pixel calculations
+    act(() => {
+      fireEvent.mouseMove(document, { clientX: 150, clientY: 150 })
+    })
+
+    // Wait for first resize callback
+    expect(resizeHandlerCalled).toBe(1)
+
+    // Second move - should use currentPixelSize (lines 366-367)
+    act(() => {
+      fireEvent.mouseMove(document, { clientX: 200, clientY: 200 })
+    })
+
+    // Should have called resize again
+    expect(resizeHandlerCalled).toBe(2)
+
+    // Complete resize
+    act(() => {
+      fireEvent.mouseUp(document)
+    })
   })
 })

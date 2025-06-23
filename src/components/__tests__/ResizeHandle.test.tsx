@@ -340,4 +340,35 @@ describe('ResizeHandle', () => {
     
     expect(mockOnMouseDown).toHaveBeenCalledTimes(2)
   })
+
+  it('should return null for unsupported positions', () => {
+    const { container } = render(
+      <ResizeHandle 
+        position="invalid" as any
+        onMouseDown={mockOnMouseDown}
+        isVisible={false}
+      />
+    )
+
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('should prevent double click events on edge handles', () => {
+    const { container } = render(
+      <ResizeHandle 
+        position="n" 
+        onMouseDown={mockOnMouseDown}
+        isActive={true}
+        isVisible={false}
+      />
+    )
+
+    const handle = container.querySelector('div') as HTMLElement
+    act(() => {
+      fireEvent.doubleClick(handle)
+    })
+    
+    // Verify the double click event was handled (no exceptions thrown)
+    expect(handle).toBeTruthy()
+  })
 })

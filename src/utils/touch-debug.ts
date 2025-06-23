@@ -1,21 +1,24 @@
 // Touch event debugging utilities
 
 export function logTouchEvent(eventName: string, e: TouchEvent | MouseEvent) {
-  if ('touches' in e) {
-    console.log(`🔥 TOUCH EVENT: ${eventName}`, {
-      type: e.type,
-      touches: e.touches.length,
-      targetTouches: e.targetTouches?.length || 0,
-      changedTouches: e.changedTouches?.length || 0,
-      target: (e.target as Element)?.tagName,
-      timestamp: Date.now()
-    })
-  } else {
-    console.log(`🖱️ MOUSE EVENT: ${eventName}`, {
-      type: e.type,
-      target: (e.target as Element)?.tagName,
-      timestamp: Date.now()
-    })
+  // Production build: logging disabled
+  if (process.env.NODE_ENV === 'development') {
+    if ('touches' in e) {
+      console.log(`🔥 TOUCH EVENT: ${eventName}`, {
+        type: e.type,
+        touches: e.touches.length,
+        targetTouches: e.targetTouches?.length || 0,
+        changedTouches: e.changedTouches?.length || 0,
+        target: (e.target as Element)?.tagName,
+        timestamp: Date.now()
+      })
+    } else {
+      console.log(`🖱️ MOUSE EVENT: ${eventName}`, {
+        type: e.type,
+        target: (e.target as Element)?.tagName,
+        timestamp: Date.now()
+      })
+    }
   }
 }
 
@@ -30,5 +33,7 @@ export function enableTouchDebugging() {
   document.addEventListener('mousemove', (e) => logTouchEvent('mousemove', e))
   document.addEventListener('mouseup', (e) => logTouchEvent('mouseup', e))
   
-  console.log('🚀 Touch debugging enabled')
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🚀 Touch debugging enabled')
+  }
 }

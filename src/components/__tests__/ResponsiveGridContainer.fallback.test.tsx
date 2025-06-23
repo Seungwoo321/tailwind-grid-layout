@@ -62,15 +62,35 @@ describe('ResponsiveGridContainer fallback functionality', () => {
   it('should fallback to 12 columns when both cols object and default cols do not have breakpoint', () => {
     const layouts: BreakpointLayouts = {
       unknown: [{ id: '1', x: 0, y: 0, w: 3, h: 2 }],
+      lg: [{ id: '1', x: 0, y: 0, w: 3, h: 2 }],
     }
 
     const customBreakpoints = {
       unknown: 500,
+      lg: 1200,
     }
 
     const onBreakpointChange = vi.fn()
 
-    render(
+    // Start with lg breakpoint
+    const { rerender } = render(
+      <ResponsiveGridContainer
+        layouts={layouts}
+        breakpoints={customBreakpoints}
+        cols={{}} // Empty cols object
+        rowHeight={100}
+        width={1300} // Initially trigger lg breakpoint
+        onBreakpointChange={onBreakpointChange}
+      >
+        {(item) => <div key={item.id}>Item {item.id}</div>}
+      </ResponsiveGridContainer>
+    )
+
+    // Clear previous calls
+    onBreakpointChange.mockClear()
+
+    // Now change width to trigger unknown breakpoint
+    rerender(
       <ResponsiveGridContainer
         layouts={layouts}
         breakpoints={customBreakpoints}

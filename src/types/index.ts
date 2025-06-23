@@ -59,6 +59,9 @@ export interface ResizeState {
   startSize: { w: number; h: number }
   startPos: { x: number; y: number }
   originalPos?: { x: number; y: number }
+  // These are always set when isResizing is true
+  currentPixelSize: { w: number; h: number }
+  currentPixelPos: { x: number; y: number }
 }
 
 export type ResizeHandle = 's' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'
