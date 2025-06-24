@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.0.0...v1.0.1) (2025-06-24)
+
+
+### Bug Fixes
+
+* CI 워크플로우 중복 실행 제거 ([928eff5](https://github.com/Seungwoo321/tailwind-grid-layout/commit/928eff5c3e260dd7d70b8bb0ae80f73a3351ec09))
+* Dashboard Example 카드 높이 조정 및 vite.svg 참조 제거 ([a67509c](https://github.com/Seungwoo321/tailwind-grid-layout/commit/a67509c491e42f0d309b0d07d2bfb7b6c3104b53))
+
 # 1.0.0 (2025-06-23)
 
 
