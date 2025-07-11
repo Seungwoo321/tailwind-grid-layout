@@ -225,10 +225,9 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     // If prevent collision is enabled and allowOverlap is false, don't allow overlapping
     if (preventCollision && !allowOverlap) {
       const collisions = getAllCollisions(tempLayout, { ...draggedItem, ...newPosition })
-      const staticCollisions = collisions.filter(item => item.static)
       
-      if (staticCollisions.length > 0) {
-        // Don't update state or call callbacks if colliding with static items
+      if (collisions.length > 0) {
+        // Don't update state or call callbacks if colliding with any items
         return
       }
     }

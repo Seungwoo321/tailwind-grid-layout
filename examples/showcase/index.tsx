@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import { ResponsiveGridContainer, WidthProvider } from '../../src'
-import type { GridItem, BreakpointLayouts } from '../../src'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../src/components/ui/card'
-import { enableTouchDebugging } from '../../src/utils/touch-debug'
-import { TouchTestGrid } from '../../src/components/TouchTestGrid'
+import { ResponsiveGridContainer, WidthProvider, GridContainer } from '@/'
+import type { GridItem, BreakpointLayouts } from '@/'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { enableTouchDebugging } from '@/utils/touch-debug'
+import { TouchTestGrid } from '@/components/TouchTestGrid'
 
 const ResponsiveGridWithWidth = WidthProvider(ResponsiveGridContainer)
 
 export function ShowcaseExample() {
   const [dashboardBreakpoint, setDashboardBreakpoint] = useState<string>('lg')
   const [responsiveBreakpoint, setResponsiveBreakpoint] = useState<string>('lg')
+  const [preventCollision, setPreventCollision] = useState<boolean>(false)
+  const [allowOverlap, setAllowOverlap] = useState<boolean>(false)
 
   // Enable touch debugging in development
   useEffect(() => {
@@ -90,6 +92,15 @@ export function ShowcaseExample() {
       { id: '4', x: 0, y: 6, w: 2, h: 2 },
     ],
   })
+
+  // Prevent Collision Test Items
+  const [collisionTestItems, setCollisionTestItems] = useState<GridItem[]>([
+    { id: '1', x: 0, y: 0, w: 3, h: 2 },
+    { id: '2', x: 4, y: 0, w: 3, h: 2 },
+    { id: '3', x: 8, y: 0, w: 3, h: 2, static: true },
+    { id: '4', x: 0, y: 3, w: 4, h: 2 },
+    { id: '5', x: 5, y: 3, w: 4, h: 2 },
+  ])
 
   const renderDashboardItem = (item: GridItem) => {
     const content = {
@@ -295,6 +306,128 @@ export function ShowcaseExample() {
               <p className="text-gray-600 text-sm">Items automatically rearrange when you rotate your device or change screen size.</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Prevent Collision Demo Section */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Collision Handling Options</h2>
+        <p className="text-gray-600 mb-6">
+          Test how items behave when they collide. Toggle the options below to see different behaviors.
+        </p>
+        
+        {/* Controls */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="prevent-collision"
+                checked={preventCollision}
+                onChange={(e) => setPreventCollision(e.target.checked)}
+                disabled={allowOverlap}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
+              />
+              <label htmlFor="prevent-collision" className="cursor-pointer">
+                <span className="font-medium block">Prevent Collision</span>
+                <span className="text-sm text-gray-500">
+                  {preventCollision ? '아이템이 다른 아이템과 겹칠 수 없음' : '아이템이 다른 아이템을 밀어냄'}
+                </span>
+              </label>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="allow-overlap"
+                checked={allowOverlap}
+                onChange={(e) => setAllowOverlap(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <label htmlFor="allow-overlap" className="cursor-pointer">
+                <span className="font-medium block">Allow Overlap</span>
+                <span className="text-sm text-gray-500">
+                  {allowOverlap ? '아이템이 서로 겹칠 수 있음' : '아이템이 서로 겹칠 수 없음'}
+                </span>
+              </label>
+            </div>
+          </div>
+          
+          {/* Current behavior explanation */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-md">
+            <h4 className="font-semibold text-gray-900 mb-2">현재 동작:</h4>
+            <p className="text-gray-700">
+              {allowOverlap 
+                ? '✅ 아이템들이 자유롭게 겹칠 수 있습니다.'
+                : preventCollision 
+                  ? '🚫 아이템이 다른 아이템이 있는 위치로 이동할 수 없습니다.'
+                  : '↔️ 아이템을 드래그하면 다른 아이템들이 밀려납니다.'}
+            </p>
+          </div>
+        </div>
+
+        {/* Grid Demo */}
+        <div className="bg-white rounded-lg shadow-lg">
+          <GridContainer
+            items={collisionTestItems}
+            cols={12}
+            rowHeight={80}
+            gap={16}
+            containerPadding={[16, 16]}
+            preventCollision={preventCollision}
+            allowOverlap={allowOverlap}
+            onLayoutChange={setCollisionTestItems}
+          >
+            {(item) => (
+              <Card className={`h-full ${item.static ? 'bg-red-50 border-red-300' : ''}`}>
+                <CardHeader className="p-4">
+                  <CardTitle className="text-lg">
+                    {item.static ? '🔒 Static Item' : `Item ${item.id}`}
+                  </CardTitle>
+                  <CardDescription>
+                    {item.static 
+                      ? 'This item cannot be moved' 
+                      : 'Drag me to test collision behavior'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <div className="text-xs text-gray-500">
+                    Position: ({item.x}, {item.y}) | Size: {item.w}×{item.h}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </GridContainer>
+        </div>
+        
+        {/* Instructions */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader className="p-4">
+              <CardTitle className="text-base">기본 동작 (preventCollision=false)</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <p className="text-sm">아이템을 드래그하면 충돌하는 아이템들이 자동으로 밀려납니다.</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-orange-200 bg-orange-50">
+            <CardHeader className="p-4">
+              <CardTitle className="text-base">충돌 방지 (preventCollision=true)</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <p className="text-sm">아이템이 다른 아이템이 있는 위치로 이동할 수 없습니다.</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-green-200 bg-green-50">
+            <CardHeader className="p-4">
+              <CardTitle className="text-base">겹침 허용 (allowOverlap=true)</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <p className="text-sm">아이템들이 서로 겹칠 수 있습니다. preventCollision은 무시됩니다.</p>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
