@@ -299,6 +299,14 @@ describe('GridContainer', () => {
   })
 
   it('should handle droppingItem prop', () => {
+    // Mock container width for drop preview to render
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      get: function() {
+        return this.classList?.contains('tailwind-grid-layout') ? 800 : 100
+      }
+    })
+
     const droppingItem = { w: 3, h: 2 }
     const { container } = render(
       <GridContainer items={mockItems} droppingItem={droppingItem} isExternalDragging={true}>
@@ -306,7 +314,7 @@ describe('GridContainer', () => {
       </GridContainer>
     )
 
-    const dropPreview = container.querySelector('.bg-gray-200.border-dashed')
+    const dropPreview = container.querySelector('.bg-green-200.border-dashed')
     expect(dropPreview).toBeTruthy()
     expect(dropPreview?.textContent).toContain('Drop here')
   })
