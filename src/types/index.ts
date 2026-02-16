@@ -91,6 +91,7 @@ export interface GridContainerProps {
   verticalCompact?: boolean // 레거시 - compactType을 사용하는 것을 권장
   transformScale?: number // 스케일 변환 지원
   droppingItem?: Partial<GridItem> // 드롭 중인 아이템 미리보기
+  isExternalDragging?: boolean // 외부에서 드래그 중인지 여부
   onLayoutChange?: (layout: GridItem[]) => void
   onDragStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
   onDrag?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void

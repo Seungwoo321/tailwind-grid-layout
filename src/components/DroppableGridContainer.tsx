@@ -95,7 +95,7 @@ export function DroppableGridContainer({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <GridContainer {...props} droppingItem={isDraggingOver ? droppingItem : undefined} />
+      <GridContainer {...props} droppingItem={isDraggingOver ? droppingItem : undefined} isExternalDragging={isDraggingOver} />
       {isDraggingOver && (
         <div className="absolute inset-0 bg-blue-500/10 rounded-lg pointer-events-none" />
       )}
