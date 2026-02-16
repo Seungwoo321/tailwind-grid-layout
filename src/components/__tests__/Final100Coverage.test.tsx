@@ -68,7 +68,7 @@ describe('Final 100% Coverage Tests', () => {
       </GridContainer>
     )
 
-    const placeholder = container.querySelector('.bg-gray-200')
+    const placeholder = container.querySelector('.bg-green-200')
     expect(placeholder).toBeTruthy()
   })
 

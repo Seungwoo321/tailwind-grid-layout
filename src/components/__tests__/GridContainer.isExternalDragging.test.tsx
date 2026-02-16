@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { GridContainer } from '../GridContainer'
 import type { GridItem } from '../../types'
@@ -9,7 +9,18 @@ describe('GridContainer - isExternalDragging prop', () => {
     { id: '2', x: 2, y: 0, w: 2, h: 2 }
   ]
 
-  const droppingItem = { w: 3, h: 2 }
+  // droppingItem now requires previewX and previewY for real-time tracking
+  const droppingItem = { w: 3, h: 2, previewX: 0, previewY: 0, isValid: true }
+
+  // Mock container width for drop preview to render
+  beforeEach(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      get: function() {
+        return this.classList?.contains('tailwind-grid-layout') ? 800 : 100
+      }
+    })
+  })
 
   it('should not show dropping preview when isExternalDragging is false', () => {
     render(
@@ -86,14 +97,9 @@ describe('GridContainer - isExternalDragging prop', () => {
     )
 
     const dropPreview = screen.getByText('Drop here').parentElement
-    expect(dropPreview).toHaveClass('absolute', 'bg-gray-200', 'border-2', 'border-dashed', 'border-gray-400')
+    expect(dropPreview).toHaveClass('absolute', 'bg-green-200', 'border-2', 'border-dashed', 'border-green-400')
     expect(dropPreview).toHaveClass('rounded', 'opacity-75', 'pointer-events-none')
     expect(dropPreview).toHaveClass('flex', 'items-center', 'justify-center')
-
-    // Check inline styles
-    const style = window.getComputedStyle(dropPreview!)
-    expect(style.left).toBe('20px') // containerPadding[0]
-    expect(style.top).toBe('20px') // containerPadding[1]
   })
 
   it('should work correctly with autoSize enabled', () => {

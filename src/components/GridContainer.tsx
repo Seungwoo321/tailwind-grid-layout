@@ -688,19 +688,55 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       })()}
       
       {/* Dropping Item Preview */}
-      {droppingItem && isExternalDragging && !dragState.isDragging && (
-        <div
-          className="absolute bg-gray-200 border-2 border-dashed border-gray-400 rounded opacity-75 pointer-events-none flex items-center justify-center"
-          style={{
-            width: ((droppingItem.w || 1) * (containerWidth - containerPadding[0] * 2) / cols) - gap,
-            height: ((droppingItem.h || 1) * rowHeight) - gap,
-            left: containerPadding[0],
-            top: containerPadding[1]
-          }}
-        >
-          <span className="text-gray-600 font-medium">Drop here</span>
-        </div>
-      )}
+      {droppingItem && isExternalDragging && !dragState.isDragging && containerWidth > 0 && (() => {
+        const previewX = droppingItem.previewX ?? 0
+        const previewY = droppingItem.previewY ?? 0
+        const isValid = droppingItem.isValid ?? true
+
+        const position = getPixelPosition(
+          {
+            x: previewX,
+            y: previewY,
+            w: droppingItem.w || 2,
+            h: droppingItem.h || 2
+          },
+          cols,
+          rowHeight,
+          gap,
+          containerWidth,
+          margin,
+          containerPadding
+        )
+
+        // Check if position values are valid
+        if (isNaN(position.width) || isNaN(position.height) || isNaN(position.left) || isNaN(position.top)) {
+          return null
+        }
+
+        return (
+          <div
+            className={cn(
+              "absolute border-2 border-dashed rounded opacity-75 pointer-events-none flex items-center justify-center transition-all duration-150",
+              isValid
+                ? "bg-green-200 border-green-400"
+                : "bg-red-200 border-red-400"
+            )}
+            style={{
+              width: position.width,
+              height: position.height,
+              left: position.left,
+              top: position.top
+            }}
+          >
+            <span className={cn(
+              "font-medium",
+              isValid ? "text-green-600" : "text-red-600"
+            )}>
+              {isValid ? "Drop here" : "Invalid position"}
+            </span>
+          </div>
+        )
+      })()}
     </div>
   )
 }
