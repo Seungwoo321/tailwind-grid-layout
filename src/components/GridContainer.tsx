@@ -688,36 +688,24 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       })()}
       
       {/* Dropping Item Preview */}
-      {droppingItem && isExternalDragging && !dragState.isDragging && containerWidth > 0 && (() => {
+      {droppingItem && isExternalDragging && !dragState.isDragging && (() => {
         const previewX = droppingItem.previewX ?? 0
         const previewY = droppingItem.previewY ?? 0
-        const isValid = droppingItem.isValid ?? true
+        const previewW = droppingItem.w || 2
+        const previewH = droppingItem.h || 2
+        const isValidPosition = droppingItem.isValidPosition ?? true
 
-        const position = getPixelPosition(
-          {
-            x: previewX,
-            y: previewY,
-            w: droppingItem.w || 2,
-            h: droppingItem.h || 2
-          },
-          cols,
-          rowHeight,
-          gap,
-          containerWidth,
-          margin,
-          containerPadding
-        )
-
-        // Check if position values are valid
-        if (isNaN(position.width) || isNaN(position.height) || isNaN(position.left) || isNaN(position.top)) {
-          return null
-        }
+        // Calculate pixel position using the same logic as grid items
+        const previewItem = { x: previewX, y: previewY, w: previewW, h: previewH }
+        const position = containerWidth > 0
+          ? getPixelPosition(previewItem, cols, rowHeight, gap, containerWidth, margin, containerPadding)
+          : { left: containerPadding[0], top: containerPadding[1], width: 0, height: 0 }
 
         return (
           <div
             className={cn(
               "absolute border-2 border-dashed rounded opacity-75 pointer-events-none flex items-center justify-center transition-all duration-150",
-              isValid
+              isValidPosition
                 ? "bg-green-200 border-green-400"
                 : "bg-red-200 border-red-400"
             )}
@@ -725,14 +713,15 @@ export const GridContainer: React.FC<GridContainerProps> = ({
               width: position.width,
               height: position.height,
               left: position.left,
-              top: position.top
+              top: position.top,
+              transform: 'translate3d(0, 0, 0)' // Hardware acceleration
             }}
           >
             <span className={cn(
               "font-medium",
-              isValid ? "text-green-600" : "text-red-600"
+              isValidPosition ? "text-green-600" : "text-red-600"
             )}>
-              {isValid ? "Drop here" : "Invalid position"}
+              {isValidPosition ? 'Drop here' : 'Invalid position'}
             </span>
           </div>
         )

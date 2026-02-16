@@ -67,12 +67,6 @@ export interface ResizeState {
 export type ResizeHandle = 's' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'
 export type CompactType = 'vertical' | 'horizontal' | null
 
-export interface DroppingItemPreview extends Partial<GridItem> {
-  previewX?: number
-  previewY?: number
-  isValid?: boolean
-}
-
 export interface GridContainerProps {
   items: GridItem[]
   children: (item: GridItem) => React.ReactNode
@@ -96,7 +90,7 @@ export interface GridContainerProps {
   autoSize?: boolean // 자동으로 컨테이너 높이 조정
   verticalCompact?: boolean // 레거시 - compactType을 사용하는 것을 권장
   transformScale?: number // 스케일 변환 지원
-  droppingItem?: DroppingItemPreview // 드롭 중인 아이템 미리보기
+  droppingItem?: Partial<GridItem> & { previewX?: number; previewY?: number; isValidPosition?: boolean } // 드롭 중인 아이템 미리보기
   isExternalDragging?: boolean // 외부에서 드래그 중인지 여부
   onLayoutChange?: (layout: GridItem[]) => void
   onDragStart?: (layout: GridItem[], oldItem: GridItem, newItem: GridItem, placeholder: GridItem, e: MouseEvent | TouchEvent | PointerEvent, element: HTMLElement) => void
