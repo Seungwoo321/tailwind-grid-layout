@@ -1,26 +1,28 @@
-export function throttle<T extends (...args: never[]) => void>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function throttle<T extends (...args: any[]) => void>(
   func: T,
-  delay: number
+  wait: number
 ): (...args: Parameters<T>) => void {
-  let lastCall = 0
   let timeout: NodeJS.Timeout | null = null
+  let lastTime = 0
 
-  return function throttled(...args: Parameters<T>) {
+  return (...args: Parameters<T>) => {
     const now = Date.now()
-    const timeSinceLastCall = now - lastCall
+    const remaining = wait - (now - lastTime)
 
-    if (timeSinceLastCall >= delay) {
-      lastCall = now
-      func(...args)
-    } else {
+    if (remaining <= 0 || remaining > wait) {
       if (timeout) {
         clearTimeout(timeout)
-      }
-      timeout = setTimeout(() => {
-        lastCall = Date.now()
-        func(...args)
         timeout = null
-      }, delay - timeSinceLastCall)
+      }
+      lastTime = now
+      func(...args)
+    } else if (!timeout) {
+      timeout = setTimeout(() => {
+        lastTime = Date.now()
+        timeout = null
+        func(...args)
+      }, remaining)
     }
   }
 }
