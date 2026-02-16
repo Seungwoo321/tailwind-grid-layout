@@ -135,13 +135,16 @@ export const CombinedDemo: Story = {
     ])
     
     const [autoSize, setAutoSize] = useState(true)
-    const [showDroppingPreview, setShowDroppingPreview] = useState(false)
+    const [draggedSize, setDraggedSize] = useState<{ w: number; h: number } | null>(null)
 
     return (
       <div className="w-full max-w-6xl mx-auto p-4">
-        <h2 className="text-2xl font-bold mb-4">Combined Features</h2>
+        <h2 className="text-2xl font-bold mb-4">Combined Features: AutoSize + DroppingItem</h2>
+        <p className="mb-4">
+          This demo shows how autoSize and droppingItem work together. Drag items from below to the grid.
+        </p>
         
-        <div className="mb-4 flex gap-4">
+        <div className="mb-4">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -151,34 +154,61 @@ export const CombinedDemo: Story = {
             />
             <span>Enable autoSize</span>
           </label>
-          
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={showDroppingPreview}
-              onChange={(e) => setShowDroppingPreview(e.target.checked)}
-              className="w-4 h-4"
-            />
-            <span>Show dropping preview</span>
-          </label>
+        </div>
+
+        <div className="mb-4 p-4 bg-gray-100 rounded">
+          <h3 className="font-semibold mb-2">Drag these items to the grid:</h3>
+          <div className="flex gap-2">
+            {[
+              { label: 'Small (2x2)', size: { w: 2, h: 2 } },
+              { label: 'Medium (3x2)', size: { w: 3, h: 2 } },
+              { label: 'Large (4x3)', size: { w: 4, h: 3 } }
+            ].map((item) => (
+              <div
+                key={item.label}
+                draggable
+                onDragStart={(e) => {
+                  setDraggedSize(item.size)
+                  e.dataTransfer.setData('application/json', JSON.stringify({
+                    id: `new-${Date.now()}`,
+                    ...item.size
+                  }))
+                }}
+                onDragEnd={() => setDraggedSize(null)}
+                className="p-3 bg-green-500 text-white rounded cursor-move hover:bg-green-600"
+              >
+                {item.label}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className={!autoSize ? 'h-96 overflow-auto' : ''}>
-          <GridContainer
+          <DroppableGridContainer
             items={items}
             autoSize={autoSize}
-            droppingItem={showDroppingPreview ? { w: 3, h: 2 } : undefined}
+            droppingItem={draggedSize || { w: 3, h: 2 }}
             rowHeight={60}
             className="border-2 border-gray-300"
             style={!autoSize ? { height: '100%' } : undefined}
             onLayoutChange={(newLayout) => setItems(newLayout)}
+            onDrop={(newItem) => {
+              setItems([...items, newItem])
+            }}
           >
             {(item) => (
               <div className="bg-indigo-500 text-white p-4 rounded h-full flex items-center justify-center">
                 {item.id}
               </div>
             )}
-          </GridContainer>
+          </DroppableGridContainer>
+        </div>
+
+        <div className="mt-4 p-4 bg-blue-50 rounded">
+          <p className="text-sm text-gray-600">
+            <strong>Note:</strong> The dropping preview only appears when you're actually dragging an item over the grid.
+            The preview shows where the item will be placed.
+          </p>
         </div>
       </div>
     )

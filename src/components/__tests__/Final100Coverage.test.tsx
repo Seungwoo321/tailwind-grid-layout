@@ -58,9 +58,10 @@ describe('Final 100% Coverage Tests', () => {
   // GridContainer lines 693-694: Dropping item with no w/h
   it('should render dropping placeholder with default dimensions', () => {
     const { container } = render(
-      <GridContainer 
+      <GridContainer
         items={[{ id: '1', x: 0, y: 0, w: 2, h: 2 }]}
         droppingItem={{ id: 'new', x: 0, y: 0 }}
+        isExternalDragging={true}
         containerPadding={[20, 20]}
       >
         {(item) => <div>Item {item.id}</div>}

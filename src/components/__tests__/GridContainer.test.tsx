@@ -301,7 +301,7 @@ describe('GridContainer', () => {
   it('should handle droppingItem prop', () => {
     const droppingItem = { w: 3, h: 2 }
     const { container } = render(
-      <GridContainer items={mockItems} droppingItem={droppingItem}>
+      <GridContainer items={mockItems} droppingItem={droppingItem} isExternalDragging={true}>
         {(item) => <div>Item {item.id}</div>}
       </GridContainer>
     )

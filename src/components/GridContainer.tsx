@@ -26,6 +26,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   verticalCompact: _verticalCompact = true,
   transformScale: _transformScale = 1,
   droppingItem,
+  isExternalDragging = false,
   onLayoutChange,
   onDragStart,
   onDrag,
@@ -687,7 +688,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       })()}
       
       {/* Dropping Item Preview */}
-      {droppingItem && !dragState.isDragging && (
+      {droppingItem && isExternalDragging && !dragState.isDragging && (
         <div
           className="absolute bg-gray-200 border-2 border-dashed border-gray-400 rounded opacity-75 pointer-events-none flex items-center justify-center"
           style={{
