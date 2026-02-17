@@ -3,7 +3,7 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react'
 import { cn } from '../utils/cn'
 import { GridItem, DragState, ResizeState, GridContainerProps } from '../types'
-import { getPixelPosition, calculateGridPosition, compactLayout, moveItems, getAllCollisions } from '../utils/grid'
+import { getPixelPosition, calculateGridPosition, compactLayout, moveItems, getAllCollisions, checkCollision } from '../utils/grid'
 import { GridItemComponent } from './GridItem'
 import { getControlPosition, preventDefaultTouchEvent, touchEventOptions } from '../utils/touch'
 
@@ -339,7 +339,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     if ('touches' in e.nativeEvent) {
       preventDefaultTouchEvent(e.nativeEvent as TouchEvent)
     }
-  }, [layout, onResizeStart])
+  }, [layout, onResizeStart, cols, containerPadding, containerWidth, gap, margin, rowHeight])
 
   // Handle resize move
   const handleResizeMove = useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
@@ -365,16 +365,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     
     
     // Get initial pixel values - these are always set in handleResizeStart
-    const startPixelW = resizeState.currentPixelSize!.w
-    const startPixelH = resizeState.currentPixelSize!.h
-    const startPixelX = resizeState.currentPixelPos!.x
-    const startPixelY = resizeState.currentPixelPos!.y
-    
-    // Calculate new pixel dimensions based on handle
-    let newPixelX = startPixelX
-    let newPixelY = startPixelY
-    let newPixelW = startPixelW
-    let newPixelH = startPixelH
+    // 현재는 직접 그리드 계산을 사용하므로 픽셀 값은 사용하지 않음
     
     // 단순한 그리드 기반 리사이즈로 접근
     // 마우스 델타를 그리드 단위로 변환
@@ -443,11 +434,11 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     newGridX = Math.max(0, Math.min(cols - newGridW, newGridX))
     newGridW = Math.min(newGridW, cols - newGridX)
     
-    // 픽셀 크기로 다시 계산 (표시용)
-    newPixelX = newGridX * gridUnitW
-    newPixelY = newGridY * gridUnitH
-    newPixelW = newGridW * colWidth + (newGridW - 1) * horizontalMargin
-    newPixelH = newGridH * rowHeight + (newGridH - 1) * verticalMargin
+    // 픽셀 크기로 다시 계산 (표시용) - 현재는 사용하지 않지만 향후 필요할 수 있음
+    // const newPixelX = newGridX * gridUnitW
+    // const newPixelY = newGridY * gridUnitH
+    // const newPixelW = newGridW * colWidth + (newGridW - 1) * horizontalMargin
+    // const newPixelH = newGridH * rowHeight + (newGridH - 1) * verticalMargin
     
     // 그리드 기반으로 직접 계산된 값 사용 (minW/maxW 제약 조건 적용)
     const constrainedW = Math.min(Math.max(item.minW || 1, newGridW), item.maxW || Infinity)
@@ -455,20 +446,153 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     const constrainedX = Math.max(0, Math.min(cols - constrainedW, newGridX))
     const constrainedY = Math.max(0, newGridY)
     
+    // Static 아이템과의 충돌 검사 및 제한된 크기 계산
+    const staticItems = layout.filter(i => i.static && i.id !== item.id)
+    let finalX = constrainedX
+    let finalY = constrainedY
+    let finalW = constrainedW
+    let finalH = constrainedH
+    let hasCollision = false
+    
+    // 각 static 아이템과의 충돌을 검사하고 가능한 최대 크기를 계산
+    for (const staticItem of staticItems) {
+      const tempItem = { ...item, x: constrainedX, y: constrainedY, w: constrainedW, h: constrainedH }
+      
+      if (checkCollision(tempItem, staticItem)) {
+        hasCollision = true
+        
+        // 리사이즈 방향에 따라 최대 가능한 크기 계산
+        switch (resizeState.resizeHandle) {
+          case 'se':
+            // 오른쪽으로 확장 시 static 아이템의 왼쪽 경계까지만
+            if (tempItem.x < staticItem.x) {
+              finalW = Math.min(finalW, staticItem.x - tempItem.x)
+            }
+            // 아래로 확장 시 static 아이템의 위쪽 경계까지만
+            if (tempItem.y < staticItem.y) {
+              finalH = Math.min(finalH, staticItem.y - tempItem.y)
+            }
+            break
+            
+          case 'nw':
+            // 왼쪽으로 확장 시 static 아이템의 오른쪽 경계까지만
+            if (staticItem.x + staticItem.w <= resizeState.originalPos!.x + resizeState.startSize.w) {
+              const maxLeftMove = resizeState.originalPos!.x - (staticItem.x + staticItem.w)
+              const actualLeftMove = resizeState.originalPos!.x - constrainedX
+              if (actualLeftMove > maxLeftMove) {
+                finalX = staticItem.x + staticItem.w
+                finalW = resizeState.originalPos!.x + resizeState.startSize.w - finalX
+              }
+            }
+            // 위로 확장 시 static 아이템의 아래쪽 경계까지만
+            if (staticItem.y + staticItem.h <= resizeState.originalPos!.y + resizeState.startSize.h) {
+              const maxUpMove = resizeState.originalPos!.y - (staticItem.y + staticItem.h)
+              const actualUpMove = resizeState.originalPos!.y - constrainedY
+              if (actualUpMove > maxUpMove) {
+                finalY = staticItem.y + staticItem.h
+                finalH = resizeState.originalPos!.y + resizeState.startSize.h - finalY
+              }
+            }
+            break
+            
+          case 'sw':
+            // 왼쪽으로 확장
+            if (staticItem.x + staticItem.w <= resizeState.originalPos!.x + resizeState.startSize.w) {
+              const maxLeftMove = resizeState.originalPos!.x - (staticItem.x + staticItem.w)
+              const actualLeftMove = resizeState.originalPos!.x - constrainedX
+              if (actualLeftMove > maxLeftMove) {
+                finalX = staticItem.x + staticItem.w
+                finalW = resizeState.originalPos!.x + resizeState.startSize.w - finalX
+              }
+            }
+            // 아래로 확장
+            if (tempItem.y < staticItem.y) {
+              finalH = Math.min(finalH, staticItem.y - tempItem.y)
+            }
+            break
+            
+          case 'ne':
+            // 오른쪽으로 확장
+            if (tempItem.x < staticItem.x) {
+              finalW = Math.min(finalW, staticItem.x - tempItem.x)
+            }
+            // 위로 확장
+            if (staticItem.y + staticItem.h <= resizeState.originalPos!.y + resizeState.startSize.h) {
+              const maxUpMove = resizeState.originalPos!.y - (staticItem.y + staticItem.h)
+              const actualUpMove = resizeState.originalPos!.y - constrainedY
+              if (actualUpMove > maxUpMove) {
+                finalY = staticItem.y + staticItem.h
+                finalH = resizeState.originalPos!.y + resizeState.startSize.h - finalY
+              }
+            }
+            break
+            
+          case 'w':
+            // 왼쪽으로만 확장
+            if (staticItem.x + staticItem.w <= resizeState.originalPos!.x + resizeState.startSize.w) {
+              const maxLeftMove = resizeState.originalPos!.x - (staticItem.x + staticItem.w)
+              const actualLeftMove = resizeState.originalPos!.x - constrainedX
+              if (actualLeftMove > maxLeftMove) {
+                finalX = staticItem.x + staticItem.w
+                finalW = resizeState.originalPos!.x + resizeState.startSize.w - finalX
+              }
+            }
+            break
+            
+          case 'e':
+            // 오른쪽으로만 확장
+            if (tempItem.x < staticItem.x) {
+              finalW = Math.min(finalW, staticItem.x - tempItem.x)
+            }
+            break
+            
+          case 'n':
+            // 위로만 확장
+            if (staticItem.y + staticItem.h <= resizeState.originalPos!.y + resizeState.startSize.h) {
+              const maxUpMove = resizeState.originalPos!.y - (staticItem.y + staticItem.h)
+              const actualUpMove = resizeState.originalPos!.y - constrainedY
+              if (actualUpMove > maxUpMove) {
+                finalY = staticItem.y + staticItem.h
+                finalH = resizeState.originalPos!.y + resizeState.startSize.h - finalY
+              }
+            }
+            break
+            
+          case 's':
+            // 아래로만 확장
+            if (tempItem.y < staticItem.y) {
+              finalH = Math.min(finalH, staticItem.y - tempItem.y)
+            }
+            break
+        }
+      }
+    }
+    
+    // 충돌 상태 업데이트
+    setResizeState(prev => ({
+      ...prev,
+      isColliding: hasCollision
+    }))
     
     const newLayout = layout.map(i => 
       i.id === resizeState.resizedItem
-        ? { ...i, x: constrainedX, y: constrainedY, w: constrainedW, h: constrainedH }
+        ? { ...i, x: finalX, y: finalY, w: finalW, h: finalH }
         : i
     )
     
     setLayout(newLayout)
     
+    // 최종 픽셀 크기 재계산
+    const finalPixelX = finalX * gridUnitW
+    const finalPixelY = finalY * gridUnitH
+    const finalPixelW = finalW * colWidth + (finalW - 1) * horizontalMargin
+    const finalPixelH = finalH * rowHeight + (finalH - 1) * verticalMargin
+    
     // Update pixel positions for smooth resizing
     setResizeState(prev => ({
       ...prev,
-      currentPixelSize: { w: newPixelW, h: newPixelH },
-      currentPixelPos: { x: newPixelX, y: newPixelY }
+      currentPixelSize: { w: finalPixelW, h: finalPixelH },
+      currentPixelPos: { x: finalPixelX, y: finalPixelY }
     }))
     
     // Call onResize callback
@@ -476,7 +600,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
       const element = containerRef.current?.querySelector(`[data-grid-id="${resizeState.resizedItem}"]`) as HTMLElement
       if (element) {
         const originalItem = { ...item, x: resizeState.originalPos.x, y: resizeState.originalPos.y, w: resizeState.startSize.w, h: resizeState.startSize.h }
-        const newItem = { ...item, x: constrainedX, y: constrainedY, w: constrainedW, h: constrainedH }
+        const newItem = { ...item, x: finalX, y: finalY, w: finalW, h: finalH }
         onResize(newLayout, originalItem, newItem, newItem, e, element)
       }
     }
@@ -485,7 +609,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
     if ('touches' in e) {
       e.preventDefault()
     }
-  }, [resizeState, layout, containerWidth, cols, rowHeight, gap, margin, onResize])
+  }, [resizeState, layout, containerWidth, cols, rowHeight, gap, margin, onResize, containerPadding])
 
   // Handle resize end
   const handleResizeEnd = useCallback((e: MouseEvent | TouchEvent | PointerEvent) => {
@@ -642,6 +766,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
             position={position}
             isDragging={isDragging}
             isResizing={isResizing}
+            isColliding={isResizing && resizeState.isColliding}
             isDraggable={isDraggable && item.isDraggable !== false}
             isResizable={isResizable && item.isResizable !== false}
             resizeHandles={resizeHandles}

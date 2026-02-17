@@ -62,6 +62,7 @@ export interface ResizeState {
   // These are always set when isResizing is true
   currentPixelSize: { w: number; h: number }
   currentPixelPos: { x: number; y: number }
+  isColliding?: boolean
 }
 
 export type ResizeHandle = 's' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'

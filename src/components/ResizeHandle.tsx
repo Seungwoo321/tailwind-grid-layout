@@ -29,6 +29,7 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
     const corner = cornerPositions[position as keyof typeof cornerPositions]
     return (
       <span
+        data-testid={`resize-handle-${position}`}
         className={cn(
           'react-grid-layout__resize-handle',
           'absolute w-5 h-5',
@@ -71,6 +72,7 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
   if (!isVisible && handleClasses[position]) {
     return (
       <div
+        data-testid={`resize-handle-${position}`}
         className={cn(
           'absolute',
           handleClasses[position],
