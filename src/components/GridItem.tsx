@@ -68,7 +68,7 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
         !isDragging && 'transition-all duration-200',
         isDragging && 'opacity-80 z-50 cursor-grabbing shadow-2xl',
         isResizing && 'z-40',
-        isColliding && 'ring-2 ring-red-500 ring-opacity-50 bg-red-50 bg-opacity-10',
+        isColliding && 'ring-1 ring-gray-400 shadow-inner',
         !isDragging && !isResizing && 'hover:z-30',
         item.static && 'cursor-not-allowed',
         item.className

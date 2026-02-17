@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { fn } from '@storybook/test'
 import { ResponsiveGridContainer, WidthProvider } from '../src'
 import type { BreakpointLayouts } from '../src'
 import { useState } from 'react'
@@ -11,6 +12,10 @@ const meta = {
     layout: 'fullscreen',
   },
   tags: ['autodocs'],
+  args: {
+    onBreakpointChange: fn(),
+    onLayoutChange: fn(),
+  },
 } satisfies Meta<typeof ResponsiveGridContainer>
 
 export default meta
