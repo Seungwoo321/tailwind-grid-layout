@@ -77,24 +77,31 @@ describe('GridContainer - Static Item Collision on Resize', () => {
 
     it('NW handle should stop at static item boundary', async () => {
       const onResize = vi.fn()
+      // Static item is at top-left of the resizing item
+      const items: GridItem[] = [
+        { id: '1', x: 4, y: 3, w: 4, h: 2 },
+        { id: '2', x: 0, y: 0, w: 3, h: 2, static: true }
+      ]
+
       const { container } = render(
         <GridContainer
           {...defaultProps}
-          items={createItems()}
+          items={items}
           onResize={onResize}
         />
       )
 
-      const item = container.querySelector('[data-grid-id="3"]') as HTMLElement
+      const item = container.querySelector('[data-grid-id="1"]') as HTMLElement
       const nwHandle = item?.querySelector('[data-testid="resize-handle-nw"]') as HTMLElement
 
       expect(nwHandle).toBeTruthy()
 
       act(() => {
-        fireEvent.mouseDown(nwHandle, { clientX: 100, clientY: 200 })
+        fireEvent.mouseDown(nwHandle, { clientX: 200, clientY: 200 })
       })
+      // Move up-left to collide with static item
       act(() => {
-        fireEvent.mouseMove(document, { clientX: -100, clientY: 0 })
+        fireEvent.mouseMove(document, { clientX: -100, clientY: -100 })
       })
 
       await waitFor(() => {
@@ -131,6 +138,44 @@ describe('GridContainer - Static Item Collision on Resize', () => {
       })
       act(() => {
         fireEvent.mouseMove(document, { clientX: 0, clientY: 200 })
+      })
+
+      await waitFor(() => {
+        expect(onResize).toHaveBeenCalled()
+      })
+
+      act(() => {
+        fireEvent.mouseUp(document)
+      })
+    })
+
+    it('SW handle should stop at static item below', async () => {
+      const onResize = vi.fn()
+      // Static item is below the resizing item in the same column
+      const items: GridItem[] = [
+        { id: '1', x: 4, y: 0, w: 4, h: 2 },
+        { id: '2', x: 4, y: 3, w: 4, h: 2, static: true }
+      ]
+
+      const { container } = render(
+        <GridContainer
+          {...defaultProps}
+          items={items}
+          onResize={onResize}
+        />
+      )
+
+      const item = container.querySelector('[data-grid-id="1"]') as HTMLElement
+      const swHandle = item?.querySelector('[data-testid="resize-handle-sw"]') as HTMLElement
+
+      expect(swHandle).toBeTruthy()
+
+      act(() => {
+        fireEvent.mouseDown(swHandle, { clientX: 200, clientY: 100 })
+      })
+      // Move down to collide with static item below
+      act(() => {
+        fireEvent.mouseMove(document, { clientX: 100, clientY: 400 })
       })
 
       await waitFor(() => {
@@ -250,15 +295,21 @@ describe('GridContainer - Static Item Collision on Resize', () => {
 
     it('N handle should stop at static item boundary', async () => {
       const onResize = vi.fn()
+      // Static item is above the resizing item in the same column
+      const items: GridItem[] = [
+        { id: '1', x: 4, y: 3, w: 4, h: 2 },
+        { id: '2', x: 4, y: 0, w: 4, h: 2, static: true }
+      ]
+
       const { container } = render(
         <GridContainer
           {...defaultProps}
-          items={createItems()}
+          items={items}
           onResize={onResize}
         />
       )
 
-      const item = container.querySelector('[data-grid-id="3"]') as HTMLElement
+      const item = container.querySelector('[data-grid-id="1"]') as HTMLElement
       const nHandle = item?.querySelector('[data-testid="resize-handle-n"]') ||
                       item?.querySelector('.cursor-n-resize') as HTMLElement
 
@@ -266,8 +317,9 @@ describe('GridContainer - Static Item Collision on Resize', () => {
         act(() => {
           fireEvent.mouseDown(nHandle, { clientX: 100, clientY: 200 })
         })
+        // Move up to collide with static item above
         act(() => {
-          fireEvent.mouseMove(document, { clientX: 100, clientY: 0 })
+          fireEvent.mouseMove(document, { clientX: 100, clientY: -100 })
         })
 
         await waitFor(() => {
