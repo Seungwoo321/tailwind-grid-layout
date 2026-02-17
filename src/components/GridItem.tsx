@@ -10,6 +10,7 @@ interface GridItemComponentProps {
   position: { left: number; top: number; width: number; height: number }
   isDragging: boolean
   isResizing: boolean
+  isColliding?: boolean
   isDraggable: boolean
   isResizable: boolean
   resizeHandles?: Array<'s' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'>
@@ -24,6 +25,7 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
   position,
   isDragging,
   isResizing,
+  isColliding = false,
   isDraggable,
   isResizable,
   resizeHandles = ['se'],
@@ -66,6 +68,7 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
         !isDragging && 'transition-all duration-200',
         isDragging && 'opacity-80 z-50 cursor-grabbing shadow-2xl',
         isResizing && 'z-40',
+        isColliding && 'ring-2 ring-red-500 ring-opacity-50 bg-red-50 bg-opacity-10',
         !isDragging && !isResizing && 'hover:z-30',
         item.static && 'cursor-not-allowed',
         item.className
