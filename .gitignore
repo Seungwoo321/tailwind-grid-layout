@@ -65,4 +65,4 @@ docs-dist/
 *.log
 
 # Vitest
-*.timestamp-*
+*.timestamp-*examples/pnpm-lock.yaml
