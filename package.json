@@ -45,15 +45,13 @@
     "dev": "concurrently \"pnpm:dev:*\"",
     "dev:lib": "vite build --watch",
     "dev:storybook": "storybook dev -p 6006",
-    "build": "pnpm build:lib && pnpm build:storybook",
-    "build:lib": "tsc --noEmit && tsc -p tsconfig.build.json && vite build",
+    "build": "pnpm build:lib",
+    "build:lib": "tsc --noEmit && vite build",
     "build:storybook": "storybook build",
     "clean": "rm -rf dist storybook-static",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:watch": "vitest",
     "test:coverage": "vitest --coverage",
-    "prepublishOnly": "pnpm run build:lib",
     "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
