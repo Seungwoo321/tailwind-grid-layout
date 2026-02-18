@@ -12,7 +12,7 @@ export default tseslint.config(
       'node_modules/**',
       'coverage/**',
       'storybook-static/**',
-      'docs-dist/**',
+      'site-dist/**',
       '*.config.js',
       '*.config.ts',
       '.storybook/**',
