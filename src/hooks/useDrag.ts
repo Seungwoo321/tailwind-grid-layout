@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { GridItem, DragState } from '../types'
+import { GridItem, DragState, CompactType } from '../types'
 import { getControlPosition, touchEventOptions } from '../utils/touch'
 import { calculateGridPosition, compactLayout, moveItems, getAllCollisions } from '../utils/grid'
 
@@ -16,7 +16,7 @@ export interface UseDragOptions {
   preventCollision: boolean
   allowOverlap: boolean
   isBounded: boolean
-  compactType: 'vertical' | 'horizontal' | 'none'
+  compactType: CompactType
   layout: GridItem[]
   setLayout: React.Dispatch<React.SetStateAction<GridItem[]>>
   updateLayout: (layout: GridItem[]) => void
