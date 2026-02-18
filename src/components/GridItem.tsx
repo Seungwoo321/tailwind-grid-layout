@@ -10,6 +10,7 @@ interface GridItemComponentProps {
   position: { left: number; top: number; width: number; height: number }
   isDragging: boolean
   isResizing: boolean
+  isColliding?: boolean
   isDraggable: boolean
   isResizable: boolean
   resizeHandles?: Array<'s' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'>
@@ -24,6 +25,7 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
   position,
   isDragging,
   isResizing,
+  isColliding = false,
   isDraggable,
   isResizable,
   resizeHandles = ['se'],
@@ -33,27 +35,32 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
   children
 }) => {
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
-    
     // Don't allow dragging static items
     if (item.static) return
-    
+
     // Only initiate drag if clicking on the drag handle or if no specific handle is defined
     const target = e.target as HTMLElement
     const isDragHandle = target.closest('.grid-drag-handle')
     const isActionButton = target.closest('.grid-actions, button, a')
-    
+
+    // Check if clicking on resize handle - don't start drag
+    const isResizeHandle = target.closest('.react-grid-layout__resize-handle') || target.closest('[data-testid^="resize-handle-"]')
+    if (isResizeHandle) {
+      return
+    }
+
     // Check draggableCancel selector
     const isCancelled = draggableCancel && target.closest(draggableCancel)
-    
-    
+
+
     if (isDraggable && (isDragHandle || !target.closest('.grid-drag-handle')) && !isActionButton && !isCancelled) {
-      
+
       // For touch events, we need to call preventDefault to prevent scrolling
       // But we should do it before calling onDragStart to ensure the event is not consumed
       if ('touches' in e) {
         e.preventDefault()
       }
-      
+
       onDragStart(item.id, e)
     }
   }
@@ -62,12 +69,13 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
     <div
       data-grid-id={item.id}
       className={cn(
-        'absolute',
+        'absolute isolate',
         !isDragging && 'transition-all duration-200',
         isDragging && 'opacity-80 z-50 cursor-grabbing shadow-2xl',
         isResizing && 'z-40',
+        isColliding && 'ring-1 ring-gray-400 shadow-inner',
         !isDragging && !isResizing && 'hover:z-30',
-        item.static && 'cursor-not-allowed',
+        !isDragging && (item.static ? 'cursor-not-allowed' : (isDraggable ? 'cursor-grab' : 'cursor-default')),
         item.className
       )}
       style={{
@@ -75,8 +83,7 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
         top: `${position.top}px`,
         width: `${position.width}px`,
         height: `${position.height}px`,
-        transform: isDragging ? 'scale(1.02)' : 'scale(1)',
-        cursor: isDraggable ? 'grab' : 'default'
+        transform: isDragging ? 'scale(1.02)' : 'scale(1)'
       }}
       onMouseDown={handleMouseDown}
       onTouchStart={(e) => {
@@ -85,11 +92,13 @@ export const GridItemComponent: React.FC<GridItemComponentProps> = ({
         // Stop propagation to prevent bubbling issues
         e.stopPropagation()
       }}
-      onPointerDown={handleMouseDown}
       onDoubleClick={(e) => e.preventDefault()}
     >
-      {children}
-      
+      {/* Content wrapper with lower z-index to ensure resize handles are always on top */}
+      <div className="relative z-0 h-full w-full">
+        {children}
+      </div>
+
       {/* Resize handles */}
       {isResizable && (
         <>

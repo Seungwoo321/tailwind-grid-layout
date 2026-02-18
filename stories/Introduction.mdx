@@ -1,0 +1,112 @@
+{/* Introduction.mdx */}
+import { Meta } from '@storybook/blocks'
+
+<Meta title="Introduction" />
+
+# Tailwind Grid Layout
+
+A Tailwind CSS-based alternative to React Grid Layout.
+
+## Features
+
+- **Drag & Drop** - Drag items to change position
+- **Resize** - Resize with 8-direction handles
+- **Responsive** - Layout per breakpoint
+- **Collision** - Collision detection and auto-placement
+- **Touch Support** - Full mobile touch support
+
+## Installation
+
+```bash
+npm install tailwind-grid-layout
+# or
+pnpm add tailwind-grid-layout
+```
+
+## Quick Start
+
+```tsx
+import { GridContainer } from 'tailwind-grid-layout'
+import type { GridItem } from 'tailwind-grid-layout'
+
+const items: GridItem[] = [
+  { id: '1', x: 0, y: 0, w: 4, h: 2 },
+  { id: '2', x: 4, y: 0, w: 4, h: 2 },
+]
+
+function App() {
+  const [layout, setLayout] = useState(items)
+
+  return (
+    <GridContainer
+      items={layout}
+      cols={12}
+      rowHeight={60}
+      onLayoutChange={setLayout}
+    >
+      {(item) => (
+        <div className="bg-blue-500 text-white p-4 rounded">
+          {item.id}
+        </div>
+      )}
+    </GridContainer>
+  )
+}
+```
+
+## Components
+
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>GridContainer</code></td>
+      <td>Basic grid container with drag and resize support</td>
+    </tr>
+    <tr>
+      <td><code>ResponsiveGridContainer</code></td>
+      <td>Responsive grid container with breakpoint layouts</td>
+    </tr>
+    <tr>
+      <td><code>DroppableGridContainer</code></td>
+      <td>Grid container with external drag and drop support</td>
+    </tr>
+  </tbody>
+</table>
+
+## Utilities
+
+<table>
+  <thead>
+    <tr>
+      <th>Utility</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>generateLayouts</code></td>
+      <td>Apply the same layout to all breakpoints</td>
+    </tr>
+    <tr>
+      <td><code>generateResponsiveLayouts</code></td>
+      <td>Auto-adjust layout based on column count</td>
+    </tr>
+    <tr>
+      <td><code>WidthProvider</code></td>
+      <td>HOC for automatic container width detection</td>
+    </tr>
+  </tbody>
+</table>
+
+## Navigation
+
+- **Components** - Core component documentation and demos
+- **Features** - Feature-specific detailed demos
+- **Utilities** - Utility function documentation
+- **Examples** - Real-world usage examples

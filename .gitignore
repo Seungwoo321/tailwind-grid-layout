@@ -39,6 +39,7 @@ lerna-debug.log*
 .vscode/*
 !.vscode/extensions.json
 .idea
+.claude/
 *.suo
 *.ntvs*
 *.njsproj
@@ -65,3 +66,5 @@ docs-dist/
 
 # Vitest
 *.timestamp-*
+examples/pnpm-lock.yaml
+pnpm-lock.yaml

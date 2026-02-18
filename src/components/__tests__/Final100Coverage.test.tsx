@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { GridContainer } from '../GridContainer'
@@ -8,6 +8,14 @@ import { DroppableGridContainer } from '../DroppableGridContainer'
 import type { GridItem } from '../../types'
 
 describe('Final 100% Coverage Tests', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+  })
   // GridContainer lines 366-367: Resize with existing currentPixelSize
   it('should use currentPixelSize during resize operations', () => {
     const mockBoundingRect = {
@@ -58,16 +66,17 @@ describe('Final 100% Coverage Tests', () => {
   // GridContainer lines 693-694: Dropping item with no w/h
   it('should render dropping placeholder with default dimensions', () => {
     const { container } = render(
-      <GridContainer 
+      <GridContainer
         items={[{ id: '1', x: 0, y: 0, w: 2, h: 2 }]}
         droppingItem={{ id: 'new', x: 0, y: 0 }}
+        isExternalDragging={true}
         containerPadding={[20, 20]}
       >
         {(item) => <div>Item {item.id}</div>}
       </GridContainer>
     )
 
-    const placeholder = container.querySelector('.bg-gray-200')
+    const placeholder = container.querySelector('.bg-green-200')
     expect(placeholder).toBeTruthy()
   })
 

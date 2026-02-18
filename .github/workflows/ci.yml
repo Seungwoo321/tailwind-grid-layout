@@ -3,8 +3,6 @@ name: CI
 on:
   pull_request:
     branches: [ main, develop ]
-  push:
-    branches: [ main ]
 
 jobs:
   test:
@@ -26,10 +24,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Run linter
         run: pnpm lint

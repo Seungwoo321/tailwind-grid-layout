@@ -11,6 +11,7 @@ describe('Coverage 100% Final Tests', () => {
   })
 
   afterEach(() => {
+    vi.runOnlyPendingTimers()
     vi.useRealTimers()
     vi.restoreAllMocks()
   })
