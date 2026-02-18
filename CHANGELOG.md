@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.0-beta.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.0.2-beta.0...v1.1.0-beta.1) (2026-02-18)
+
+### Bug Fixes
+
+* correct gitignore format for examples/pnpm-lock.yaml ([a805597](https://github.com/Seungwoo321/tailwind-grid-layout/commit/a80559774083f3111dcf2634b9b0c8721c747a20))
+
 ## [1.0.2-beta.0](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v0.1.0-beta.2...v1.0.2-beta.0) (2026-02-18)
 
 ### Bug Fixes
