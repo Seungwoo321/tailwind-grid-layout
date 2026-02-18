@@ -143,18 +143,17 @@ describe('ResizeHandle', () => {
       expect(handle).not.toHaveClass('h-5')
     })
 
-    it.each(['sw', 'ne', 'nw'] as const)('should apply w-5 h-5 classes to corner handle %s when not visible', (position) => {
+    it.each(['sw', 'ne', 'nw'] as const)('should not render corner handle %s when not visible', (position) => {
       const { container } = render(
-        <ResizeHandle 
-          position={position} 
+        <ResizeHandle
+          position={position}
           onMouseDown={mockOnMouseDown}
           isVisible={false}
         />
       )
 
-      const handle = container.querySelector('div')
-      expect(handle).toHaveClass('w-5')
-      expect(handle).toHaveClass('h-5')
+      // Corner handles only render when isVisible=true
+      expect(container.firstChild).toBeNull()
     })
 
     it('should set onMouseDown to undefined when isActive is false', () => {
@@ -216,34 +215,38 @@ describe('ResizeHandle', () => {
       })
     })
 
-    it('should render edge handles with correct positioning when visible', () => {
+    it('should render edge handles with correct positioning regardless of visibility', () => {
       const edgePositions = ['n', 's', 'e', 'w'] as const
-      
+
       edgePositions.forEach((position) => {
         const { container } = render(
-          <ResizeHandle 
-            position={position} 
+          <ResizeHandle
+            position={position}
             onMouseDown={mockOnMouseDown}
             isVisible={true}
           />
         )
 
-        // Edge handles return null when visible
-        expect(container.firstChild).toBeNull()
+        // Edge handles always render regardless of isVisible
+        const handle = container.querySelector('div')
+        expect(handle).toBeTruthy()
+        expect(handle).toHaveClass('absolute')
       })
     })
   })
 
-  it('should return null for unsupported positions when visible', () => {
+  it('should render edge handle n when visible', () => {
     const { container } = render(
-      <ResizeHandle 
-        position="n" 
+      <ResizeHandle
+        position="n"
         onMouseDown={mockOnMouseDown}
         isVisible={true}
       />
     )
 
-    expect(container.firstChild).toBeNull()
+    // Edge handles always render
+    const handle = container.querySelector('div')
+    expect(handle).toBeTruthy()
   })
 
   it('should handle transform styles for corners', () => {
