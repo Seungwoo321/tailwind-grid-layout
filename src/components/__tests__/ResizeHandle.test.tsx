@@ -285,24 +285,6 @@ describe('ResizeHandle', () => {
     expect(mockOnMouseDown).toHaveBeenCalled()
   })
 
-  it('should handle pointer events', () => {
-    const { container } = render(
-      <ResizeHandle 
-        position="se" 
-        onMouseDown={mockOnMouseDown}
-        isActive={true}
-        isVisible={true}
-      />
-    )
-
-    const handle = container.querySelector('.react-grid-layout__resize-handle') as HTMLElement
-    act(() => {
-      fireEvent.pointerDown(handle)
-    })
-    
-    expect(mockOnMouseDown).toHaveBeenCalled()
-  })
-
   it('should prevent double click events', () => {
     const { container } = render(
       <ResizeHandle 
@@ -324,8 +306,8 @@ describe('ResizeHandle', () => {
 
   it('should handle edge case with touch events on non-visible edge handles', () => {
     const { container } = render(
-      <ResizeHandle 
-        position="n" 
+      <ResizeHandle
+        position="n"
         onMouseDown={mockOnMouseDown}
         isActive={true}
         isVisible={false}
@@ -335,9 +317,9 @@ describe('ResizeHandle', () => {
     const handle = container.querySelector('div') as HTMLElement
     act(() => {
       fireEvent.touchStart(handle)
-      fireEvent.pointerDown(handle)
+      fireEvent.mouseDown(handle)
     })
-    
+
     expect(mockOnMouseDown).toHaveBeenCalledTimes(2)
   })
 

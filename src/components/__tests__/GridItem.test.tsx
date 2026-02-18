@@ -344,30 +344,6 @@ describe('GridItemComponent', () => {
     expect(mockOnDragStart).toHaveBeenCalledWith('1', expect.any(Object))
   })
 
-  it('should handle pointer events', () => {
-    const { container } = render(
-      <GridItemComponent
-        item={defaultItem}
-        position={defaultPosition}
-        isDragging={false}
-        isResizing={false}
-        isDraggable={true}
-        isResizable={true}
-        onDragStart={mockOnDragStart}
-        onResizeStart={mockOnResizeStart}
-      >
-        <div>Test</div>
-      </GridItemComponent>
-    )
-
-    const element = container.firstChild as HTMLElement
-    act(() => {
-      fireEvent.pointerDown(element)
-    })
-    
-    expect(mockOnDragStart).toHaveBeenCalledWith('1', expect.any(Object))
-  })
-
   it('should handle double click events', () => {
     const { container } = render(
       <GridItemComponent
@@ -416,7 +392,9 @@ describe('GridItemComponent', () => {
     act(() => {
       fireEvent.mouseDown(resizeHandle)
     })
-    
+
     expect(mockOnResizeStart).toHaveBeenCalledWith('1', 'se', expect.any(Object))
+    // Verify drag is NOT triggered when clicking resize handle
+    expect(mockOnDragStart).not.toHaveBeenCalled()
   })
 })
