@@ -67,7 +67,7 @@ export const PushMode: Story = {
           className="bg-slate-50 rounded"
         >
           {(item) => (
-            <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 flex items-center justify-center text-sm">
+            <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 flex items-center justify-center text-sm overflow-auto">
               {item.id}
             </div>
           )}
@@ -109,7 +109,7 @@ export const BlockMode: Story = {
           className="bg-slate-50 rounded"
         >
           {(item) => (
-            <div className="h-full bg-slate-600 text-slate-100 rounded border border-slate-500 flex items-center justify-center text-sm">
+            <div className="h-full bg-slate-600 text-slate-100 rounded border border-slate-500 flex items-center justify-center text-sm overflow-auto">
               {item.id}
             </div>
           )}
@@ -156,7 +156,7 @@ export const OverlapMode: Story = {
           className="bg-slate-50 rounded min-h-[400px]"
         >
           {(item) => (
-            <div className="h-full bg-slate-500/90 text-slate-100 rounded border border-slate-400 flex items-center justify-center text-sm">
+            <div className="h-full bg-slate-500/90 text-slate-100 rounded border border-slate-400 flex items-center justify-center text-sm overflow-auto">
               {item.id}
             </div>
           )}
@@ -252,7 +252,7 @@ export const Comparison: Story = {
             className="bg-slate-50 rounded"
           >
             {(item) => (
-              <div className="h-full bg-slate-600 text-slate-100 rounded border border-slate-500 flex items-center justify-center text-sm">
+              <div className="h-full bg-slate-600 text-slate-100 rounded border border-slate-500 flex items-center justify-center text-sm overflow-auto">
                 {item.id}
               </div>
             )}
@@ -273,7 +273,7 @@ export const Comparison: Story = {
             className="bg-slate-50 rounded"
           >
             {(item) => (
-              <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 flex items-center justify-center text-sm">
+              <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 flex items-center justify-center text-sm overflow-auto">
                 {item.id}
               </div>
             )}

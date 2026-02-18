@@ -5,15 +5,15 @@ import { Meta } from '@storybook/blocks'
 
 # Tailwind Grid Layout
 
-React Grid Layout의 Tailwind CSS 기반 대안입니다.
+A Tailwind CSS-based alternative to React Grid Layout.
 
 ## Features
 
-- **Drag & Drop** - 아이템을 드래그하여 위치 변경
-- **Resize** - 8방향 핸들로 크기 조절
-- **Responsive** - 브레이크포인트별 레이아웃
-- **Collision** - 충돌 감지 및 자동 배치
-- **Touch Support** - 모바일 터치 지원
+- **Drag & Drop** - Drag items to change position
+- **Resize** - Resize with 8-direction handles
+- **Responsive** - Layout per breakpoint
+- **Collision** - Collision detection and auto-placement
+- **Touch Support** - Full mobile touch support
 
 ## Installation
 
@@ -56,23 +56,57 @@ function App() {
 
 ## Components
 
-| Component | Description |
-|-----------|-------------|
-| `GridContainer` | 기본 그리드 컨테이너 |
-| `ResponsiveGridContainer` | 반응형 그리드 컨테이너 |
-| `DroppableGridContainer` | 외부 드래그 앤 드롭 지원 |
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>GridContainer</code></td>
+      <td>Basic grid container with drag and resize support</td>
+    </tr>
+    <tr>
+      <td><code>ResponsiveGridContainer</code></td>
+      <td>Responsive grid container with breakpoint layouts</td>
+    </tr>
+    <tr>
+      <td><code>DroppableGridContainer</code></td>
+      <td>Grid container with external drag and drop support</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Utilities
 
-| Utility | Description |
-|---------|-------------|
-| `generateLayouts` | 동일 레이아웃을 모든 브레이크포인트에 적용 |
-| `generateResponsiveLayouts` | 컬럼 수에 맞게 레이아웃 자동 조정 |
-| `WidthProvider` | 컨테이너 너비 자동 감지 HOC |
+<table>
+  <thead>
+    <tr>
+      <th>Utility</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>generateLayouts</code></td>
+      <td>Apply the same layout to all breakpoints</td>
+    </tr>
+    <tr>
+      <td><code>generateResponsiveLayouts</code></td>
+      <td>Auto-adjust layout based on column count</td>
+    </tr>
+    <tr>
+      <td><code>WidthProvider</code></td>
+      <td>HOC for automatic container width detection</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Navigation
 
-- **Components** - 핵심 컴포넌트 문서 및 데모
-- **Features** - 기능별 상세 데모
-- **Utilities** - 유틸리티 함수 설명
-- **Examples** - 실제 사용 예제
+- **Components** - Core component documentation and demos
+- **Features** - Feature-specific detailed demos
+- **Utilities** - Utility function documentation
+- **Examples** - Real-world usage examples

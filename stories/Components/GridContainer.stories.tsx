@@ -104,6 +104,14 @@ const meta: Meta<typeof GridContainer> = {
         defaultValue: { summary: 'true' },
       },
     },
+    preserveInitialHeight: {
+      control: 'boolean',
+      description: '초기 레이아웃 기준 최소 높이 유지 (스크롤 활성화)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
     maxRows: {
       control: { type: 'number', min: 1, max: 100 },
       description: '최대 행 수',
@@ -151,7 +159,7 @@ const GridContainerWithState = (props: React.ComponentProps<typeof GridContainer
     >
       {(item) => (
         <div
-          className="h-full bg-slate-700 rounded border border-slate-600 flex items-center justify-center text-slate-100 text-sm"
+          className="h-full bg-slate-700 rounded border border-slate-600 flex items-center justify-center text-slate-100 text-sm overflow-auto"
           data-testid={`grid-item-${item.id}`}
         >
           {item.id}
@@ -289,7 +297,7 @@ export const WithStaticItems: Story = {
       >
         {(item) => (
           <div
-            className={`h-full rounded border flex items-center justify-center text-sm ${
+            className={`h-full rounded border flex items-center justify-center text-sm overflow-auto ${
               item.static
                 ? 'bg-slate-300 text-slate-500 cursor-not-allowed border-slate-400'
                 : 'bg-slate-700 text-slate-100 border-slate-600'
@@ -328,7 +336,7 @@ export const WithConstraints: Story = {
         onLayoutChange={setItems}
       >
         {(item) => (
-          <div className="h-full bg-slate-700 rounded border border-slate-600 p-3 text-slate-100">
+          <div className="h-full bg-slate-700 rounded border border-slate-600 p-3 text-slate-100 overflow-auto">
             <div className="text-sm">{item.id}</div>
             <div className="text-xs mt-1 text-slate-400 space-y-0.5">
               {item.minW && <div>minW: {item.minW}</div>}
@@ -369,4 +377,64 @@ export const InteractionTest: Story = {
     await expect(item1).toHaveTextContent('Item test-1')
     await expect(item2).toHaveTextContent('Item test-2')
   },
+}
+
+/**
+ * 초기 레이아웃 기준 높이를 유지하는 그리드입니다.
+ * `preserveInitialHeight={true}`와 `autoSize={false}`를 함께 사용하면
+ * 초기 레이아웃 높이로 고정되어 부모가 더 작을 때 스크롤이 가능합니다.
+ */
+export const PreserveInitialHeight: Story = {
+  args: {
+    ...Default.args,
+    preserveInitialHeight: true,
+    autoSize: false,
+    items: [
+      { id: '1', x: 0, y: 0, w: 4, h: 2 },
+      { id: '2', x: 4, y: 0, w: 4, h: 3 },
+      { id: '3', x: 8, y: 0, w: 4, h: 2 },
+      { id: '4', x: 0, y: 2, w: 4, h: 2 },
+      { id: '5', x: 4, y: 3, w: 4, h: 2 },
+    ],
+  },
+  render: (args) => (
+    <div className="space-y-4">
+      <div className="text-sm text-slate-600">
+        <p>이 예제에서는 <code className="bg-slate-200 px-1 rounded">preserveInitialHeight={'{true}'}</code>와 <code className="bg-slate-200 px-1 rounded">autoSize={'{false}'}</code>가 설정되어 있습니다.</p>
+        <p className="mt-1">GridContainer가 초기 레이아웃 높이(약 380px)로 고정되고, 200px wrapper 안에서 스크롤됩니다.</p>
+      </div>
+      <div className="h-[200px] border-2 border-dashed border-slate-300 rounded-lg overflow-auto">
+        <GridContainerWithState {...args} className="bg-gray-100" />
+      </div>
+      <div className="text-sm text-slate-600">
+        <p>Wrapper 높이 제한 없이 (전체 높이 표시):</p>
+      </div>
+      <GridContainerWithState {...args} className="bg-gray-100" />
+    </div>
+  ),
+}
+
+/**
+ * 8방향 리사이즈 핸들이 있는 그리드입니다.
+ * NW (북서), NE (북동), SW (남서), SE (남동) 핸들을 포함한 모든 방향에서 리사이즈가 가능합니다.
+ */
+export const AllDirectionResize: Story = {
+  args: {
+    ...Default.args,
+    resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
+    items: [
+      { id: 'nw-test', x: 0, y: 0, w: 4, h: 3 },
+      { id: 'center', x: 4, y: 0, w: 4, h: 3 },
+      { id: 'se-test', x: 8, y: 0, w: 4, h: 3 },
+    ],
+  },
+  render: (args) => (
+    <div className="space-y-4">
+      <div className="text-sm text-slate-600">
+        <p>모든 8방향 리사이즈 핸들이 활성화되어 있습니다.</p>
+        <p className="mt-1">각 모서리와 변에서 리사이즈를 시도해보세요.</p>
+      </div>
+      <GridContainerWithState {...args} className="bg-gray-100" />
+    </div>
+  ),
 }

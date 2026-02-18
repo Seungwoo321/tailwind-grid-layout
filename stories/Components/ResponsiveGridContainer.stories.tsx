@@ -111,7 +111,7 @@ export const Default: Story = {
           className="bg-white rounded border border-slate-200"
         >
           {(item) => (
-            <div className="h-full bg-slate-700 rounded border border-slate-600 p-3 text-slate-100">
+            <div className="h-full bg-slate-700 rounded border border-slate-600 p-3 text-slate-100 overflow-auto">
               <div className="text-sm font-medium">{item.id}</div>
               <div className="text-xs text-slate-400 mt-1">
                 ({item.x}, {item.y}) {item.w}x{item.h}
@@ -185,7 +185,7 @@ export const CustomBreakpoints: Story = {
           className="bg-white rounded border border-slate-200"
         >
           {(item) => (
-            <div className="h-full bg-slate-600 rounded border border-slate-500 p-3 text-slate-100 flex flex-col justify-center items-center">
+            <div className="h-full bg-slate-600 rounded border border-slate-500 p-3 text-slate-100 flex flex-col justify-center items-center overflow-auto">
               <div className="text-sm">{item.id}</div>
               <div className="text-xs text-slate-400">{item.w}x{item.h}</div>
             </div>
@@ -264,7 +264,7 @@ export const Dashboard: Story = {
           className="rounded"
         >
           {(item) => (
-            <div className="h-full bg-white rounded border border-slate-200 p-3 flex flex-col">
+            <div className="h-full bg-white rounded border border-slate-200 p-3 flex flex-col overflow-auto">
               <div className="text-sm font-medium text-slate-700">
                 {widgetLabels[item.id] || item.id}
               </div>

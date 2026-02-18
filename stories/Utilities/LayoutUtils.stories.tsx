@@ -83,7 +83,7 @@ const layouts = generateLayouts(items)
             className="bg-white rounded-lg shadow"
           >
             {(item) => (
-              <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 flex items-center justify-center text-sm">
+              <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 flex items-center justify-center text-sm overflow-auto">
                 {item.id}
               </div>
             )}
@@ -161,7 +161,7 @@ const layouts = generateResponsiveLayouts(items, {
             className="bg-white rounded-lg shadow"
           >
             {(item) => (
-              <div className="h-full bg-slate-600 text-slate-100 rounded border border-slate-500 flex items-center justify-center text-sm">
+              <div className="h-full bg-slate-600 text-slate-100 rounded border border-slate-500 flex items-center justify-center text-sm overflow-auto">
                 {item.id}
               </div>
             )}
@@ -250,7 +250,7 @@ const ResponsiveGrid = WidthProvider(ResponsiveGridContainer)
             className="bg-white rounded shadow"
           >
             {(item) => (
-              <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 flex items-center justify-center text-sm">
+              <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 flex items-center justify-center text-sm overflow-auto">
                 {item.id}
               </div>
             )}
@@ -303,7 +303,7 @@ export const MeasureBeforeMount: Story = {
           className="bg-white rounded-lg shadow"
         >
           {(item) => (
-            <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 flex items-center justify-center text-lg">
+            <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 flex items-center justify-center text-lg overflow-auto">
               {item.id}
             </div>
           )}

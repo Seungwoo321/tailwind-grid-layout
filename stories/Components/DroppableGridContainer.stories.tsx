@@ -239,7 +239,7 @@ export const WithDropPreview: Story = {
           className="bg-white rounded-lg shadow min-h-[400px]"
         >
           {(item) => (
-            <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 p-4 flex items-center justify-center">
+            <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 p-4 flex items-center justify-center overflow-auto">
               <span className="font-semibold">Item {item.id}</span>
             </div>
           )}
@@ -306,7 +306,7 @@ export const WithRemove: Story = {
           className="bg-white rounded-lg shadow min-h-[300px]"
         >
           {(item) => (
-            <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 p-4 relative group">
+            <div className="h-full bg-slate-700 text-slate-100 rounded border border-slate-600 p-4 relative group overflow-auto">
               <button
                 onClick={() => removeItem(item.id)}
                 className="absolute top-2 right-2 w-6 h-6 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
