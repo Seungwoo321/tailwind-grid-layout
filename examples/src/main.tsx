@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { ShowcaseExample } from '../examples/showcase'
+import { ShowcaseExample } from './showcase'
 import './style.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
