@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.2-beta.0](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v0.1.0-beta.2...v1.0.2-beta.0) (2026-02-18)
+
+### Bug Fixes
+
+* sync version with stable release (1.0.1) ([85d4e47](https://github.com/Seungwoo321/tailwind-grid-layout/commit/85d4e474a8ca80d5e7019b8b7057fa19cf610e4d))
+
 ## [0.1.0-beta.2](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v0.1.0-beta.1...v0.1.0-beta.2) (2026-02-18)
 
 ## [0.1.0-beta.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v0.1.0-beta.0...v0.1.0-beta.1) (2026-02-18)
