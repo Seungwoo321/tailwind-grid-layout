@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { GridContainer } from '../GridContainer'
@@ -6,6 +6,14 @@ import { DroppableGridContainer } from '../DroppableGridContainer'
 import type { GridItem } from '../../types'
 
 describe('Achieve Final Coverage', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+  })
   // GridContainer line 186: if (!containerRef.current) return
   it('should handle drag move when container ref is null', () => {
     const items: GridItem[] = [{ id: '1', x: 0, y: 0, w: 2, h: 2 }]

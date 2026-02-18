@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { GridContainer } from '../GridContainer'
@@ -8,6 +8,14 @@ import { DroppableGridContainer } from '../DroppableGridContainer'
 import type { GridItem } from '../../types'
 
 describe('Final 100% Coverage Tests', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+  })
   // GridContainer lines 366-367: Resize with existing currentPixelSize
   it('should use currentPixelSize during resize operations', () => {
     const mockBoundingRect = {

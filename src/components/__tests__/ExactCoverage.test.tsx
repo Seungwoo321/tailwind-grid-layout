@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { GridContainer } from '../GridContainer'
@@ -6,6 +6,14 @@ import { DroppableGridContainer } from '../DroppableGridContainer'
 import type { GridItem } from '../../types'
 
 describe('Exact Coverage Tests', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+  })
   // GridContainer line 186: Early return when containerRef.current is null
   it('should return early from handleDragMove when containerRef is null', () => {
     const items: GridItem[] = [{ id: '1', x: 0, y: 0, w: 2, h: 2 }]

@@ -14,6 +14,7 @@ describe('Uncovered Lines Tests for 100% Coverage', () => {
   })
 
   afterEach(() => {
+    vi.runOnlyPendingTimers()
     vi.useRealTimers()
     vi.restoreAllMocks()
   })
