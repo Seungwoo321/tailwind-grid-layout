@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1-beta.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.1-beta.0...v1.1.1-beta.1) (2026-02-19)
+
+## [1.1.1-beta.0](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.0...v1.1.1-beta.0) (2026-02-19)
+
+### Refactoring
+
+* **styles:** remove [@layer](https://github.com/layer) directives from CSS variables ([38d3625](https://github.com/Seungwoo321/tailwind-grid-layout/commit/38d36254351f435a07ded3f472539558f220a692))
+
 ## [1.1.0](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.0-beta.1...v1.1.0) (2026-02-18)
 
 ## [1.1.0-beta.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.0.2-beta.0...v1.1.0-beta.1) (2026-02-18)
