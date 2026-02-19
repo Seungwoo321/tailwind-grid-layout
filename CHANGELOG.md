@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2-beta.0](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.1...v1.1.2-beta.0) (2026-02-19)
+
+### Documentation
+
+* **storybook:** update story files for v10 compatibility ([4129a3e](https://github.com/Seungwoo321/tailwind-grid-layout/commit/4129a3e2b211bdf24619a404b206e60db0de645d))
+* update demo and storybook URLs ([325c530](https://github.com/Seungwoo321/tailwind-grid-layout/commit/325c530f4e2ac44dafefb48d5423e8eb9768ce2a))
+
 ## [1.1.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.1-beta.1...v1.1.1) (2026-02-19)
 
 ## [1.1.1-beta.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.1-beta.0...v1.1.1-beta.1) (2026-02-19)
