@@ -66,3 +66,4 @@ docs-dist/
 
 # Vitest
 *.timestamp-*
+.playwright-mcp/
