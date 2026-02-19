@@ -1,6 +1,6 @@
 {
   "name": "tailwind-grid-layout",
-  "version": "1.1.1-beta.0",
+  "version": "1.1.1-beta.1",
   "type": "module",
   "description": "A modern, Tailwind CSS-based grid layout system for React. A lightweight alternative to react-grid-layout with full feature parity.",
   "keywords": [
