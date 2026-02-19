@@ -6,7 +6,7 @@ React용 현대적이고 가벼운 그리드 레이아웃 시스템. Tailwind CS
 [![license](https://img.shields.io/npm/l/tailwind-grid-layout.svg)](https://github.com/Seungwoo321/tailwind-grid-layout/blob/main/LICENSE)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/tailwind-grid-layout)](https://bundlephobia.com/package/tailwind-grid-layout)
 
-> [Live Demo](https://seungwoo321.github.io/tailwind-grid-layout/) | [Storybook](https://seungwoo321.github.io/tailwind-grid-layout/storybook)
+> [Live Demo](https://tailwind-grid-layout.pages.dev/) | [Storybook](https://tailwind-grid-layout-storybook.pages.dev/)
 
 > [English](./README.md) | 한국어
 
