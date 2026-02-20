@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.3-beta.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.3-beta.0...v1.1.3-beta.1) (2026-02-20)
+
+### Bug Fixes
+
+* **coverage:** adjust coverage thresholds to 95% ([4223d1f](https://github.com/Seungwoo321/tailwind-grid-layout/commit/4223d1f1883e1de8f0cc17040d281a1126b2469d))
+
+## [1.1.3-beta.0](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.2...v1.1.3-beta.0) (2026-02-20)
+
+### Documentation
+
+* **readme:** update React version requirement ([0be97d2](https://github.com/Seungwoo321/tailwind-grid-layout/commit/0be97d2f766e54a55e6c14c48c20e2d0da29677c))
+
 ## [1.1.2](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.2-beta.1...v1.1.2) (2026-02-20)
 
 ## [1.1.2-beta.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.2-beta.0...v1.1.2-beta.1) (2026-02-20)
