@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.2-beta.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.2-beta.0...v1.1.2-beta.1) (2026-02-20)
+
+### Bug Fixes
+
+* **storybook:** resolve MDX file URL issue in pnpm ([be00898](https://github.com/Seungwoo321/tailwind-grid-layout/commit/be00898a94e6d017c32acfb5c1041e218d9ec003))
+
 ## [1.1.2-beta.0](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.1...v1.1.2-beta.0) (2026-02-19)
 
 ### Documentation
