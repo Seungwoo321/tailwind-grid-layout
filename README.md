@@ -30,7 +30,7 @@ npm install tailwind-grid-layout
 
 ### Requirements
 
-- React 18+
+- React 19+
 - Tailwind CSS 4.x
 
 ## Quick Start

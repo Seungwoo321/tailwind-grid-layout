@@ -30,7 +30,7 @@ npm install tailwind-grid-layout
 
 ### 요구사항
 
-- React 18+
+- React 19+
 - Tailwind CSS 4.x
 
 ## 빠른 시작
