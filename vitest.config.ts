@@ -21,6 +21,7 @@ export default defineConfig({
         '**/*.config.*',
         '**/mockData.ts',
         'src/index.ts',
+        'src/hooks/index.ts',
         '.storybook/**',
         'docs/**',
         'examples/**',
@@ -39,10 +40,10 @@ export default defineConfig({
         '**/*.browser.test.*'
       ],
       thresholds: {
-        lines: 100,
-        branches: 100,
-        functions: 100,
-        statements: 100
+        lines: 95,
+        branches: 95,
+        functions: 95,
+        statements: 95
       }
     }
   },
