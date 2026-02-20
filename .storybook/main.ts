@@ -18,6 +18,18 @@ const config: StorybookConfig = {
     const tailwindcss = await import('@tailwindcss/vite').then(m => m.default)
     config.plugins?.push(tailwindcss())
 
+    // Fix MDX file:// URL resolution issue in Storybook 10 with pnpm
+    config.plugins?.push({
+      name: 'fix-mdx-react-shim',
+      enforce: 'pre',
+      resolveId(source) {
+        if (source.startsWith('file://') && source.includes('mdx-react-shim.js')) {
+          return new URL(source).pathname
+        }
+        return null
+      },
+    })
+
     // Set base path for GitHub Pages deployment
     if (process.env.STORYBOOK_BASE) {
       config.base = process.env.STORYBOOK_BASE
