@@ -1,5 +1,7 @@
 # Changelog
 
+## [1.1.2](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.2-beta.1...v1.1.2) (2026-02-20)
+
 ## [1.1.2-beta.1](https://github.com/Seungwoo321/tailwind-grid-layout/compare/v1.1.2-beta.0...v1.1.2-beta.1) (2026-02-20)
 
 ### Bug Fixes
